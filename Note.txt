@@ -1,0 +1,6 @@
+git init
+git add . 
+git commit -m "ตั้งชื่อ commit"
+git branch (ชื่อ branch ตัวเอง)
+git remote add origin https://github.com/your-username/your-repository.git
+git push -u origin (ชื่อ branch ตัวเอง)

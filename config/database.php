@@ -39,6 +39,25 @@ return [
             ]) : [],
         ],
 
+        'mydb' => [
+            'driver' => 'mysql',
+            'host' => env('MYDB_HOST', '127.0.0.1'),
+            'port' => env('MYDB_PORT', '3306'),
+            'database' => env('MYDB_DATABASE', 'mydb'),
+            'username' => env('MYDB_USERNAME', 'root'),
+            'password' => env('MYDB_PASSWORD', 'root'),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
         'laravel' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),

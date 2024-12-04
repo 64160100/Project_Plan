@@ -11,3 +11,20 @@ docker-compose exec app php artisan migrate
 mkdir -p storage/logs
 touch storage/logs/laravel.log
 tail -f storage/logs/laravel.log
+
+##Failed to fetch models##
+F1 > "Set Log Level" >
+
+php artisan make:controller RegisterController
+php artisan make:model MyModel
+
+composer dump-autoload
+
+กรณีที่สร้างหน้า viwe ใช้ get
+add -> กรณีที่เพิ่มถึงอย่างใช้ add ตามด้วยชื่อไฟล์ ตย. addEmployee
+edit -> กรณีที่แก้ไขถึงอย่างใช้ edit ตามด้วยชื่อไฟล์ ตย. editEmployee
+view -> กรณีที่ดูถึงอย่างใช้ view ตามด้วยชื่อไฟล์ ตย. viewEmployee
+
+กรณีที่เป็น method ใช้ post
+delete -> กรณีที่ลบถึงอย่างใช้ delete ตามด้วยชื่อไฟล์ ตย. deleteEmployee
+update -> กรณีที่อัพเดทถึงอย่างใช้ update ตามด้วยชื่อไฟล์ ตย. updateEmployee

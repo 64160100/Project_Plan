@@ -10,7 +10,7 @@
     @section('content')
     <h1>ข้อมูลพนักงาน</h1>
     <div class="mb-3">
-        <a href="{{ route('employees.create') }}" class="btn btn-success">เพิ่มพนักงาน</a>
+        <!-- <a href="{{ route('account.create') }}" class="btn btn-success">เพิ่มพนักงาน</a> -->
     </div>
     <table class="table table-striped">
         <thead class="table-header">
@@ -30,7 +30,7 @@
                 <td>{{ $employee->Position }}</td>
                 <td>{{ $employee->Department }}</td>
                 <td>
-                    <a href="{{ route('employees.showemployee', $employee->Id_Employee) }}" class="btn btn-primary">
+                    <a href="{{ route('account.showemployee', $employee->Id_Employee) }}" class="btn btn-primary">
                         ดูรายละเอียด
                     </a>
                 </td>

@@ -1,27 +1,13 @@
 <?php
-
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\strategicController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('register', [RegisterController::class, 'register']);
+Route::get('/dashboard', [strategicController::class, 'strategic'])->name('account.strategic');
+Route::get('strategic/{Id_Strategic}/edit', [strategicController::class, 'editStrategic'])->name('strategic.edit');
+Route::put('strategic/{Id_Strategic}', [strategicController::class, 'updateStrategic'])->name('strategic.update');
 
-Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('login', [LoginController::class, 'login']);
-Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-
-Route::get('/employees', [EmployeeController::class, 'employee'])->name('employees.employee');
-Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
-Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
-Route::get('/employees/{id}', [EmployeeController::class, 'showemployee'])->name('employees.showemployee');
-
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware('auth');
+require __DIR__.'/account.php';
+require __DIR__.'/auth.php';

@@ -3,9 +3,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MyModel extends Model
+class EmployeeModel extends Model
 {
-    protected $connection = 'mydb'; // Ensure this matches your database connection name in .env
+    protected $connection = 'mydb';
     protected $table = 'Employee';
     protected $primaryKey = 'Id_Employee';
     protected $fillable = [
@@ -15,4 +15,9 @@ class MyModel extends Model
         'Password',
     ];
     public $timestamps = false;
+
+    public function permissions()
+    {
+        return $this->belongsToMany(PremissionModel::class, 'Users', 'Employee_Id_Employee', 'Premission_Id_Permission');
+    }
 }

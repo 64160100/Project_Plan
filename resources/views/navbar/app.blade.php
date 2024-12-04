@@ -130,13 +130,13 @@
                             <h4 class="text-section">การจัดการระบบ</h4>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="">
+                            <a class="nav-link" href="{{ route('account.user') }}">
                                 <i class='bx bx-group'></i>
                                 <p>จัดการผู้ใช้งาน</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('employees.employee') }}">
+                            <a class="nav-link" href="{{ route('account.employee') }}">
                                 <i class='bx bx-group'></i>
                                 <p>ข้อมูลพนักงาน</p>
                             </a>

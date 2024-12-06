@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\ProjectController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,3 +27,9 @@ Route::get('/employees/{id}', [EmployeeController::class, 'showemployee'])->name
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware('auth');
+
+// project
+Route::get('index', [ProjectController::class, 'index'])->name('Project.index');
+Route::match (['get', 'post'], '/addProject', [ProjectController::class, 'addProject'])->name('addProject');
+// Route::get('showStrategic', [ProjectController::class, 'showStrategic'])->name('Project.FormInsertProject');
+

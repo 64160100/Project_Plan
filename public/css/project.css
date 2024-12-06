@@ -1,0 +1,130 @@
+/* SDG button */
+.btn-add {
+    background-color: initial;
+    background-image: linear-gradient(#7C3AED, #472187 100%);
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 16px;
+    /* font-weight: bold; */
+    text-align: center;
+    height: 40px;
+    width: 120px;
+    line-height: 40px;
+    transition: all .3s cubic-bezier(.05, .03, .35, 1);
+
+    display: inline-block;
+    margin-left: 600px;
+  }
+  .btn-add:hover {
+    opacity: .8;
+  }
+  
+  .btn-edit {
+    background-color: initial;
+    background-image: linear-gradient(#EEE605, #A78B02);
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    /* font-family: sans-serif; */
+    font-size: 16px;
+    /* font-weight: bold; */
+    height: 40px;
+    width: 80px;
+    text-align: center;
+    transition: all .3s cubic-bezier(.05, .03, .35, 1);
+  }
+  .btn-edit:hover {
+    opacity: .8;
+  }
+  
+  .btn-delete {
+    background-color: initial;
+    background-image: linear-gradient(#EF4444, #892727);
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    /* font-family: sans-serif; */
+    font-size: 16px;
+    /* font-weight: bold; */
+    height: 40px;
+    width: 80px;
+    text-align: center;
+    transition: all .3s cubic-bezier(.05, .03, .35, 1);
+  }
+  .btn-delete:hover {
+    opacity: .8;
+  }
+
+  /* Accordion */
+  .accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    transition: 0.4s;
+  }
+  
+  .active, .accordion:hover {
+    background-color: #ccc; 
+  }
+  
+  .panel {
+    padding: 0 18px;
+    display: none;
+    background-color: white;
+    overflow: hidden;
+  }
+
+  .panel.show {
+    display: block;
+  }
+
+
+  
+
+ /* SDG button */
+
+/* @font-face {
+  font-family: "Roboto";
+  src: url('fonts/roboto/Roboto-Regular.eot');
+  src: url('fonts/roboto/Roboto-Regular.eot') format('embedded-opentype'),
+       url('fonts/roboto/Roboto-Regular.woff2') format('woff2'),
+       url('fonts/roboto/Roboto-Regular.woff') format('woff'),
+       url('fonts/roboto/Roboto-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: "noto-sans-thai";
+  src: url('fonts/notosansthai/notosansthai-Regular.eot');
+  src: url('fonts/notosansthai/notosansthai-Regular.eot') format('embedded-opentype'),
+       url('fonts/notosansthai/notosansthai-Regular.woff2') format('woff2'),
+       url('fonts/notosansthai/notosansthai-Regular.woff') format('woff'),
+       url('fonts/notosansthai/notosansthai-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto';
+}
+@font-face {
+  font-family: 'noto-sans-thai';
+  unicode-range: U+0E00–U+0E7F;
+}
+
+h1, h2, h3, h4, h5, h6, a, button, input, b, strong, span, nav, p, body {
+  font-family: 'Roboto', 'noto-sans-thai';
+}  */

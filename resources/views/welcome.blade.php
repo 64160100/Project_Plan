@@ -44,19 +44,9 @@
 
                     <div class="col-lg-6 d-flex flex-column justify-content-center order-lg-last" data-aos="fade-in">
                         <div class='card p-3 custom-bg'>
-                            <h1>ระบบติดตามแผนงาน</h1>
-                            <form method="POST" action="{{ route('login') }}">
-                                @csrf
-                                <label for="email">อีเมล</label>
-                                <input type="email" id="email" class="login" placeholder="กรุณาใส่อีเมล" name="email"
-                                    required>
-
-                                <label for="password" class='mt-2'>รหัสผ่าน</label>
-                                <input type="password" id="password" placeholder="กรุณาใส่รหัสผ่าน" name="password"
-                                    required>
-
-                                <button type="submit" class='btn btn-warning mt-4'>เข้าสู่ระบบ</button>
-                            </form>
+                            <a href="{{ route('login') }}">
+                                <h1>ระบบติดตามแผนงาน</h1>
+                            </a>
                         </div>
                     </div>
 

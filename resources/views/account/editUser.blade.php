@@ -13,81 +13,96 @@
 
     <!-- Form for editing employee information -->
     <div class="form-container">
-        <form action="{{ route('account.updateUser', $employee->Id_Employee) }}" method="POST">
-            @csrf
-            @method('PUT')
+        @csrf
+        @method('PUT')
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="Id_Employee">รหัสพนักงาน:</label>
-                    <input type="text" class="form-control" id="Id_Employee" name="Id_Employee"
-                        value="{{ $employee->Id_Employee }}" disabled>
-                </div>
-                <div class="form-group">
-                    <label for="Name_Employee">ชื่อ-นามสกุล:</label>
-                    <input type="text" class="form-control" id="Name_Employee" name="Name_Employee"
-                        value="{{ $employee->Name_Employee }}" disabled>
-                </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="Id_Employee">รหัสพนักงาน:</label>
+                <input type="text" class="form-control" id="Id_Employee" name="Id_Employee"
+                    value="{{ $employee->Id_Employee }}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="Name_Employee">ชื่อ-นามสกุล:</label>
+                <input type="text" class="form-control" id="Name_Employee" name="Name_Employee"
+                    value="{{ $employee->Name_Employee }}" disabled>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="Position">ตำแหน่ง:</label>
+                <input type="text" class="form-control" id="Position" name="Position" value="{{ $employee->Position }}"
+                    disabled>
+            </div>
+            <div class="form-group">
+                <label for="Department">ฝ่าย:</label>
+                <input type="text" class="form-control" id="Department" name="Department"
+                    value="{{ $employee->Department }}" disabled>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="Email">อีเมล:</label>
+                <input type="email" class="form-control" id="Email" name="Email" value="{{ $employee->Email }}"
+                    disabled>
+            </div>
+            <div class="form-group">
+                <label for="Password">รหัสผ่าน:</label>
+                <input type="password" class="form-control" id="Password" name="Password"
+                    value="{{ $employee->Password }}" disabled>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>สิทธิ์การเข้าถึง:</label>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    @foreach($employee->permissions as $permission)
+                    <div
+                        style="border: 1px solid #ccc; padding: 5px; border-radius: 5px; margin-bottom: 5px; display: inline-block;">
+                        {{ $permission->Name_Promission }}
+                        <form
+                            action="{{ route('account.removePermission', ['Id_Employee' => $employee->Id_Employee, 'Id_Permission' => $permission->Id_Permission]) }}"
+                            method="POST" style="display: inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" style="border: none; background: none; cursor: pointer;">
+                                <i class='bx bx-x'></i>
+                            </button>
+                        </form>
+                    </div>
+                    @endforeach
+                </ul>
+                <form action="{{ route('account.updateUser', ['Id_Employee' => $employee->Id_Employee]) }}"
+                    method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="Id_Employee" value="{{ $employee->Id_Employee }}">
+                    <div class="form-group">
+                        <label for="additionalPermissions">เลือกสิทธิ์เพิ่มเติม</label>
+                        <select id="additionalPermissions" name="Id_Permission" class="form-control">
+                            <option value="">เลือกสิทธิ์เพิ่มเติม</option>
+                            @foreach($unassignedPermissions as $permission)
+                            <option value="{{ $permission->Id_Permission }}">{{ $permission->Name_Promission }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">มอบสิทธิ์</button>
+                </form>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="Position">ตำแหน่ง:</label>
-                    <input type="text" class="form-control" id="Position" name="Position"
-                        value="{{ $employee->Position }}" disabled>
-                </div>
-                <div class="form-group">
-                    <label for="Department">ฝ่าย:</label>
-                    <input type="text" class="form-control" id="Department" name="Department"
-                        value="{{ $employee->Department }}" disabled>
-                </div>
+            <div class="form-group">
+                <label>สิทธิ์ที่ได้รับ:</label>
+                <ul>
+                    @foreach($employee->permissions as $permission)
+                    <div><i class='bx bx-check'></i> {{ $permission->Name_Promission }}</div>
+                    @endforeach
+                </ul>
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="Email">อีเมล:</label>
-                    <input type="email" class="form-control" id="Email" name="Email" value="{{ $employee->Email }}"
-                        disabled>
-                </div>
-                <div class="form-group">
-                    <label for="Password">รหัสผ่าน:</label>
-                    <input type="password" class="form-control" id="Password" name="Password"
-                        value="{{ $employee->Password }}" disabled>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>สิทธิ์การเข้าถึง:</label>
-                    <ul style="list-style-type: none; padding-left: 0;">
-                        @foreach($employee->permissions as $permission)
-                        <div>
-                            {{ $permission->Name_Promission }}
-                            <i class='bx bx-x' style="cursor: pointer;"
-                                onclick="removePermission({{ $permission->id }})"></i>
-                        </div>
-                        @endforeach
-                    </ul>
-                    <select id="additionalPermissions" class="form-control">
-                        <option value="">เลือกสิทธิ์เพิ่มเติม</option>
-                        @foreach($unassignedPermissions as $permission)
-                        <option value="{{ $permission->id }}">{{ $permission->Name_Promission }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>สิทธิ์ที่ได้รับ:</label>
-                    <ul>
-                        @foreach($employee->permissions as $permission)
-                        <div><i class='bx bx-check'></i> {{ $permission->Name_Promission }}</div>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>
-        </form>
+        </div>
     </div>
     @endsection
 </body>

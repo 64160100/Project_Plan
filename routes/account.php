@@ -9,5 +9,5 @@ Route::get('/employees/create', [AccountController::class, 'create'])->name('acc
 
 Route::get('/user', [AccountController::class, 'userAccount'])->name('account.user');
 Route::get('/user/edit/{Id_Employee}', [AccountController::class, 'editUser'])->name('account.editUser');
-Route::delete('/user/{Id_Employee}', [AccountController::class, 'destroyUser'])->name('account.destroyUser');
-Route::put('/user/{Id_Employee}', [AccountController::class, 'updateUser'])->name('account.updateUser');
+Route::put('/user/update/{Id_Employee}', [AccountController::class, 'updateUserPermissions'])->name('account.updateUser');
+Route::delete('/user/delete/{Id_Employee}/{Id_Permission}', [AccountController::class, 'removePermission'])->name('account.removePermission');

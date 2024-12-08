@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmployeeModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\EmployeeModel;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
-class LoginController extends Controller
+class AuthController extends Controller
 {
     public function showLoginForm()
     {
@@ -26,12 +26,10 @@ class LoginController extends Controller
 
             Log::info('Login', ['Employee' => $employee, 'Permissions' => $permissions]);
 
-            session([
+            return redirect()->route('dashboard')->with([
                 'employee' => $employee,
                 'permissions' => $permissions
             ]);
-
-            return redirect()->route('dashboard');
         } else {
             $employeeByEmail = EmployeeModel::where('email', $credentials['email'])->first();
             if ($employeeByEmail) {
@@ -45,7 +43,6 @@ class LoginController extends Controller
             }
         }
     }
-
     public function logout(Request $request)
     {
         Auth::logout();

@@ -18,6 +18,6 @@ class EmployeeModel extends Model
 
     public function permissions()
     {
-        return $this->belongsToMany(PremissionModel::class, 'Users', 'Employee_Id_Employee', 'Premission_Id_Permission');
+        return $this->belongsToMany(PermissionModel::class, 'Users', 'Employee_Id_Employee', 'Premission_Id_Permission');
     }
 }

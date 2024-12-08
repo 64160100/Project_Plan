@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EmployeeModel;
-use App\Models\PremissionModel;
+use App\Models\PermissionModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -42,7 +42,7 @@ class AccountController extends Controller
     public function userAccount()
     {
         $employees = EmployeeModel::with('permissions')->get();
-        $permissions = PremissionModel::with('employees')->get();
+        $permissions = PermissionModel::with('employees')->get();
         
     
         Log::info('Employees and Permissions Data:', [
@@ -56,16 +56,49 @@ class AccountController extends Controller
     public function editUser($Id_Employee)
     {
         $employee = EmployeeModel::with('permissions')->findOrFail($Id_Employee);
-        $allPermissions = PremissionModel::all();
+        $allPermissions = PermissionModel::all();
 
         $assignedPermissionIds = $employee->permissions->pluck('Id_Permission')->toArray();
-        log::info('Unassigned ', ['Permissions' => $assignedPermissionIds]);
 
         $unassignedPermissions = $allPermissions->filter(function ($permission) use ($assignedPermissionIds) {
             return !in_array($permission->Id_Permission, $assignedPermissionIds);
-    });
+        });
 
         return view('account.editUser', compact('employee', 'unassignedPermissions'));
+    }
+
+    public function updateUserPermissions(Request $request, $Id_Employee)
+    {
+        Log::info('Request Data', $request->all());
+
+        if (!$request->has('Id_Permission') || !$request->Id_Permission) {
+            return redirect()->back()->with('error', 'กรุณาเลือกสิทธิ์เพิ่มเติม');
+        }
+
+        $employee = EmployeeModel::findOrFail($request->Id_Employee);
+        $permission = PermissionModel::findOrFail($request->Id_Permission);
+
+        if ($employee->permissions()->where('Premission_Id_Permission', $permission->Id_Permission)->exists()) {
+            return redirect()->back()->with('error', 'พนักงานมีสิทธิ์นี้อยู่แล้ว');
+        }
+
+        // Attach the permission to the employee
+        $employee->permissions()->attach($permission->Id_Permission);
+
+        return redirect()->back()->with('success', 'สิทธิ์ถูกมอบเรียบร้อยแล้ว');
+    }
+
+    public function removePermission($Id_Employee, $Id_Permission)
+    {
+        $employee = EmployeeModel::findOrFail($Id_Employee);
+        $permission = PermissionModel::findOrFail($Id_Permission);
+
+        if ($employee->permissions()->where('Premission_Id_Permission', $permission->Id_Permission)->exists()) {
+            $employee->permissions()->detach($permission->Id_Permission);
+            return redirect()->back()->with('success', 'สิทธิ์ถูกลบเรียบร้อยแล้ว');
+        }
+
+        return redirect()->back()->with('error', 'ไม่สามารถลบสิทธิ์ได้');
     }
 
 }

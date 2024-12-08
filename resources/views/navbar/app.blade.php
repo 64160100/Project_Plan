@@ -221,13 +221,12 @@
                                 <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#"
                                     aria-expanded="false">
                                     <div class="avatar-sm">
-                                        <img src="{{asset('images/profile.jpg')}}" alt="..."
+                                        <img src="{{ asset('images/profile.jpg') }}" alt="..."
                                             class="avatar-img rounded-circle" />
                                     </div>
                                     <span class="profile-username">
-                                        <span class="op-7">Hi,</span>
-                                        <span class="fw-bold">Hizrian</span>
-                                    </span>
+                                        <span class="op-7">Hi,</span>                                  
+                                        <span class="fw-bold">{{ session('employee') ? session('employee')->Name_Employee : 'Guest' }}</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-user animated fadeIn">
                                     <div class="dropdown-user-scroll scrollbar-outer">
@@ -239,11 +238,12 @@
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item" href="#">Account Setting</a>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Logout</a>
+                                            <a class="dropdown-item" href="{{ route('logout') }}">Logout</a>
                                         </li>
                                     </div>
                                 </ul>
                             </li>
+
                         </ul>
                     </div>
                 </nav>

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PremissionModel extends Model
+class PermissionModel extends Model
 {
     protected $connection = 'mydb';
     protected $table = 'Premission';

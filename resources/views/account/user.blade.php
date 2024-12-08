@@ -27,20 +27,18 @@
                 <td>{{ $employee->Id_Employee }}</td>
                 <td>{{ $employee->Name_Employee }}</td>
                 <td>
-                    @foreach($employee->permissions as $permission)
-                    {{ $permission->Name_Promission }}<br>
-                    @endforeach
+                    <div style="display: flex; flex-wrap: nowrap; gap: 10px;">
+                        @foreach($employee->permissions as $permission)
+                        <div style="border: 1px solid purple; padding: 5px; border-radius: 5px;">
+                            {{ $permission->Name_Promission }}
+                        </div>
+                        @endforeach
+                    </div>
                 </td>
                 <td>
-                    <form action="{{ route('employee.editUser', $employee->Id_Employee) }}" method="GET"
+                    <form action="{{ route('account.editUser', $employee->Id_Employee) }}" method="GET"
                         style="display:inline;">
                         <button type="submit" class="btn btn-warning">แก้ไข</button>
-                    </form>
-                    <form action="{{ route('employee.destroy', $employee->Id_Employee) }}" method="POST"
-                        style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">ลบ</button>
                     </form>
                 </td>
             </tr>

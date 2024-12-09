@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\EmployeeModel;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+
 
 class LoginController extends Controller
 {
@@ -24,12 +26,15 @@ class LoginController extends Controller
         if ($employee) {
             $permissions = $employee->permissions;
 
-            Log::info('Login', ['Employee' => $employee, 'Permissions' => $permissions]);
+            $token = Str::random(60);
 
             session([
                 'employee' => $employee,
-                'permissions' => $permissions
+                'permissions' => $permissions,
+                'token' => $token
             ]);
+
+            Log::info('Session Data', session()->all());
 
             return redirect()->route('dashboard');
         } else {

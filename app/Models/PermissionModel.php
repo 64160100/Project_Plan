@@ -11,7 +11,7 @@ class PermissionModel extends Model
     protected $primaryKey = 'Id_Permission';
     protected $fillable = [
         'Id_Permission',
-        'Name_Promission',
+        'Name_Permission',
         'Dashborad',
         'List_Project',
         'Track_Status',

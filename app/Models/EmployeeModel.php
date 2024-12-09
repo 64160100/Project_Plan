@@ -10,7 +10,8 @@ class EmployeeModel extends Model
     protected $primaryKey = 'Id_Employee';
     protected $fillable = [
         'Id_Employee',
-        'Name_Employee',
+        'Firstname_Employee',
+        'Lastname_Employee',
         'Email',
         'Password',
     ];

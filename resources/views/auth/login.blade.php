@@ -47,7 +47,7 @@
                             <a href="{{ route('login') }}" class="text-decoration-none text-dark">
                                 <h1 class="text-center">ระบบติดตามแผนงาน</h1>
                             </a>
-                            <form method="POST" action="{{ route('login') }}">
+                            <form method="POST" action="{{ route('login.submit') }}">
                                 @csrf
                                 <div class="form-group mb-3 position-relative">
                                     <label for="email" class="form-label">อีเมล</label>

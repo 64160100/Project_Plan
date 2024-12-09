@@ -30,7 +30,8 @@ class AccountController extends Controller
     {
         EmployeeModel::create([
         'Id_Employee' => $request->Id_Employee,
-        'Name_Employee' => $request->Name_Employee,
+        'FirstName_Employee' => $request->FirstName_Employee,
+        'Lastname_Employee' => $request->Lastname_Employee,
         'Email' => $request->Email,
         'Password' => $request->Password,
     ]);
@@ -82,7 +83,6 @@ class AccountController extends Controller
             return redirect()->back()->with('error', 'พนักงานมีสิทธิ์นี้อยู่แล้ว');
         }
 
-        // Attach the permission to the employee
         $employee->permissions()->attach($permission->Id_Permission);
 
         return redirect()->back()->with('success', 'สิทธิ์ถูกมอบเรียบร้อยแล้ว');

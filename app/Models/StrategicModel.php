@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\StrategyModel;
+
 
 class StrategicModel extends Model
 {
@@ -15,4 +17,10 @@ class StrategicModel extends Model
         'Goals_Strategic',
     ];
     public $timestamps = false;
+
+    public function strategies()
+    {
+        return $this->hasMany(StrategyModel::class, 'Strategic_Id', 'Id_Strategic');
+    }
+
 }

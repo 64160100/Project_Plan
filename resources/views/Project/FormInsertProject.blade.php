@@ -5,47 +5,49 @@
 <head>
     <title>FormInsertProject</title>
     <link rel="stylesheet" href="{{ asset('css/project.css') }}">
+    <script src="{{ asset('js/addField.js') }}" defer></script>
+    <script src="{{ asset('js/radioButton.js') }}" defer></script>
+    <script src="{{ asset('js/toggleDropdown.js') }}" defer></script>
+    <script src="{{ asset('js/filterSearch.js') }}" defer></script>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
 </head>
 <body>
     @section('content')
-        <h3 class="card-header">กรอกข้อมูลโครงการใหม่</h3>
-        <form id="formAuthentication" class="mb-3" action="{{ route('addProject') }}" medthod="POST">
-    
-            <div class="mb-3">
-            @csrf
-                <label for="formGroupExampleInput" class="form-label">ชื่อโครงการ</label>
-                <input type="text" class="form-control" id="formGroupExampleInput" placeholder="กรอกชื่อโครงการ" fdprocessedid="2hlulq">
+    <h3 class="card-header">กรอกข้อมูลโครงการใหม่</h3><br>
+    <form id="formAuthentication" class="mb-3" action="{{ route('addProject') }}" method="POST">
+     @csrf   
+        <!-- ชื่อโครงการ -->
+        <details class="accordion">
+            <summary class="accordion-btn"><b>ชื่อโครงการ</b></summary>
+            <div class="accordion-content">
+                <div class="mb-3">
+                    @include('Project.App.ProjectName')
+                </div>
             </div>
-
-            <!-- resources/views/Project/FormInsertProject.blade.php -->
-            <div class="mb-3 col-md-6">
-                <label for="Id_Strategic" class="form-label">เลือกยุทธศาสตร์</label>
-                <select 
-                    class="form-select @error('Id_Strategic') is-invalid @enderror" 
-                    id="Id_Strategic"
-                    name="Id_Strategic"
-                    required>
-                    
-                    <!-- Option แรกสำหรับเลือก -->
-                    <option select>เลือกยุทธศาสตร์</option>
-
-                    <!-- แสดงข้อมูลจากฐานข้อมูล -->
-                    @foreach($strategic['Strategic'] as $Strategic)
-                        <option value="{{ $Strategic->Id_Strategic }}"
-                            {{ old('Id_Strategic') == $Strategic->Id_Strategic ? 'selected' : '' }}>
-                            {{ $Strategic->Name_Strategic_Plan }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('Id_Strategic')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <br><button type="submit" class="btn btn-primary me-2">บันทึก</button>
-        </form>
-
+        </details>
+        <!-- endชื่อโครงการ -->
         
+        
+        <!-- ความสอดคล้องส่วนงาน -->
+        <details class="accordion">
+            <summary class="accordion-btn"><b>ความสอดคล้องกับยุทธศาสตร์ส่วนงาน</b></summary>
+            <div class="accordion-content">
+                @include('Project.App.Strategic_Strategy')
+            </div>
+        </details>
+        <!-- end ความสอดคล้องยุทศาสตร์ -->
+
+        <div>
+            <button type="submit" class="btn btn-primary me-2">บันทึก</button> 
+        </div>
+    </form> 
     @endsection
 </body>
 </html>

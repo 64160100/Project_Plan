@@ -19,11 +19,13 @@ class Strategic extends Model
     ];
     public $timestamps = false;
 
-    // ความสัมพันธ์ที่ Strategic มีหลายโปรเจค
+    // Strategic มีหลายโปรเจค
     public function projects()
     {
-        return $this->hasMany(Project::class, 'Strategic_Id');
+        // return $this->hasMany(Project::class, 'Strategic_Id');
+        return $this->hasMany(Project::class, 'Strategic_Id', 'Id_Strategic');
     }
+
     
     //เพิ่มโครงการ
     public static function SelectFormStrategic(){

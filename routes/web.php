@@ -5,6 +5,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\StrategicController;
 
 
 Route::get('/', function () {
@@ -29,7 +30,17 @@ Route::get('/dashboard', function () {
 })->middleware('auth');
 
 // project
-Route::get('index', [ProjectController::class, 'index'])->name('Project.index');
-Route::match (['get', 'post'], '/addProject', [ProjectController::class, 'addProject'])->name('addProject');
-// Route::get('showStrategic', [ProjectController::class, 'showStrategic'])->name('Project.FormInsertProject');
+Route::get('index', [ProjectController::class, 'index'])->name('index');
+
+Route::get('/addProject', [ProjectController::class, 'addProject'])->name('addProject');
+Route::post('/addProject', [ProjectController::class, 'addProject'])->name('addProject');
+
+
+// Route::match (['get', 'post'], '/addProject', [ProjectController::class, 'addProject'])->name('addProject');
+Route::get('/viewProjectInStrategic/{Id_Strategic}', [ProjectController::class, 'viewProjectInStrategic'])->name('viewProjectInStrategic');
+Route::get('/viewProject/{Id_Project}', [ProjectController::class, 'viewProject'])->name('viewProject');
+
+
+
+
 

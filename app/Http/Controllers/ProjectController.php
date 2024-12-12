@@ -9,51 +9,93 @@ use Illuminate\Support\Facades\DB;
 
 class ProjectController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $strategic = Strategic::all();
+        $strategics  = Strategic::all();
 
-        $strategic = Strategic::with('projects')->get();
+        $strategics  = Strategic::with('projects')->get();
 
-        return view('Project.index', compact('strategic')); 
-
+        return view('Project.index', compact('strategics')); 
     }
 
-    
-   
+
+    public function viewProjectInStrategic($Id_Strategic)
+    {
+        $strategics = Strategic::findOrFail($Id_Strategic);
+        $strategics = Strategic::where('Id_Strategic', $Id_Strategic)->firstOrFail();
+
+        $strategics = Strategic::with('projects')
+                        ->where('Id_Strategic', $Id_Strategic)
+                        ->firstOrFail();
+        
+        if ($Id_Strategic == 1) {
+            return view('Project.ViewProjectInStrategic',
+            [
+                'strategics' => $strategics,
+            ]);
+        } elseif ($Id_Strategic == 2) {
+            return view('Project.ViewProjectInStrategic', 
+            [
+                'strategics' => $strategics,
+            ]);
+        } elseif ($Id_Strategic == 3) {
+            return view('Project.ViewProjectInStrategic', 
+            [
+                'strategics' => $strategics,
+            ]);
+        } elseif ($Id_Strategic == 4) {
+            return view('Project.ViewProjectInStrategic', 
+            [
+                'strategics' => $strategics,
+            ]);
+        } else {
+            abort(404, 'not found.'); // กรณีที่ Id_Strategic ไม่ตรง
+        }
+    }
+
+
+    public function viewProject($Id_Project)  // รับพารามิเตอร์ id จาก URL
+    {
+        // $projects = Project::findOrFail($Id_Project);
+        $projects = Project::with('strategic')->findOrFail($Id_Project); // ดึงข้อมูลโครงการและยุทธศาสตร์ที่เกี่ยวข้อง
+
+        // $strategics = Strategic::with('projects')->get();
+
+        return view('Project.ViewProject', [
+            'projects' => $projects,
+            // 'strategics' => $strategics,
+        ]);
+    }
+
+
+
     public function addProject(Request $request)
     {
+
         if($request->isMethod('post')) {
-            // ตรวจสอบความถูกต้องของข้อมูล
+            dd($request->all());
             $validatedData = $request->validate([
                 'Name_Project' => 'required|string|max:255',
-                'Strategic_Id' => 'required|integer|exists:strategics,id',
+                'Strategic_Id' => 'required|exists:strategics,Id_Strategic', // ตรวจสอบว่า Id_Strategic มีอยู่ในฐานข้อมูล
             ]);
+
+            Project::create([
+                // 'Id_Project' => $request->Id_Project,
+                'Strategic_Id' => $request->Strategic_Id,
+                'Name_Project' => $request->Name_Project,
+            ]);
+        
+            return redirect('/viewProjectInStrategic');   
     
-            // บันทึกข้อมูลลงในฐานข้อมูล
-            $project = new Project();
-            $project->Name_Project = $request->Name_Project;
-            $project->Strategic_Id = $request->Id_Strategic;
-            $project->save();
-    
-            return redirect('/index');
         }
-    
-        // ดึงข้อมูลยุทธศาสตร์
-        $strategic['Strategic'] = Strategic::SelectFormStrategic();
-        return view('Project.FormInsertProject', ['strategic' => $strategic]);
+
+        $strategics = Strategic::all();
+        $strategics['Strategic'] = Strategic::SelectFormStrategic();
+
+        return view('Project.FormInsertProject', ['strategics' => $strategics]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    
 
     /**
      * Display the specified resource.
@@ -79,11 +121,5 @@ class ProjectController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    
 }

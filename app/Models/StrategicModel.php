@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\StrategyModel;
 
-
 class StrategicModel extends Model
 {
-    protected $connection = 'mydb';
-    protected $table = 'Strategic';
+    protected $connection = 'mydb'; 
+    protected $table = 'Strategic'; 
     protected $primaryKey = 'Id_Strategic';
+    protected $keyType = 'int';
     protected $fillable = [
         'Id_Strategic',
         'Name_Strategic_Plan',
@@ -22,5 +22,4 @@ class StrategicModel extends Model
     {
         return $this->hasMany(StrategyModel::class, 'Strategic_Id', 'Id_Strategic');
     }
-
 }

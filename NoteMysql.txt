@@ -1,0 +1,5 @@
+ALTER TABLE Strategic_Opportunity_Details AUTO_INCREMENT = 1;
+
+ALTER TABLE Strategic_Challenges AUTO_INCREMENT = 1;
+
+ALTER TABLE Strategic_Advantages AUTO_INCREMENT = 1;

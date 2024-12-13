@@ -1,7 +1,7 @@
 <?php
 use App\Http\Controllers\StrategicController;
 use App\Http\Controllers\StrategyController;
-
+use App\Http\Controllers\StrategicAnalysisController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -22,3 +22,8 @@ Route::delete('/strategic/{Id_Strategic}', [StrategicController::class, 'deleteS
 Route::get('/strategy/{Id_Strategic}',[StrategyController::class, 'index'])->name('strategy.index');
 Route::post('/AddStrategy', [StrategyController::class, 'addStrategy'])->name('strategy.add');
 // Route::post('/strategic/{Id_Strategic}/strategy/add', [StrategyController::class, 'addStrategy'])->name('strategy.add');
+
+
+Route::post('/strategic-analysis/add', [StrategicAnalysisController::class, 'addDetail'])->name('StrategicAnalysis.addDetail');
+Route::put('/strategic-analysis/update-detail/{type}/{id}', [StrategicAnalysisController::class, 'updateDetail'])->name('StrategicAnalysis.updateDetail');
+Route::delete('/StrategicAnalysis/delete-detail/{type}/{id}', [StrategicAnalysisController::class, 'destroyDetail'])->name('StrategicAnalysis.destroyDetail');

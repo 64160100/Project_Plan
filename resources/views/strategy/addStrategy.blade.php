@@ -21,7 +21,7 @@
                     <input type="hidden" name="Strategic_Id" value="{{ $strategic->Id_Strategic }}">
                     <div class="mb-3">
                         <label for="Name_Strategy" class="form-label">ชื่อกลยุทธ์</label>
-                        <input type="text" class="form-control" id="Name_Strategy" name="Name_Strategy" placeholder="กรอกชื่อกลยุทธ์" required>
+                        <input type="text" class="form-control" id="Name_Strategy" name="Name_Strategy" placeholder="กรอกชื่อกลยุทธ์" >
                     </div>
                     <div class="mb-3">
                         <label for="Strategy_Objectives	" class="form-label">วัตถุประสงค์เชิงกลยุทธ์(Strategic Objectives)</label>
@@ -35,7 +35,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="Target_Value" class="form-label">ค่าเป้าหมาย</label>
-                        <input type="text" class="form-control" id="Target_Value" name="Target_Value" placeholder="กรอกค่าเป้าหมาย" required>
+                        <input type="text" class="form-control" id="Target_Value" name="Target_Value" placeholder="กรอกค่าเป้าหมาย" >
                     </div>
                     
                 </div>

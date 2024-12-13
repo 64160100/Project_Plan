@@ -20,6 +20,7 @@ php artisan make:model MyModel
 
 composer dump-autoload
 
+
 กรณีที่สร้างหน้า viwe ใช้ get
 add -> กรณีที่เพิ่มถึงอย่างใช้ add ตามด้วยชื่อไฟล์ ตย. addEmployee
 edit -> กรณีที่แก้ไขถึงอย่างใช้ edit ตามด้วยชื่อไฟล์ ตย. editEmployee

@@ -5,7 +5,7 @@
 @section('content')
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
-            <h1>แผนยุทธศาสตร์</h1>
+            <!-- <h1>แผนยุทธศาสตร์</h1> -->
             <a href="#" class='btn-add' data-bs-toggle="modal" data-bs-target="#ModalAddStrategic">เพิ่มข้อมูล</a>
         </div>        
         @foreach ( $strategic as $Strategic )

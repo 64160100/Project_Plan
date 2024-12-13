@@ -10,7 +10,6 @@
     <script src="{{ asset('js/toggleDropdown.js') }}" defer></script>
     <script src="{{ asset('js/filterSearch.js') }}" defer></script>
 
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
@@ -21,33 +20,33 @@
 <body>
     @section('content')
     <h3 class="card-header">กรอกข้อมูลโครงการใหม่</h3><br>
-    <form id="formAuthentication" class="mb-3" action="{{ route('addProject') }}" method="POST">
-     @csrf   
-        <!-- ชื่อโครงการ -->
-        <details class="accordion">
-            <summary class="accordion-btn"><b>ชื่อโครงการ</b></summary>
-            <div class="accordion-content">
-                <div class="mb-3">
-                    @include('Project.App.ProjectName')
+    <form action="{{ route('Project.createProject') }}" method="POST">
+            @csrf 
+            <!-- ชื่อโครงการ -->
+            <details class="accordion">
+                <summary class="accordion-btn"><b>ชื่อโครงการ</b></summary>
+                <div class="accordion-content">
+                    <div class="mb-3">
+                        @include('Project.App.ProjectName')
+                    </div>
                 </div>
-            </div>
-        </details>
-        <!-- endชื่อโครงการ -->
+            </details>
+            <!-- endชื่อโครงการ -->
+            
+            
+            <!-- ความสอดคล้องส่วนงาน -->
+            <details class="accordion">
+                <summary class="accordion-btn"><b>ความสอดคล้องกับยุทธศาสตร์ส่วนงาน</b></summary>
+                <div class="accordion-content">
+                    @include('Project.App.Strategic_Strategy')
+                </div>
+            </details>
+            <!-- end ความสอดคล้องยุทศาสตร์ -->
         
-        
-        <!-- ความสอดคล้องส่วนงาน -->
-        <details class="accordion">
-            <summary class="accordion-btn"><b>ความสอดคล้องกับยุทธศาสตร์ส่วนงาน</b></summary>
-            <div class="accordion-content">
-                @include('Project.App.Strategic_Strategy')
-            </div>
-        </details>
-        <!-- end ความสอดคล้องยุทศาสตร์ -->
-
-        <div>
-            <button type="submit" class="btn btn-primary me-2">บันทึก</button> 
-        </div>
+        <button type="submit" class="btn btn-primary">บันทึก</button>
     </form> 
+        
+
     @endsection
 </body>
 </html>

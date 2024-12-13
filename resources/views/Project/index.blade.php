@@ -12,12 +12,14 @@
 <body>
 @section('content')
   <h3 class="head-project"><b>รายการโครงการ ปีงบประมาณ พ.ศ. 2567</b>
-    <form action="{{ route('addProject') }}" method="get" style="display: inline;">
-      <a href="{{ route('addProject') }}" class="btn-add">
+    <form action="{{ route('createProject') }}" style="display: inline;">
+      <a href="{{ route('createProject') }}" class="btn-add">
         <i class='bx bx-plus'></i>เพิ่มข้อมูล
       </a>
     </form>
   </h3>
+
+
   @foreach ( $strategics as $Strategic )
   <details class="accordion">
     <summary class="accordion-btn">
@@ -36,14 +38,15 @@
               @endforeach
           @endif
         <!-- </p> -->
-        
-
     </div>
   </details>
   @endforeach
-
-
 @endsection
+
+
+
+
+
 
 
 

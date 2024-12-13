@@ -11,7 +11,7 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $strategics  = Strategic::all();
+        // $strategics  = Strategic::all();
 
         $strategics  = Strategic::with('projects')->get();
 
@@ -21,13 +21,15 @@ class ProjectController extends Controller
 
     public function viewProjectInStrategic($Id_Strategic)
     {
-        $strategics = Strategic::findOrFail($Id_Strategic);
-        $strategics = Strategic::where('Id_Strategic', $Id_Strategic)->firstOrFail();
+        $strategics = Strategic::findOrFail($Id_Strategic); //ค้นหาโดย Primary Key 
+        $strategics = Strategic::where('Id_Strategic', $Id_Strategic)->firstOrFail(); //ค้นหา Id_Strategic ใน Strategic
 
         $strategics = Strategic::with('projects')
                         ->where('Id_Strategic', $Id_Strategic)
                         ->firstOrFail();
-        
+
+        $strategics = Strategic::with('projects')->findOrFail($Id_Strategic);
+
         if ($Id_Strategic == 1) {
             return view('Project.ViewProjectInStrategic',
             [
@@ -49,17 +51,19 @@ class ProjectController extends Controller
                 'strategics' => $strategics,
             ]);
         } else {
-            abort(404, 'not found.'); // กรณีที่ Id_Strategic ไม่ตรง
+            abort(404, 'not found.');
         }
+
+        return view('Project.viewProjectInStrategic', [
+            'strategics' => $strategics,
+            // 'projects' => $strategic->projects, // ดึง Projects ที่สัมพันธ์กับ Strategic
+        ]);
     }
 
 
     public function viewProject($Id_Project)  // รับพารามิเตอร์ id จาก URL
     {
-        // $projects = Project::findOrFail($Id_Project);
         $projects = Project::with('strategic')->findOrFail($Id_Project); // ดึงข้อมูลโครงการและยุทธศาสตร์ที่เกี่ยวข้อง
-
-        // $strategics = Strategic::with('projects')->get();
 
         return view('Project.ViewProject', [
             'projects' => $projects,
@@ -67,59 +71,24 @@ class ProjectController extends Controller
         ]);
     }
 
+    // public function addProject()
+    // {
+    //     $strategics['Strategic'] = Strategic::SelectFormStrategic();
+    //     return view('Project.FormInsertProject', ['strategics' => $strategics]);            
+    // }
 
-
-    public function addProject(Request $request)
+    public function createProject(Request $request)
     {
+        $Project = new Project;
+        $Project->Strategic_Id = $request->Strategic_Id;
+        $Project->Name_Project = $request->Name_Project;
+        $Project->save();
 
-        if($request->isMethod('post')) {
-            dd($request->all());
-            $validatedData = $request->validate([
-                'Name_Project' => 'required|string|max:255',
-                'Strategic_Id' => 'required|exists:strategics,Id_Strategic', // ตรวจสอบว่า Id_Strategic มีอยู่ในฐานข้อมูล
-            ]);
-
-            Project::create([
-                // 'Id_Project' => $request->Id_Project,
-                'Strategic_Id' => $request->Strategic_Id,
-                'Name_Project' => $request->Name_Project,
-            ]);
-        
-            return redirect('/viewProjectInStrategic');   
-    
-        }
-
-        $strategics = Strategic::all();
-        $strategics['Strategic'] = Strategic::SelectFormStrategic();
-
-        return view('Project.FormInsertProject', ['strategics' => $strategics]);
+        return redirect()->route('index')->with('success', 'Project created successfully.');
     }
 
-    
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
 
     
 }

@@ -25,9 +25,6 @@
             </summary>
         </details>
     @endforeach
-    
-
-
 
 @endsection
 

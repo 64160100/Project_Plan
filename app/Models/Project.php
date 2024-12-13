@@ -11,10 +11,10 @@ class Project extends Model
     protected $connection = 'mydb';
     protected $table = 'Project';
     protected $primaryKey = 'Id_Project';
+    protected $keyType = 'int';
 
     protected $fillable = [
-        'Id_Project',
-        'Strategic_Id ',
+        'Strategic_Id',
         'Name_Project',
     ];
     public $timestamps = false;

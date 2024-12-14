@@ -20,7 +20,7 @@
 <body>
     @section('content')
     <h3 class="card-header">กรอกข้อมูลโครงการใหม่</h3><br>
-    <form action="{{ route('Project.createProject') }}" method="POST">
+    <form action="{{ route('createProject') }}" method="POST">
             @csrf 
             <!-- ชื่อโครงการ -->
             <details class="accordion">
@@ -28,7 +28,9 @@
                 <div class="accordion-content">
                     <div class="mb-3">
                         @include('Project.App.ProjectName')
+                    
                     </div>
+
                 </div>
             </details>
             <!-- endชื่อโครงการ -->
@@ -39,6 +41,8 @@
                 <summary class="accordion-btn"><b>ความสอดคล้องกับยุทธศาสตร์ส่วนงาน</b></summary>
                 <div class="accordion-content">
                     @include('Project.App.Strategic_Strategy')
+                    
+
                 </div>
             </details>
             <!-- end ความสอดคล้องยุทศาสตร์ -->

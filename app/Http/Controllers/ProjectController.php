@@ -11,7 +11,6 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        // $strategics  = Strategic::all();
 
         $strategics  = Strategic::with('projects')->get();
 
@@ -71,24 +70,22 @@ class ProjectController extends Controller
         ]);
     }
 
-    // public function addProject()
-    // {
-    //     $strategics['Strategic'] = Strategic::SelectFormStrategic();
-    //     return view('Project.FormInsertProject', ['strategics' => $strategics]);            
-    // }
+    public function showCreateForm()
+    {
+        $strategics = Strategic::with('projects')->get();
+        return view('Project.FormInsertProject', compact('strategics'));
+    }
 
     public function createProject(Request $request)
     {
+
         $Project = new Project;
         $Project->Strategic_Id = $request->Strategic_Id;
         $Project->Name_Project = $request->Name_Project;
         $Project->save();
 
-        return redirect()->route('index')->with('success', 'Project created successfully.');
+        return redirect()->route('index')->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
+
     }
-
-
-
-
-    
+ 
 }

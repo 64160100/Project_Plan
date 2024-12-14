@@ -12,8 +12,8 @@
 <body>
 @section('content')
   <h3 class="head-project"><b>รายการโครงการ ปีงบประมาณ พ.ศ. 2567</b>
-    <form action="{{ route('createProject') }}" style="display: inline;">
-      <a href="{{ route('createProject') }}" class="btn-add">
+    <form action="{{ route('showCreateForm') }}" style="display: inline;">
+      <a href="{{ route('showCreateForm') }}" class="btn-add">
         <i class='bx bx-plus'></i>เพิ่มข้อมูล
       </a>
     </form>
@@ -21,10 +21,11 @@
 
 
   @foreach ( $strategics as $Strategic )
-  <details class="accordion">
+  <details class="accordion" id="{{ $Strategic->Id_Strategic }}">
     <summary class="accordion-btn">
     <b><a href="{{ route('viewProjectInStrategic', ['Id_Strategic' => $Strategic->Id_Strategic]) }}">
-        {{ $Strategic->Name_Strategic_Plan }}</a></b>
+        {{ $Strategic->Name_Strategic_Plan }}</a></b> 
+        
 
     </summary>
     <div class="accordion-content">
@@ -42,12 +43,6 @@
   </details>
   @endforeach
 @endsection
-
-
-
-
-
-
 
 
 </body>

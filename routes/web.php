@@ -30,14 +30,11 @@ Route::get('/dashboard', function () {
 })->middleware('auth');
 
 // project
-Route::get('/index', [ProjectController::class, 'index'])->name('index');
+Route::get('index', [ProjectController::class, 'index'])->name('index');
 
 // Route::get('/addProject', [ProjectController::class, 'addProject'])->name('addProject');
-// Route::get('/createProject', [ProjectController::class, 'createProject'])->name('createProject');
+Route::get('/createProject', [ProjectController::class, 'showCreateForm'])->name('showCreateForm');
 Route::post('/createProject', [ProjectController::class, 'createProject'])->name('createProject');
-// Route::post('/addProjectStore', [ProjectController::class, 'addProjectStore'])->name('addProjectStore');
-
-
 
 
 //แสดงหน้า Strategic

@@ -11,7 +11,7 @@ class Project extends Model
     protected $connection = 'mydb';
     protected $table = 'Project';
     protected $primaryKey = 'Id_Project';
-    protected $keyType = 'int';
+    // protected $keyType = 'int';
 
     protected $fillable = [
         'Strategic_Id',
@@ -22,7 +22,7 @@ class Project extends Model
     // ความสัมพันธ์ที่ Project belongs to Strategic
     public function strategic()
     {
-        return $this->belongsTo(Strategic::class, 'Strategic_Id');
+        return $this->belongsTo(Strategic::class, 'Strategic_Id', 'Id_Strategic');
     }
     
 }

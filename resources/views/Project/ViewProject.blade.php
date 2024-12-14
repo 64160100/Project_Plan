@@ -11,8 +11,8 @@
 @section('content')
     <h2>
         <b>{{ $projects->Name_Project }}</b>
-        <form action="{{ route('addProject') }}" method="get" style="display: inline;">
-            <a href="{{ route('addProject') }}" class="btn-add">
+        <form action="" method="get" style="display: inline;">
+            <a href="" class="btn-add">
                 <i class='bx bx-edit'></i>แก้ไข
             </a>
         </form>

@@ -22,10 +22,11 @@
                 <input type="text" class="form-control" id="Id_Employee" name="Id_Employee"
                     value="{{ $employee->Id_Employee }}" disabled>
             </div>
+
             <div class="form-group">
-                <label for="Name_Employee">ชื่อ-นามสกุล:</label>
-                <input type="text" class="form-control" id="Name_Employee" name="Name_Employee"
-                    value="{{ $employee->Name_Employee }}" disabled>
+                <label for="Fullname_Employee">ชื่อ-นามสกุล:</label>
+                <input type="text" class="form-control" id="Fullname_Employee" name="Fullname_Employee"
+                    value="{{ $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee }}" disabled>
             </div>
         </div>
 
@@ -62,7 +63,7 @@
                     @foreach($employee->permissions as $permission)
                     <div
                         style="border: 1px solid #ccc; padding: 5px; border-radius: 5px; margin-bottom: 5px; display: inline-block;">
-                        {{ $permission->Name_Promission }}
+                        {{ $permission->Name_Permission }}
                         <form
                             action="{{ route('account.removePermission', ['Id_Employee' => $employee->Id_Employee, 'Id_Permission' => $permission->Id_Permission]) }}"
                             method="POST" style="display: inline;">
@@ -85,7 +86,7 @@
                         <select id="additionalPermissions" name="Id_Permission" class="form-control">
                             <option value="">เลือกสิทธิ์เพิ่มเติม</option>
                             @foreach($unassignedPermissions as $permission)
-                            <option value="{{ $permission->Id_Permission }}">{{ $permission->Name_Promission }}
+                            <option value="{{ $permission->Id_Permission }}">{{ $permission->Name_Permission }}
                             </option>
                             @endforeach
                         </select>
@@ -98,7 +99,7 @@
                 <label>สิทธิ์ที่ได้รับ:</label>
                 <ul>
                     @foreach($employee->permissions as $permission)
-                    <div><i class='bx bx-check'></i> {{ $permission->Name_Promission }}</div>
+                    <div><i class='bx bx-check'></i> {{ $permission->Name_Permission }}</div>
                     @endforeach
                 </ul>
             </div>

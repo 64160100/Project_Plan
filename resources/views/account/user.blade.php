@@ -16,7 +16,8 @@
         <thead class="table-header">
             <tr>
                 <th>รหัสพนักงาน</th>
-                <th>ชื่อ-นามสกุล</th>
+                <th>ชื่อ</th>
+                <th>นามสกุล</th>
                 <th>สิทธิ์การเข้าถึง</th>
                 <th>การจัดการ</th>
             </tr>
@@ -25,12 +26,13 @@
             @foreach($employees as $employee)
             <tr>
                 <td>{{ $employee->Id_Employee }}</td>
-                <td>{{ $employee->Name_Employee }}</td>
+                <td>{{ $employee->Firstname_Employee }}</td>
+                <td>{{ $employee->Lastname_Employee }}</td>
                 <td>
                     <div style="display: flex; flex-wrap: nowrap; gap: 10px;">
                         @foreach($employee->permissions as $permission)
                         <div style="border: 1px solid purple; padding: 5px; border-radius: 5px;">
-                            {{ $permission->Name_Promission }}
+                            {{ $permission->Name_Permission }}
                         </div>
                         @endforeach
                     </div>

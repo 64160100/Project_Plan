@@ -5,8 +5,12 @@ git branch (ชื่อ branch ตัวเอง)
 git remote add origin https://github.com/your-username/your-repository.git
 git push -u origin (ชื่อ branch ตัวเอง)
 
+git checkout ชื่อ branch
+
 docker-compose exec app php artisan config:cac
 docker-compose exec app php artisan migrate
+
+git push --force origin main
 
 mkdir -p storage/logs
 touch storage/logs/laravel.log

@@ -9,16 +9,22 @@ use Illuminate\Support\Facades\Log;
 
 class AccountController extends Controller
 {
-    public function employee()
+    public function employee(Request $request)
     {
+        $employee = $request->session()->get('employee');
+        $permissions = $request->session()->get('permissions');
+    
         $employees = EmployeeModel::all();
-        return view('account.employee', compact('employees'));
+    
+        return view('account.employee', compact('employees'), ['employee' => $employee, 'permissions' => $permissions]);
     }
 
-    public function showemployee($Id_Employee)
+    public function showEmployees()
     {
-        $employee = EmployeeModel::findOrFail($Id_Employee);
-        return view('account.showEmployee', compact('employee'));
+        $employees = EmployeeModel::all();
+        $permissions = PermissionModel::all(); // Assuming you have a PermissionModel
+    
+        return view('account.employee', compact('employees', 'permissions'));
     }
 
     public function create()
@@ -30,7 +36,8 @@ class AccountController extends Controller
     {
         EmployeeModel::create([
         'Id_Employee' => $request->Id_Employee,
-        'Name_Employee' => $request->Name_Employee,
+        'Firstname_Employee' => $request->Firstname_Employee,
+        'Lastname_Employee' => $request->Lastname_Employee,
         'Email' => $request->Email,
         'Password' => $request->Password,
     ]);

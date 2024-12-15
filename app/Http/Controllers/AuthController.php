@@ -24,12 +24,12 @@ class AuthController extends Controller
         if ($employee) {
             $permissions = $employee->permissions;
 
-            Log::info('Login', ['Employee' => $employee, 'Permissions' => $permissions]);
-
-            return redirect()->route('dashboard')->with([
+            session([
                 'employee' => $employee,
                 'permissions' => $permissions
             ]);
+
+            return redirect()->route('dashboard');
         } else {
             $employeeByEmail = EmployeeModel::where('email', $credentials['email'])->first();
             if ($employeeByEmail) {
@@ -43,6 +43,7 @@ class AuthController extends Controller
             }
         }
     }
+
     public function logout(Request $request)
     {
         Auth::logout();

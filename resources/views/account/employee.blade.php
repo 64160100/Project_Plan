@@ -1,6 +1,7 @@
 @extends('navbar.app')
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Employees</title>
     <link rel="stylesheet" href="{{ asset('css/employee.css') }}">
@@ -8,6 +9,7 @@
 
 <body>
     @section('content')
+    @foreach ($permissions as $permission)
     <h1>ข้อมูลพนักงาน</h1>
     <div class="mb-3">
         <!-- <a href="{{ route('account.create') }}" class="btn btn-success">เพิ่มพนักงาน</a> -->
@@ -16,7 +18,8 @@
         <thead class="table-header">
             <tr>
                 <th>รหัสพนักงาน</th>
-                <th>ชื่อ-นามสกุล</th>
+                <th>ชื่อ</th>
+                <th>นามสกุล</th>
                 <th>ตำแหน่ง</th>
                 <th>ฝ่าย</th>
                 <th>การจัดการ</th>
@@ -26,7 +29,8 @@
             @foreach ($employees as $employee)
             <tr>
                 <td>{{ $employee->Id_Employee }}</td>
-                <td>{{ $employee->Name_Employee }}</td>
+                <td>{{ $employee->Firstname_Employee }}</td>
+                <td>{{ $employee->Lastname_Employee }}</td>
                 <td>{{ $employee->Position }}</td>
                 <td>{{ $employee->Department }}</td>
                 <td>
@@ -39,5 +43,8 @@
         </tbody>
     </table>
     @endsection
+    @endforeach
+
 </body>
+
 </html>

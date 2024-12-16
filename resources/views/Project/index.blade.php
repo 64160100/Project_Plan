@@ -11,13 +11,18 @@
 </head>
 <body>
 @section('content')
-  <h3 class="head-project"><b>รายการโครงการ ปีงบประมาณ พ.ศ. 2567</b>
-    <form action="{{ route('showCreateForm') }}" style="display: inline;">
-      <a href="{{ route('showCreateForm') }}" class="btn-add">
-        <i class='bx bx-plus'></i>เพิ่มข้อมูล
-      </a>
-    </form>
+
+
+<div class="container">
+  <h3 class="head-project">
+    <b>รายการโครงการ ปีงบประมาณ พ.ศ. 2567</b>
   </h3>
+  <a href="{{ route('showCreateProject') }}" class="btn-add">
+    <i class='bx bx-plus'></i>เพิ่มข้อมูล
+  </a>
+</div>
+
+  
 
 
   @foreach ( $strategics as $Strategic )

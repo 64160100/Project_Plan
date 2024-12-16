@@ -6,31 +6,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ViewProject</title>
+    <link rel="stylesheet" href="{{ asset('css/project.css') }}">
+
 </head>
 <body>
 @section('content')
-    <h2>
-        <b>{{ $projects->Name_Project }}</b>
-        <form action="" method="get" style="display: inline;">
-            <a href="" class="btn-add">
-                <i class='bx bx-edit'></i>แก้ไข
-            </a>
-        </form>
-    </h2>
+
+    <div class="container">
+        <h3 class="head-project">
+            <b>รายละเอียดโครงการ : {{ $projects->Name_Project }}</b>
+        </h3>
+        <a href="{{ route('editProject', ['Id_Project' => $projects->Id_Project]) }}" class="btn-edit">
+            <i class='bx bx-edit'></i></i> แก้ไข
+        </a>
+    </div>
 
     <b><p>หน้าฟอร์มโครงการ</p></b>
 
-    <table>
-        <thead>
-            <tr>
-                <td>ชื่อโครงการ</td><br>
-                <td>ยุทศาสตร์</td>
-            </tr>
-        </thead>
-        <tbody>
-        
-        </tbody>
-    </table>
     
     
         

@@ -12,10 +12,63 @@ class ProjectController extends Controller
     public function index()
     {
 
-        $strategics  = Strategic::with('projects')->get();
+        $strategics = Strategic::with('projects')->get();
 
         return view('Project.index', compact('strategics')); 
     }
+
+    public function showCreateProject()
+    {
+        $strategics = Strategic::with('projects')->get();
+        return view('Project.FormInsertProject', compact('strategics'));
+    }
+
+    public function createProject(Request $request)
+    {
+        $Project = new Project;
+        $Project->Strategic_Id = $request->Strategic_Id;
+        $Project->Name_Project = $request->Name_Project;
+        $Project->save();
+
+        return redirect()->route('index')->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
+
+    }
+
+    public function editProject(Request $request, $Id_Project)
+    {
+        $projects = Project::find($Id_Project);
+
+        if($request->isMethod('post')){
+            $Project->Strategic_Id = $request->Strategic_Id;
+            $Project->Name_Project = $request->Name_Project;
+            $Project->save();
+
+            return redirect()->route('index')->with('success', 'แก้ไขโครงการเรียบร้อยแล้ว');
+        }
+        
+        $strategics = Strategic::all(); // หรือวิธีอื่นๆ ในการดึงข้อมูลยุทธศาสตร์
+        return view('Project.FormEditProject', compact('projects', 'strategics'));
+    }
+
+    public function updateProject(Request $request, $Id_Project)
+    {
+        // ค้นหา Project ตาม ID
+        $Project = Project::find($Id_Project);
+
+        // ตรวจสอบว่าพบข้อมูลหรือไม่
+        if (!$Project) {
+            return redirect()->route('index')->with('error', 'ไม่พบโครงการที่ต้องการอัปเดต');
+        }
+
+        // อัปเดตข้อมูล
+        $Project->Strategic_Id = $request->Strategic_Id;
+        $Project->Name_Project = $request->Name_Project;
+        $Project->save();
+
+        return redirect()->route('index')->with('success', 'โครงการถูกอัปเดตเรียบร้อยแล้ว');
+    }
+
+
 
 
     public function viewProjectInStrategic($Id_Strategic)
@@ -70,22 +123,6 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function showCreateForm()
-    {
-        $strategics = Strategic::with('projects')->get();
-        return view('Project.FormInsertProject', compact('strategics'));
-    }
-
-    public function createProject(Request $request)
-    {
-
-        $Project = new Project;
-        $Project->Strategic_Id = $request->Strategic_Id;
-        $Project->Name_Project = $request->Name_Project;
-        $Project->save();
-
-        return redirect()->route('index')->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
-
-    }
+    
  
 }

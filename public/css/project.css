@@ -1,31 +1,33 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,400i,700");
 
+.container {
+  display: flex;
+  justify-content: space-between; /* กระจายองค์ประกอบให้ชิดซ้ายและขวา */
+  align-items: center; /* จัดให้อยู่ตรงกลางแนวตั้ง */
+  width: 100%; /* ใช้เต็มหน้าจอ */
+}
+
 /* button */
 .btn-add {
-    background-color: initial;
-    background-image: linear-gradient(#7C3AED, #472187 100%);
-    border-radius: 10px;
-    border-style: none;
-    box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
-    color: #fff;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 16px;
-    /* font-weight: bold; */
-    text-align: center;
-    height: 40px;
-    width: 120px;
-    line-height: 40px;
-    transition: all .3s cubic-bezier(.05, .03, .35, 1);
+  background-color: initial;
+  background-image: linear-gradient(#7C3AED, #472187 100%);
+  border-radius: 10px;
+  border-style: none;
+  box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+  height: 40px;
+  width: 120px;
+  line-height: 40px;
+  display: inline-block;
+}
+.btn-add:hover {
+  opacity: .8;
+}
 
-    display: inline-block;
-    margin-left: 600px;
-  }
-  .btn-add:hover {
-    opacity: .8;
-  }
 
-  
   .btn-edit {
     background-color: initial;
     background-image: linear-gradient(#EEE605, #A78B02);
@@ -34,14 +36,12 @@
     box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
     color: #fff;
     cursor: pointer;
-    display: inline-block;
-    /* font-family: sans-serif; */
     font-size: 16px;
-    /* font-weight: bold; */
+    text-align: center;
     height: 40px;
     width: 80px;
-    text-align: center;
-    transition: all .3s cubic-bezier(.05, .03, .35, 1);
+    line-height: 40px;
+    display: inline-block;
   }
   .btn-edit:hover {
     opacity: .8;

@@ -9,8 +9,7 @@
     <h1>ตั้งค่าระบบ</h1>
     <p class="text-style">จัดการตั้งค่าทั้งหมดของระบบ</p>
 
-    @foreach ($permissions as $permission)
-    <a href="#" class="link-style">
+    <a href="{{ route('strategic.index') }}" class="link-style">
         <div class="card-style">
             <div class="icon-style">
                 <i class='bx bx-target-lock'></i>
@@ -57,6 +56,5 @@
             </div>
         </div>
     </a>
-    @endforeach
 </div>
 @endsection

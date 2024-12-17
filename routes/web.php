@@ -37,6 +37,7 @@ Route::post('/createProject', [ProjectController::class, 'createProject'])->name
 Route::match(['get', 'post'],'/editProject/{Id_Project}', [ProjectController::class, 'editProject'])->name('editProject');
 Route::put('/editProject/{Id_Project}', [ProjectController::class, 'updateProject'])->name('updateProject');
 
+
 //แสดงหน้า Strategic
 Route::get('/viewProjectInStrategic/{Id_Strategic}', [ProjectController::class, 'viewProjectInStrategic'])->name('viewProjectInStrategic');
 Route::get('/viewProject/{Id_Project}', [ProjectController::class, 'viewProject'])->name('viewProject');

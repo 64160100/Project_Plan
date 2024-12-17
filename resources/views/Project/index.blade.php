@@ -22,9 +22,6 @@
   </a>
 </div>
 
-  
-
-
   @foreach ( $strategics as $Strategic )
   <details class="accordion" id="{{ $Strategic->Id_Strategic }}">
     <summary class="accordion-btn">
@@ -35,15 +32,17 @@
     </summary>
     <div class="accordion-content">
       <hr>
-        <!-- <p> -->
           @if ($Strategic->projects->isEmpty())
             <p>ไม่มีโครงการที่เกี่ยวข้อง</p>
           @else
               @foreach ($Strategic->projects as $Project)
                 <p><strong>{{ $Project->Name_Project }}</strong><br></p>
               @endforeach
+              
+              @foreach ($Project->sdgs as $Sdgs)
+                <p>{{ $Sdgs->Name_SDGs }}</p>
+              @endforeach
           @endif
-        <!-- </p> -->
     </div>
   </details>
   @endforeach

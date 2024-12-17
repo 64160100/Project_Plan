@@ -9,6 +9,7 @@
     <script src="{{ asset('js/radioButton.js') }}" defer></script>
     <script src="{{ asset('js/toggleDropdown.js') }}" defer></script>
     <script src="{{ asset('js/filterSearch.js') }}" defer></script>
+    <script src="{{ asset('js/sdgForm.js') }}" defer></script>
 
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
@@ -28,7 +29,6 @@
                 <div class="accordion-content">
                     <div class="mb-3">
                         @include('Project.App.ProjectName')
-                    
                     </div>
 
                 </div>
@@ -44,6 +44,30 @@
                 </div>
             </details>
             <!-- end ความสอดคล้องยุทศาสตร์ -->
+
+            <details class="accordion">
+                <summary class="accordion-btn"><b>ความสอดคล้องกับ (SDGs)</b></summary>
+                <div class="accordion-content">
+                    <div class="mb-3 col-md-6">
+                        <div class="dropdown-container">
+                            <div class="dropdown-button" onclick="toggleDropdown()">เลือกรายการ SDGs</div>
+                                @include('Project.App.SDGs')
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- <details class="accordion">
+                <summary class="accordion-btn"><b>การบูรณาการงานโครงการ/กิจกรรม</b></summary>
+                <div class="accordion-content">
+                    <div class="mb-3 col-md-6">
+                        <div class="dropdown-container">
+                            <div class="dropdown-button" onclick="toggleDropdown()">เลือกรายการโครงการ/กิจกรรม</div>
+                                @include('Project.App.ProjectIntegration')
+                        </div>
+                    </div>
+                </div>
+            </details> -->
         
         <button type="submit" class="btn btn-primary">บันทึก</button>
     </form> 

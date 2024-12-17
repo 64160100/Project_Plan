@@ -58,10 +58,35 @@
                             </select>
                         </div>
                     </div>
-
                 </div>
             </details>
             <!-- end ความสอดคล้องยุทศาสตร์ -->
+
+            <details class="accordion">
+                <summary class="accordion-btn"><b>ความสอดคล้องกับ (SDGs)</b></summary>
+                <div class="accordion-content">
+                    <div class="mb-3 col-md-6">
+                        <div class="dropdown-container">
+                            <div class="dropdown-button" onclick="toggleDropdown()">เลือกรายการ SDGs</div>
+                            
+                            <div class="form-group">
+                                <div class="dropdown-options">
+                                    @foreach ($sdgs as $Sdgs)
+                                        <label>
+                                            <!-- ตรวจสอบว่า SDGs ถูกเชื่อมโยงกับ Project อยู่แล้วหรือไม่ -->
+                                            <input type="checkbox" name="sdgs[]" value="{{ $Sdgs->id_SDGs }}" onchange="toggleSelectTextbox(this)"
+                                            @if(in_array($Sdgs->id_SDGs, $projects->sdgs->pluck('id_SDGs')->toArray())) checked @endif>
+                                            {{ $Sdgs->Name_SDGs }}
+                                        </label><br>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </details>
+
         <button type="submit" class="btn btn-primary">บันทึก</button>
     </form> 
         

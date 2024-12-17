@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\Strategic;
+use App\Models\Sdg;
 use Illuminate\Support\Facades\DB;
 
 class ProjectController extends Controller
 {
     public function index()
     {
-
         $strategics = Strategic::with('projects')->get();
 
         return view('Project.index', compact('strategics')); 
@@ -20,7 +20,8 @@ class ProjectController extends Controller
     public function showCreateProject()
     {
         $strategics = Strategic::with('projects')->get();
-        return view('Project.FormInsertProject', compact('strategics'));
+        $sdgs = Sdg::all();
+        return view('Project.FormInsertProject', compact('strategics', 'sdgs'));
     }
 
     public function createProject(Request $request)
@@ -30,6 +31,19 @@ class ProjectController extends Controller
         $Project->Name_Project = $request->Name_Project;
         $Project->save();
 
+       // ตรวจสอบและกรองค่า 'on' ที่อาจถูกส่งมา
+        if ($request->has('sdgs')) {
+            // กรองค่า 'on' ออกไปก่อน
+            $SDGs_Id = array_filter($request->sdgs, function($value) {
+                return is_numeric($value);  // ตรวจสอบว่าเป็นตัวเลขหรือไม่
+            });
+
+            // เชื่อม SDGs ที่เลือก
+            if (!empty($SDGs_Id)) {
+                $Project->sdgs()->attach($SDGs_Id);
+            }
+        }
+
         return redirect()->route('index')->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
 
     }
@@ -37,38 +51,43 @@ class ProjectController extends Controller
     public function editProject(Request $request, $Id_Project)
     {
         $projects = Project::find($Id_Project);
+        $strategics = Strategic::all();
+        $projects = Project::with('sdgs')->findOrFail($Id_Project);
+        $sdgs = Sdg::all();
 
         if($request->isMethod('post')){
             $Project->Strategic_Id = $request->Strategic_Id;
             $Project->Name_Project = $request->Name_Project;
+            if ($request->has('sdgs')) {
+                $Project->sdgs()->detach();// ลบการเชื่อมโยงเดิม (ถ้ามี) ก่อน
+                $Project->sdgs()->attach($request->sdgs); // เชื่อมโยง SDGs ใหม่
+            }
             $Project->save();
-
             return redirect()->route('index')->with('success', 'แก้ไขโครงการเรียบร้อยแล้ว');
         }
         
-        $strategics = Strategic::all(); // หรือวิธีอื่นๆ ในการดึงข้อมูลยุทธศาสตร์
-        return view('Project.FormEditProject', compact('projects', 'strategics'));
+        return view('Project.FormEditProject', compact('projects', 'strategics', 'sdgs'));
     }
 
     public function updateProject(Request $request, $Id_Project)
     {
-        // ค้นหา Project ตาม ID
-        $Project = Project::find($Id_Project);
-
-        // ตรวจสอบว่าพบข้อมูลหรือไม่
+        $Project = Project::find($Id_Project); // ค้นหา Project ตาม ID
         if (!$Project) {
             return redirect()->route('index')->with('error', 'ไม่พบโครงการที่ต้องการอัปเดต');
         }
 
-        // อัปเดตข้อมูล
         $Project->Strategic_Id = $request->Strategic_Id;
         $Project->Name_Project = $request->Name_Project;
+        if ($request->has('sdgs')) {
+            $Project->sdgs()->detach();
+            $Project->sdgs()->attach($request->sdgs); // เชื่อมโยง SDGs_Id ที่เลือก
+        } else {
+            $Project->sdgs()->detach();  // ถ้าไม่ได้เลือก SDGs (uncheck) ให้ลบออกทั้งหมด
+        }
         $Project->save();
 
         return redirect()->route('index')->with('success', 'โครงการถูกอัปเดตเรียบร้อยแล้ว');
     }
-
-
 
 
     public function viewProjectInStrategic($Id_Strategic)
@@ -116,12 +135,12 @@ class ProjectController extends Controller
     public function viewProject($Id_Project)  // รับพารามิเตอร์ id จาก URL
     {
         $projects = Project::with('strategic')->findOrFail($Id_Project); // ดึงข้อมูลโครงการและยุทธศาสตร์ที่เกี่ยวข้อง
-
+        
         return view('Project.ViewProject', [
             'projects' => $projects,
-            // 'strategics' => $strategics,
         ]);
     }
+
 
     
  

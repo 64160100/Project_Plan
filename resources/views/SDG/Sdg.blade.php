@@ -70,7 +70,7 @@
         <form action="{{ route('deleteSDG', $Sdg->id_SDGs) }}" method="POST" style="display: inline;">
             @csrf
             @method('DELETE') 
-            <button type="submit" class="btn-delete" onclick="return confirm('คุณต้องการลบเป้าหมายการพัฒนานี้ใช่หรือไม่?')">
+            <button type="submit" class="btn-delete" onclick="return confirm('คุณต้องการลบเป้าหมายการพัฒนา(SDGs)นี้ใช่หรือไม่?')">
                 <i class='bx bx-trash'></i>ลบ
             </button>
         </form>

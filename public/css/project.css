@@ -294,7 +294,6 @@ input[type="checkbox"] {
 }
 
 /* dropdown */
-
 .dropdown-container {
   position: relative;
   width: 300px;
@@ -327,9 +326,9 @@ input[type="checkbox"] {
 }
 
 .dropdown-options label {
-  display: flex;
-  align-items: first baseline;
-  padding: 5px 10px;
+  /* display: flex; */
+  /* align-items: first baseline; */
+  padding: 5px;
   cursor: pointer;
 }
 

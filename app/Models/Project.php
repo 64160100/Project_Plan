@@ -24,5 +24,12 @@ class Project extends Model
     {
         return $this->belongsTo(Strategic::class, 'Strategic_Id', 'Id_Strategic');
     }
+
+    public function sdgs()
+    {
+        return $this->belongsToMany(Sdg::class, 'Project_has_Sustainable_Development_Goals', 'Project_Id', 'SDGs_Id');
+    }
+
+
     
 }

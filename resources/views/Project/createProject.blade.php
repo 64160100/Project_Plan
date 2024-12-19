@@ -44,10 +44,21 @@
                 <details class="accordion">
                     <summary class="accordion-btn"><b>ความสอดคล้องกับยุทธศาสตร์ส่วนงาน</b></summary>
                     <div class="accordion-content">
-                    @include('Project.App.Strategic')
+                        @include('Project.App.Strategic')
                     </div>
                 </details>
                 <!-- end ความสอดคล้องยุทศาสตร์ -->
+
+                <!-- ผู้รับผิดชอบโครงการ -->
+                <!-- ผู้รับผิดชอบโครงการ -->
+                <details class="accordion">
+                    <summary class="accordion-btn"><b>ผู้รับผิดชอบโครงการ</b></summary>
+                    <div class="accordion-content">
+                        @include('Project.App.ProjectManager')
+                    </div>
+                </details>
+                <!-- end ผู้รับผิดชอบโครงการ -->
+                <!-- end ผู้รับผิดชอบโครงการ -->
 
                 <button type="submit" class="btn btn-primary">บันทึก</button>
             </form>

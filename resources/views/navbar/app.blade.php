@@ -6,6 +6,8 @@
     <title>ระบบติดตามแผนงาน | Lib Buu</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
 
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
     <!-- Fonts and icons -->
     <script>
     WebFont.load({
@@ -55,98 +57,190 @@
                             <i class="gg-menu-left"></i>
                         </button>
                     </div>
+
                     <button class="topbar-toggler more">
                         <i class="gg-more-vertical-alt"></i>
                     </button>
+
                 </div>
                 <!-- End Logo Header -->
             </div>
             <div class="sidebar-wrapper scrollbar scrollbar-inner">
                 <div class="sidebar-content">
-                    <!-- conten in sidebar -->
+                    <!-- content in sidebar -->
                     <ul class="nav nav-secondary">
+                        @php
+                        $permissions = session('permissions', []);
+                        $projectManagement = false;
+                        $approval = false;
+                        $systemManagement = false;
+                        $renderedItems = [
+                        'dashboard' => false,
+                        'list_project' => false,
+                        'track_status' => false,
+                        'documents_project' => false,
+                        'report_results' => false,
+                        'check_budget' => false,
+                        'approval_project' => false,
+                        'manage_users' => false,
+                        'data_employee' => false,
+                        'setup_system' => false,
+                        ];
+                        @endphp
 
-                        <!-- การจัดการโครงการ -->
+                        <!-- Check for project management permissions -->
+                        @foreach($permissions as $permission)
+                        @if($permission->Dashborad === 'Y' || $permission->List_Project === 'Y' ||
+                        $permission->Track_Status === 'Y')
+                        @php $projectManagement = true; @endphp
+                        @endif
+                        @endforeach
+
+                        @if($projectManagement)
                         <li class="nav-section">
                             <h4 class="text-section">การจัดการโครงการ</h4>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="">
+                        @endif
 
+                        @foreach($permissions as $permission)
+                        @if($permission->Dashborad === 'Y' && !$renderedItems['dashboard'])
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('dashboard') }}">
                                 <i class='bx bxs-grid-alt'></i>
                                 <p>แดชบอร์ด</p>
                             </a>
                         </li>
+                        @php $renderedItems['dashboard'] = true; @endphp
+                        @endif
+                        @if($permission->List_Project === 'Y' && !$renderedItems['list_project'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('project') }}">
                                 <i class='bx bx-folder bx-flip-horizontal'></i>
                                 <p>รายการโครงการ</p>
                             </a>
                         </li>
+                        @php $renderedItems['list_project'] = true; @endphp
+                        @endif
+                        @if($permission->Track_Status === 'Y' && !$renderedItems['track_status'])
                         <li class="nav-item">
                             <a class="nav-link" href="">
                                 <i class='bx bx-time-five bx-flip-horizontal'></i>
                                 <p>ติดตามสถานะ</p>
                             </a>
                         </li>
+                        @php $renderedItems['track_status'] = true; @endphp
+                        @endif
+                        @endforeach
 
-                        <!-- การอนุมัติ -->
+                        <!-- Check for approval permissions -->
+                        @foreach($permissions as $permission)
+                        @if($permission->Documents_Project === 'Y' || $permission->Report_results === 'Y' ||
+                        $permission->Check_Budget === 'Y' || $permission->Approval_Project === 'Y')
+                        @php $approval = true; @endphp
+                        @endif
+                        @endforeach
+
+                        @if($approval)
                         <li class="nav-section">
                             <h4 class="text-section">การอนุมัติ</h4>
                         </li>
+                        @endif
+
+                        @foreach($permissions as $permission)
+                        @if($permission->Documents_Project === 'Y' && empty($renderedItems['documents_project']))
                         <li class="nav-item">
                             <a class="nav-link" href="">
                                 <i class='bx bx-file bx-flip-horizontal'></i>
                                 <p>รวบรวมเอกสารโครงการ</p>
                             </a>
                         </li>
+                        @php $renderedItems['documents_project'] = true; @endphp
+                        @endif
+
+                        @if($permission->Report_results === 'Y' && empty($renderedItems['report_results']))
                         <li class="nav-item">
                             <a class="nav-link" href="">
                                 <i class='bx bx-task'></i>
                                 <p>รายงานผล</p>
                             </a>
                         </li>
+                        @php $renderedItems['report_results'] = true; @endphp
+                        @endif
+
+                        @if($permission->Check_Budget === 'Y' && empty($renderedItems['check_budget']))
                         <li class="nav-item">
                             <a class="nav-link" href="">
-                                <i class='bx bxs-calculator bx-flip-horizontal' undefined></i>
+                                <i class='bx bxs-calculator bx-flip-horizontal'></i>
                                 <p>ตรวจสอบงบประมาณ</p>
                             </a>
                         </li>
+                        @php $renderedItems['check_budget'] = true; @endphp
+                        @endif
+
+                        @if($permission->Approval_Project === 'Y' && empty($renderedItems['approval_project']))
                         <li class="nav-item">
-                            <a class="nav-link" href="">
+                            <a class="nav-link" href="{{ route('requestApproval') }}">
                                 <i class='bx bx-select-multiple'></i>
                                 <p>อนุมัติโครงการ</p>
                             </a>
                         </li>
+                        @php $renderedItems['approval_project'] = true; @endphp
+                        @endif
+
+                        @if($permission->Propose_Project === 'Y' && empty($renderedItems['propose_project']))
                         <li class="nav-item">
-                            <a class="nav-link" href="">
+                            <a class="nav-link" href="{{ route('proposeProject') }}">
                                 <i class='bx bx-food-menu'></i>
                                 <p>เสนอโครงการเพื่อพิจารณา</p>
                             </a>
                         </li>
+                        @php $renderedItems['propose_project'] = true; @endphp
+                        @endif
+                        @endforeach
 
-                        <!-- การจัดการระบบ -->
+                        <!-- Check for system management permissions -->
+                        @foreach($permissions as $permission)
+                        @if($permission->Manage_Users === 'Y' || $permission->Data_Employee === 'Y' ||
+                        $permission->Setup_System === 'Y')
+                        @php $systemManagement = true; @endphp
+                        @endif
+                        @endforeach
+
+                        @if($systemManagement)
                         <li class="nav-section">
                             <h4 class="text-section">การจัดการระบบ</h4>
                         </li>
+                        @endif
+
+                        @foreach($permissions as $permission)
+                        @if($permission->Manage_Users === 'Y' && !$renderedItems['manage_users'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('account.user') }}">
                                 <i class='bx bx-group'></i>
                                 <p>จัดการผู้ใช้งาน</p>
                             </a>
                         </li>
+                        @php $renderedItems['manage_users'] = true; @endphp
+                        @endif
+                        @if($permission->Data_Employee === 'Y' && !$renderedItems['data_employee'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('account.employee') }}">
                                 <i class='bx bx-group'></i>
                                 <p>ข้อมูลพนักงาน</p>
                             </a>
                         </li>
+                        @php $renderedItems['data_employee'] = true; @endphp
+                        @endif
+                        @if($permission->Setup_System === 'Y' && !$renderedItems['setup_system'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('setting') }}">
                                 <i class='bx bx-cog'></i>
                                 <p>ตั้งค่าระบบ</p>
                             </a>
                         </li>
+                        @php $renderedItems['setup_system'] = true; @endphp
+                        @endif
+                        @endforeach
                     </ul>
                 </div>
             </div>
@@ -220,14 +314,22 @@
                             <li class="nav-item topbar-user dropdown hidden-caret">
                                 <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#"
                                     aria-expanded="false">
-                                    <div class="avatar-sm">
-                                        <img src="{{asset('images/profile.jpg')}}" alt="..."
-                                            class="avatar-img rounded-circle" />
+                                    <div class="profile-container"
+                                        style="background: linear-gradient(180deg, #8729DA 0%, #AC2BDD 100%); border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; display: flex; align-items: center; color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); width: 250px; margin-left: auto; margin-right: -20px;">
+                                        <div class="avatar-sm" style="margin-right: 10px;">
+                                            <img src="{{ asset('images/profile.jpg') }}" alt="..."
+                                                class="avatar-img rounded-circle" />
+                                        </div>
+                                        <span class="profile-username">
+                                            <span class="op-7">Hi,</span>
+                                            <span class="fw-bold">
+                                                {{ session('employee') ? session('employee')->Firstname_Employee . ' ' . session('employee')->Lastname_Employee : 'Guest' }}<br>
+                                                @if(session('permissions'))
+                                                ({{ implode(', ', session('permissions')->pluck('Name_Permission')->toArray()) }})
+                                                @endif
+                                            </span>
+                                        </span>
                                     </div>
-                                    <span class="profile-username">
-                                        <span class="op-7">Hi,</span>
-                                        <span class="fw-bold">Hizrian</span>
-                                    </span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-user animated fadeIn">
                                     <div class="dropdown-user-scroll scrollbar-outer">
@@ -239,11 +341,17 @@
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item" href="#">Account Setting</a>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Logout</a>
+                                            <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                                style="display: none;">
+                                                @csrf
+                                            </form>
+                                            <a class="dropdown-item" href="#"
+                                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
                                         </li>
                                     </div>
                                 </ul>
                             </li>
+
                         </ul>
                     </div>
                 </nav>

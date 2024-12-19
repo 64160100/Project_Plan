@@ -18,3 +18,12 @@ Route::post('/createProject', [ListProjectController::class, 'createProject'])->
 //แสดงหน้า Strategic
 Route::get('/viewProjectInStrategic/{Id_Strategic}', [ListProjectController::class, 'viewProjectInStrategic'])->name('viewProjectInStrategic');
 Route::get('/viewProject/{Id_Project}', [ListProjectController::class, 'viewProject'])->name('viewProject');
+
+// ... existing code
+Route::get('/requestApproval', [ListProjectController::class, 'showAllApprovals'])->name('requestApproval');
+Route::put('/approvals/{id}/status/{status}', [ListProjectController::class, 'updateApprovalStatus'])->name('approvals.updateStatus');
+
+Route::get('/proposeProject', [ListProjectController::class, 'proposeProject'])->name('proposeProject');
+Route::post('/projects/{id}/submitForApproval', [ListProjectController::class, 'submitForApproval'])->name('projects.submitForApproval');
+
+

@@ -33,13 +33,13 @@
         <div class="form-row">
             <div class="form-group">
                 <label for="Position">ตำแหน่ง:</label>
-                <input type="text" class="form-control" id="Position" name="Position" value="{{ $employee->Position }}"
-                    disabled>
+                <input type="text" class="form-control" id="Position" name="Position" 
+                value="{{ $employee->position ? $employee->position->Name_Position : 'N/A' }}" disabled>
             </div>
             <div class="form-group">
                 <label for="Department">ฝ่าย:</label>
                 <input type="text" class="form-control" id="Department" name="Department"
-                    value="{{ $employee->Department }}" disabled>
+                    value="{{ $employee->department ? $employee->department->Name_Department : 'N/A' }}" disabled>
             </div>
         </div>
 

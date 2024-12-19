@@ -18,17 +18,24 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-
-        $employee = EmployeeModel::where('email', $credentials['email'])->where('password', $credentials['password'])->first();
-
+    
+        $employee = EmployeeModel::with('department', 'permissions')
+            ->where('email', $credentials['email'])
+            ->where('password', $credentials['password'])
+            ->first();
+    
         if ($employee) {
             $permissions = $employee->permissions;
-
+            $department = $employee->department;
+    
             session([
                 'employee' => $employee,
-                'permissions' => $permissions
+                'permissions' => $permissions,
+                'department' => $department
             ]);
-
+    
+            Log::info('Employee Department ID: ', ['Department_Id_Department' => $employee->Department_Id_Department]);
+    
             return redirect()->route('dashboard');
         } else {
             $employeeByEmail = EmployeeModel::where('email', $credentials['email'])->first();

@@ -15,6 +15,8 @@ class AccountController extends Controller
         $permissions = $request->session()->get('permissions');
     
         $employees = EmployeeModel::all();
+
+        Log:info('Employees Data:', $employees->toArray());
     
         return view('account.employee', compact('employees'), ['employee' => $employee, 'permissions' => $permissions]);
     }
@@ -22,9 +24,9 @@ class AccountController extends Controller
     public function showEmployees()
     {
         $employees = EmployeeModel::all();
-        $permissions = PermissionModel::all(); // Assuming you have a PermissionModel
+        $permissions = PermissionModel::all();
     
-        return view('account.employee', compact('employees', 'permissions'));
+        return view('account.viewEmployee', compact('employees', 'permissions'));
     }
 
     public function create()

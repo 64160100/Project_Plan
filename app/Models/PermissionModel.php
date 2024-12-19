@@ -10,7 +10,6 @@ class PermissionModel extends Model
     protected $table = 'Premission';
     protected $primaryKey = 'Id_Permission';
     protected $fillable = [
-        'Id_Permission',
         'Name_Permission',
         'Dashborad',
         'List_Project',
@@ -19,11 +18,13 @@ class PermissionModel extends Model
         'Report_results',
         'Check_Budget',
         'Approval_Project',
+        'Propose_Project',
         'Manage_Users',
         'Data_Employee',
         'Setup_System',
     ];
-    public $timestamps = false;
+
+    public $timestamps = false; 
 
     public function employees()
     {

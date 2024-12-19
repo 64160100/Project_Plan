@@ -1,0 +1,17 @@
+INSERT INTO `Premission` (`Id_Permission`, `Name_Permission`, `Dashborad`, `List_Project`, `Track_Status`, `Documents_Project`, `Report_results`, `Check_Budget`, `Approval_Project`, `Propose_Project`, `Manage_Users`, `Data_Employee`, `Setup_System`) VALUES
+(1, 'ผู้บริหาร', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
+(2, 'หัวหน้าฝ่าย', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
+(3, 'ผู้ดูแลระบบ', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N', 'N'),
+(4, 'ผู้รับผิดชอบโครงการ', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'N', 'N', 'N');
+
+INSERT INTO `Department` (`Id_Department`, `Name_Department`) VALUES
+(1, 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา'),
+(2, 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล');
+
+INSERT INTO `Position` (`Id_Position`, `Name_Position`) VALUES
+(1, 'บรรณารักษ์ชำนาญการพิเศษ'),
+(2, 'บรรณารักษ์ชำนาญการ');
+
+INSERT INTO `Strategic` (`Id_Strategic`, `Name_Strategic_Plan`, `Goals_Strategic`) VALUES
+(1, 'ยุทธศาสตร์ที่ 1 การพัฒนาความเป็นเลิศด้านบริการด้วยมาตรฐ', 'GG'),
+(2, 'ยุทธศาสตร์ที่ 2 การพัฒนาโครงการ', 'TT');

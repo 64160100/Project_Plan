@@ -2,7 +2,7 @@
 use App\Http\Controllers\AccountController;
 
 Route::get('/employees', [AccountController::class, 'employee'])->name('account.employee');
-Route::get('/employees/{Id_Employee}', [AccountController::class, 'showemployee'])->name('account.showemployee');
+Route::get('/employees/{Id_Employee}', [AccountController::class, 'showEmployees'])->name('account.showemployee');
 Route::post('/employees', [AccountController::class, 'store'])->name('account.store');
 Route::get('/employees/create', [AccountController::class, 'create'])->name('account.create');
 

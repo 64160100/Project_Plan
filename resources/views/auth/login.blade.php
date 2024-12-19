@@ -44,7 +44,7 @@
 
                     <div class="col-lg-6 d-flex flex-column justify-content-center order-lg-last" data-aos="fade-in">
                         <div class='card p-4 custom-bg'>
-                            <a href="{{ route('login') }}" class="text-decoration-none text-dark">
+                            <a href="{{ route('project') }}" class="text-decoration-none text-dark">
                                 <h1 class="text-center">ระบบติดตามแผนงาน</h1>
                             </a>
                             <form method="POST" action="{{ route('login') }}">

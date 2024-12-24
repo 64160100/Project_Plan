@@ -28,7 +28,7 @@
         {{ $Strategic->Name_Strategic_Plan }}</a><br>จำนวนโครงการ : {{ $Strategic->project_count }} โครงการ</b>
         
         <a href="{{ route('showCreateProject', ['Strategic_Id' => $Strategic->Id_Strategic]) }}" class="btn-add">
-          <i class='bx bx-plus'></i>เพิ่มข้อมูล
+          <i class='bx bx-plus'></i>เพิ่มโครงการ
         </a>
     </summary>
     <div class="accordion-content">

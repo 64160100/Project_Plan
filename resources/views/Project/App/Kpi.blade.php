@@ -11,7 +11,7 @@
         </div>
     </form> -->
 
-    <label for="formGroupExampleInput" class="form-label"><b>ตัวชี้วัด</b></label>
+    <!-- <label for="formGroupExampleInput" class="form-label"><b>ตัวชี้วัด</b></label> -->
     <div class="form-group">
         <input type="text" id="Indicators_Project" name="Indicators_Project" placeholder="กรอกตัวชี้วัด">
     </div>

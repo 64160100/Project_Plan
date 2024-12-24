@@ -197,6 +197,7 @@ class ProjectController extends Controller
 
         $strategics = Strategic::with('projects')->findOrFail($Id_Strategic);
 
+
         // แสดงโครงการในยุทศาสตร์
         if ($strategics) {
             return view('Project.ViewProjectInStrategic', [

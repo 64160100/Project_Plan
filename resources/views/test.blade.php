@@ -5,53 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+<style>
+.content-box {
+  border: 2px; /* เส้นขอบสีม่วง */
+  border-radius: 10px; /* มุมขอบโค้ง */
+  padding: 20px; /* ระยะห่างระหว่างขอบกับเนื้อหา */
+  background-color:rgb(255, 255, 255); /* พื้นหลังสีอ่อน */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เงาให้กรอบ */
+  width: 100%; /* ปรับให้ขนาดเต็มความกว้าง */
+  max-width: 600px; /* กำหนดความกว้างสูงสุด */
+  margin: 20px auto; /* จัดให้อยู่ตรงกลางหน้าจอ */
+  font-family: Arial, sans-serif; /* แบบอักษร */
+  color: #333; /* สีตัวอักษร */
+}
+
+</style>
 <body>
-    <h1>Add Multiple KPIs</h1>
 
-    <!-- แสดงฟอร์มเพิ่มหลายรายการ -->
-    <form action="#" method="POST">
-        @csrf
-        <!-- ฟอร์มที่ยืดหยุ่น -->
-        <div id="kpi-form-fields">
-            <div class="kpi-field">
-                <label for="kpi_name[]">KPI Name:</label>
-                <input type="text" name="kpi_name[]" required>
+<div class="content-box">
+  <h2>หัวข้อกรอบเนื้อหา</h2>
+  <p>นี่คือตัวอย่างของกรอบเนื้อหา คุณสามารถเพิ่มข้อความหรือองค์ประกอบอื่นๆ ได้ตามต้องการ</p>
+</div>
 
-                <label for="kpi_description[]">KPI Description:</label>
-                <input type="text" name="kpi_description[]" required>
-
-                <label for="fiscal_year[]">Fiscal Year:</label>
-                <input type="text" name="fiscal_year[]" required>
-            </div>
-        </div>
-
-        <!-- ปุ่มเพิ่มฟิลด์ -->
-        <button type="button" onclick="addKpiField()">Add Another KPI</button>
-        <br><br>
-        <button type="submit">Submit</button>
-    </form>
-
-    <script>
-        // ฟังก์ชั่นในการเพิ่มฟิลด์ใหม่
-        function addKpiField() {
-            // สร้างกลุ่มฟิลด์ใหม่
-            var newField = document.createElement('div');
-            newField.classList.add('kpi-field');
-
-            newField.innerHTML = `
-                <label for="kpi_name[]">KPI Name:</label>
-                <input type="text" name="kpi_name[]" required>
-
-                <label for="kpi_description[]">KPI Description:</label>
-                <input type="text" name="kpi_description[]" required>
-
-                <label for="fiscal_year[]">Fiscal Year:</label>
-                <input type="text" name="fiscal_year[]" required>
-            `;
-
-            // เพิ่มกลุ่มฟิลด์ใหม่เข้าไปในฟอร์ม
-            document.getElementById('kpi-form-fields').appendChild(newField);
-        }
-    </script>
 </body>
 </html>

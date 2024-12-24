@@ -10,18 +10,14 @@
     <script src="{{ asset('js/toggleDropdown.js') }}" defer></script>
     <script src="{{ asset('js/filterSearch.js') }}" defer></script>
     <script src="{{ asset('js/sdgForm.js') }}" defer></script>
-
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script> -->
+    <script src="{{ asset('js/addKpiField.js') }}" defer></script>
+    <script src="{{ asset('js/datetime.js') }}" defer></script>
 
 </head>
 <body>
     @section('content')
     <h3 class="card-header">กรอกข้อมูลโครงการใหม่</h3><br>
-    <form action="{{ route('createProject') }}" method="POST">
+    <form action="{{ route('createProject', ['Strategic_Id' => $strategics->Id_Strategic]) }}" method="POST">
             @csrf 
             <!-- ชื่อโครงการ -->
             <details class="accordion">
@@ -34,6 +30,17 @@
                 </div>
             </details>
             <!-- endชื่อโครงการ -->
+
+            <!-- ความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย  -->
+            <!-- <details class="accordion">
+                <summary class="accordion-btn"><b>ความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย</b></summary>
+                <div class="accordion-content">
+                    <div class="mb-3">
+                   
+                    </div>
+                </div>
+            </details> -->
+            <!-- end ความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย  -->
             
             
             <!-- ความสอดคล้องส่วนงาน -->
@@ -49,25 +56,63 @@
                 <summary class="accordion-btn"><b>ความสอดคล้องกับ (SDGs)</b></summary>
                 <div class="accordion-content">
                     <div class="mb-3 col-md-6">
-                        <div class="dropdown-container">
-                            <div class="dropdown-button" onclick="toggleDropdown()">เลือกรายการ SDGs</div>
-                                @include('Project.App.SDGs')
+                        @include('Project.App.SDGs')
+                    </div>
+                </div>
+            </details>
+
+            <!-- วัตถุประสงค์โครงการ   -->
+            <details class="accordion">
+                <summary class="accordion-btn"><b>วัตถุประสงค์โครงการ</b></summary>
+                <div class="accordion-content">
+                    <div class="mb-3">
+                    @include('Project.App.ProjectObjective')
+                    </div>
+                </div>
+            </details>
+        <!-- end วัตถุประสงค์โครงการ   -->
+
+            <!-- ตัวชี้วัด   -->
+            <details class="accordion">
+                <summary class="accordion-btn"><b>ตัวชี้วัด</b></summary>
+                <div class="accordion-content">
+                    <div class="mb-3">
+                    @include('Project.App.Kpi')
+                    </div>
+                </div>
+            </details>
+
+            <!-- กลุ่มเป้าหมาย   -->
+            <details class="accordion">
+                <summary class="accordion-btn"><b>กลุ่มเป้าหมาย</b></summary>
+                <div class="accordion-content">
+                    <div class="mb-3">
+                        <div class="form-group">
+                            <input type="text" name="Target_Project" id="Target_Project" placeholder="เพิ่มกลุ่มเป้าหมาย" required>
                         </div>
                     </div>
                 </div>
             </details>
 
-            <!-- <details class="accordion">
-                <summary class="accordion-btn"><b>การบูรณาการงานโครงการ/กิจกรรม</b></summary>
-                <div class="accordion-content">
-                    <div class="mb-3 col-md-6">
-                        <div class="dropdown-container">
-                            <div class="dropdown-button" onclick="toggleDropdown()">เลือกรายการโครงการ/กิจกรรม</div>
-                                @include('Project.App.ProjectIntegration')
+        <!-- ระยะเวลาดำเนินโครงการ   -->
+        <details class="accordion">
+            <summary class="accordion-btn"><b>ระยะเวลาดำเนินโครงการ</b></summary>
+            <div class="accordion-content">
+                <div class="mb-3">
+                    <!-- <form id="dynamicForm"> -->
+                        <div>
+                            <label for="First_Time">วันที่เริ่มต้น:</label><br>
+                            <input type="date" id="First_Time" name="First_Time" required>
                         </div>
-                    </div>
+                        <br>
+                        <div>
+                            <label for="End_Time">วันที่สิ้นสุด:</label><br>
+                            <input type="date" id="End_Time" name="End_Time" required>
+                        </div>
+                    <!-- </form> -->
                 </div>
-            </details> -->
+            </div>
+        </details>
         
         <button type="submit" class="btn btn-primary">บันทึก</button>
     </form> 

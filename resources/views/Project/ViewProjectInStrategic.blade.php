@@ -19,9 +19,14 @@
     @foreach ($strategics->projects as $Project)
         <details class="accordion">
             <summary class="accordion-btn">
-            <b><a href="{{ route('viewProject', ['Id_Project' => $Project->Id_Project]) }}">
+            <b>
+                <a href="{{ route('viewProject', ['Id_Project' => $Project->Id_Project]) }}">
                 {{ $Project->Name_Project }}
-                </a></b>
+                </a>
+            </b>
+            <a href="{{ route('editProject', ['Id_Project' => $Project->Id_Project]) }}" class="btn-edit">
+                <i class='bx bx-edit'></i></i> แก้ไข
+            </a>
             </summary>
         </details>
     @endforeach

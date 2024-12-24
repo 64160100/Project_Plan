@@ -25,6 +25,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('project_sdg');
+        Schema::dropIfExists('Project_has_Sustainable_Development_Goals');
     }
 };

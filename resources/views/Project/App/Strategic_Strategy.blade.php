@@ -1,14 +1,14 @@
 <div class="mb-3 col-md-6">
     <div class="mb-3">
-        <label for="strategicSelect" class="form-label">เลือกยุทธศาสตร์</label>
-        <select class="form-select" id="strategicSelect" name="Strategic_Id" required>
-            <option value="" selected disabled>เลือกยุทธศาสตร์</option>
-            @if($strategics->isNotEmpty())
-                @foreach($strategics as $Strategic)
-                    <option value="{{ $Strategic->Id_Strategic }}">{{ $Strategic->Name_Strategic_Plan }}</option>
+        <label for="strategicSelect" class="form-label">กลยุทธ์</label>
+        <select class="form-select" name="Name_Strategy" id="Name_Strategy" required>
+            <option value="" selected disabled>เลือกกลยุทธ์</option>
+            @if($strategies->isNotEmpty())    
+                @foreach($strategies as $Strategies)
+                    <option value="{{ $Strategies->Name_Strategy }}">{{ $Strategies->Name_Strategy }}</option>
                 @endforeach
             @else
-                <option value="" disabled></option>
+                <option value="" disable>ไม่มีกลยุทที่เกี่ยวข้อง</option>
             @endif
         </select>
     </div>

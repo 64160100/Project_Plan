@@ -17,12 +17,12 @@ function addField(containerId, inputName) {
 
     newField.innerHTML = `
        <input type="text" 
-            id="${placeholderText.fieldId}" 
-            name="${inputName}" 
+            id="${placeholderText.Id_Sup_Project}" 
+            name="${inputName}[]" 
             placeholder="${placeholderText.placeholder}"
             required 
             oninput="handleInput(this)">
-        <button type="button" class="remove-btn" onclick="removeField(this)">Remove</button>
+        <button type="button" class="remove-btn" onclick="removeField(this)"><i class='bx bx-x'></i></button>
     `;
     container.appendChild(newField);
 }
@@ -38,10 +38,12 @@ function removeField(button, containerId) {
 
 function getPlaceholder(inputName) {
     let fieldId = "";
+    let Id_Sup_Project = "";
+
     let placeholderText = "";
 
-    if (inputName === 'projectName[]') {
-        fieldId = `field-${projectFieldCounter}`;
+    if (inputName === 'Name_Sup_Project[]') {
+        Id_Sup_Project = `Id_Sup_Project-${projectFieldCounter}`;
         placeholderText = "กรอกชื่อโครงการย่อย";
         projectFieldCounter++;  
 
@@ -79,49 +81,25 @@ function getPlaceholder(inputName) {
         placeholderText = "ระบุค่าเป้าหมาย ไม่น้อยกว่า...";
         kpiFieldCounter++;  
     }
-    return { fieldId, placeholder: placeholderText };
+    return { fieldId, Id_Sup_Project, placeholder: placeholderText };
 }
 
 
-function handleInput(inputElement) {
-    const fieldId = inputElement.id;         
-    const fieldName = inputElement.name;     
-    const fieldValue = inputElement.value;   
-    console.log(`Field ID: ${fieldId}, Name: ${fieldName}, Value: ${fieldValue}`);
-}
-
-// function reorderFields(containerId) {
-//     const container = document.getElementById(containerId);
-//     const fields = container.querySelectorAll('.form-group');
-
-//     // เรียงลำดับใหม่โดยการตั้งค่า ID และตัวนับใหม่
-//     let counter = (containerId === 'projectContainer') ? 2 : 2;  // เริ่มที่ 2 สำหรับทั้งสอง container
-
-//     fields.forEach((field, index) => {
-//         const input = field.querySelector('input');
-//         const removeButton = field.querySelector('.remove-btn');
-        
-//         // อัปเดต id ใหม่สำหรับฟิลด์ที่เหลือ
-//         input.id = `field-${counter}`;
-//         input.name = (containerId === 'projectContainer') ? 'projectName[]' : 'objectiveProject[]';
-//         input.placeholder = (containerId === 'projectContainer') ? 'กรอกชื่อโครงการย่อย' : 'เพิ่มวัตถุประสงค์';
-
-//         // เพิ่ม event listener ใหม่ให้กับปุ่ม Remove
-//         removeButton.setAttribute('onclick', `removeField(this, '${containerId}')`);
-
-//         counter++; // เพิ่ม counter
-//     });
+// function handleInput(inputElement) {
+//     const fieldId = inputElement.id;         
+//     const fieldName = inputElement.name;     
+//     const fieldValue = inputElement.value;   
+//     console.log(`Field ID: ${fieldId}, Name: ${fieldName}, Value: ${fieldValue}`);
 // }
 
+function handleInput(inputElement) {
+    const Id_Sup_Project = inputElement.id;         
+    const fieldName = inputElement.name;     
+    const fieldValue = inputElement.value;   
+    console.log(`Field ID: ${Id_Sup_Project}, Name: ${fieldName}, Value: ${fieldValue}`);
+}
 
-// Form submission //
-// const projectForm = document.getElementById('projectForm');
-// projectForm.addEventListener('submit', function (event) {
-//     event.preventDefault();
-//     const formData = new FormData(projectForm);
-//     const items = formData.getAll('projectName[]');
-//     alert('Project Names:\n' + items.join('\n'));
-// });
+
 
 
 

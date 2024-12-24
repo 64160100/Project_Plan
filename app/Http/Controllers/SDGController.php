@@ -14,7 +14,6 @@ class SDGController extends Controller
         // return view('SDG.Sdg');
     }
 
-
     public function createSDG(Request $request)
     {
             $sdg = new Sdg;
@@ -52,30 +51,6 @@ class SDGController extends Controller
         }
         $sdg->delete();
         return redirect()->back()->with('success', 'อัปเดตเป้าหมายการพัฒนาเรียบร้อยแล้ว');
-
-    }
-
-
-    //แผนยุทมหาลัย
-    public function showUniStrategic()
-    {
-        return view('SDG.Sdg');
-    }
-
-    public function createUniStrategic()
-    {
-        return view('SDG.Sdg');
-    }
-
-   
-    public function editUniStrategic(string $id)
-    {
-        //
-    }
-
-    public function deleteUniStrategic(string $id)
-    {
-        //
     }
 
 }

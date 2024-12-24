@@ -17,30 +17,26 @@
   <h3 class="head-project">
     <b>รายการโครงการ ปีงบประมาณ พ.ศ. 2567</b>
   </h3>
-  <a href="{{ route('showCreateProject') }}" class="btn-add">
-    <i class='bx bx-plus'></i>เพิ่มข้อมูล
-  </a>
+  
 </div>
+<br>
 
   @foreach ( $strategics as $Strategic )
   <details class="accordion" id="{{ $Strategic->Id_Strategic }}">
     <summary class="accordion-btn">
     <b><a href="{{ route('viewProjectInStrategic', ['Id_Strategic' => $Strategic->Id_Strategic]) }}">
-        {{ $Strategic->Name_Strategic_Plan }}</a></b> 
+        {{ $Strategic->Name_Strategic_Plan }}</a><br>จำนวนโครงการ : {{ $Strategic->project_count }} โครงการ</b>
         
-
+        <a href="{{ route('showCreateProject', ['Strategic_Id' => $Strategic->Id_Strategic]) }}" class="btn-add">
+          <i class='bx bx-plus'></i>เพิ่มข้อมูล
+        </a>
     </summary>
     <div class="accordion-content">
-      <hr>
           @if ($Strategic->projects->isEmpty())
             <p>ไม่มีโครงการที่เกี่ยวข้อง</p>
           @else
               @foreach ($Strategic->projects as $Project)
-                <p><strong>{{ $Project->Name_Project }}</strong><br></p>
-              @endforeach
-              
-              @foreach ($Project->sdgs as $Sdgs)
-                <p>{{ $Sdgs->Name_SDGs }}</p>
+                <li><strong>{{ $Project->Name_Project }}</strong></li>
               @endforeach
           @endif
     </div>

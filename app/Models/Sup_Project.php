@@ -6,21 +6,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Sdg extends Model
+class Sup_Project extends Model
 {
     protected $connection = 'mydb';
-    protected $table = 'Sustainable_Development_Goals';
-    protected $primaryKey = 'id_SDGs';
+    protected $table = 'Sup_Project';
+    protected $primaryKey = 'Id_Sup_Project';
     // protected $keyType = 'int';
 
     protected $fillable = [
-        'Name_SDGs',
+        'Name_Sup_Project',
+        'Project_Id_Project',
     ];
     public $timestamps = false;
 
-    public function projects()
+    public function project()
     {
-        return $this->belongsToMany(Project::class, 'Project_has_Sustainable_Development_Goals', 'SDGs_Id', 'Project_Id');
+        return $this->belongsTo(Project::class, 'Project_Id_Project', 'Id_Project');
     }
+
 
 }

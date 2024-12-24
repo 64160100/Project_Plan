@@ -24,6 +24,14 @@ class Strategic extends Model
     {
         return $this->hasMany(Project::class, 'Strategic_Id', 'Id_Strategic');
     }
+
+    //หนึ่ง Strategic มีหลาย Strategy
+    public function strategies()
+    {
+        return $this->hasMany(Strategy::class, 'Strategic_Id', 'Id_Strategic');
+    }
+
+   
     
     
 }

@@ -1,0 +1,194 @@
+.container {
+    display: flex;
+    justify-content: space-between; /* กระจายองค์ประกอบให้ชิดซ้ายและขวา */
+    align-items: center; /* จัดให้อยู่ตรงกลางแนวตั้ง */
+    width: 100%; /* ใช้เต็มหน้าจอ */
+  }
+  
+  /* button */
+  .btn-add {
+    background-color: initial;
+    background-image: linear-gradient(#7C3AED, #472187 100%);
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+    height: 40px;
+    width: 120px;
+    line-height: 40px;
+    display: inline-block;
+  }
+  .btn-add:hover {
+    opacity: .8;
+  }
+  
+  
+    .btn-edit {
+      background-color: initial;
+      background-image: linear-gradient(#EEE605, #A78B02);
+      border-radius: 10px;
+      border-style: none;
+      box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
+      color: #fff;
+      cursor: pointer;
+      font-size: 16px;
+      text-align: center;
+      height: 40px;
+      width: 80px;
+      line-height: 40px;
+      display: inline-block;
+    }
+    .btn-edit:hover {
+      opacity: .8;
+    }
+    
+    .btn-delete {
+      background-color: initial;
+      background-image: linear-gradient(#EF4444, #892727);
+      border-radius: 10px;
+      border-style: none;
+      box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
+      color: #fff;
+      cursor: pointer;
+      display: inline-block;
+      /* font-family: sans-serif; */
+      font-size: 16px;
+      /* font-weight: bold; */
+      height: 40px;
+      width: 80px;
+      text-align: center;
+      transition: all .3s cubic-bezier(.05, .03, .35, 1);
+    }
+    .btn-delete:hover {
+      opacity: .8;
+    }
+  
+    .btn-addlist {
+      background-color: #e3c2ff;
+      border: 1px solid #f8f9fa;
+      border-radius: 4px;
+      color: #ffffff;
+      cursor: pointer;
+      font-family: arial,sans-serif;
+      font-size: 14px;
+      height: 30px;
+      width: 120px;
+      /* line-height: 27px;
+      min-width: 54px; */
+      padding: 0 16px;
+      text-align: center;
+      /* user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation; */
+      white-space: pre;
+    }
+    
+    .btn-addlist:hover {
+      border-color: #650893;
+      box-shadow: rgba(104, 6, 139, 0.1) 0 1px 1px;
+      color: #7304c7;
+    }
+    
+    .btn-addlist:focus {
+      border-color: #650893;
+      outline: none;
+    }
+
+    
+
+   /* end button */
+
+/* รายการโครงการ */
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: Montserrat, sans-serif;
+	height: 100vh;
+	margin: 20px 50px;
+    background: #fff;
+}
+
+h1 {
+	text-align: center;
+	color: #fff;
+	margin: 40px;
+}
+
+
+.accordion {
+	margin-bottom: 10px;
+
+	.accordion-btn {
+        position: relative;
+        background-color: #fff;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        padding: 15px 20px;
+        text-align: left;
+        cursor: pointer;
+        font-weight: bold; 
+        list-style-image: none;
+        transition: box-shadow .3s;
+	}
+
+  .accordion-btn:hover {
+    box-shadow: 0 0 20px rgba(212, 0, 255, 0.2); 
+   
+  }
+  
+  .accordion-content {
+		background-color: #ffffff;
+		border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        position: relative;
+        overflow: visible;
+
+    > *{
+      padding: 5px 20px;
+    }
+	}
+
+  &[open]{
+    .accordion-btn::after {
+    transform: translate(0%, -50%) rotate(90deg);
+    color: #9218ca;
+    }
+    
+    summary ~ *{
+      overflow: visible;
+      animation: heightUp 1s ease-in-out;
+    }
+	}
+}
+
+@keyframes heightUp {
+    0% {
+        max-height: 0;
+    }
+    100% {
+        max-height: 2000px; 
+    }
+}
+
+/* แผนยุท มหาลัย */
+.bth-group {
+  display: flex;
+  justify-content: flex-end; 
+  gap: 10px; 
+  margin-left: auto; 
+}
+
+.platform-container {
+  display: flex !important;
+  align-items: center; 
+  justify-content: flex-start; 
+  width: 100%;
+  gap: 10px; 
+  position: relative; 
+}

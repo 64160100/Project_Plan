@@ -1,5 +1,21 @@
 
-<form id="objectiveForm">
+<!-- <form id="objectiveForm">
+    <div for="formGroupExampleInput" class="form-label">วัตถุประสงค์โครงการ</div>
+        <div id="objectiveContainer">
+            <div class="form-group">
+                <input type="text" id="Objective_Project" name="Objective_Project" placeholder="เพิ่มวัตถุประสงค์" required>
+            </div>
+        </div>
+</form> -->
+
+<div for="formGroupExampleInput" class="form-label">วัตถุประสงค์โครงการ</div>
+<div class="form-group">
+    <input type="text" id="Objective_Project" name="Objective_Project" placeholder="เพิ่มวัตถุประสงค์" required>
+</div>
+
+
+
+<!-- <form id="objectiveForm">
     <div for="formGroupExampleInput" class="form-label">วัตถุประสงค์โครงการ</div>
         <div id="objectiveContainer">
             <div class="form-group">
@@ -10,4 +26,4 @@
         <div>
             <button type="button" class="btn-addlist" onclick="addField('objectiveContainer', 'projectObjective[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
         </div>
-</form>
+</form> -->

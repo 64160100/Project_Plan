@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class EmployeeModel extends Model
+class EmployeeModel extends Model implements JWTSubject
 {
     protected $connection = 'mydb';
     protected $table = 'Employee';
@@ -29,11 +30,21 @@ class EmployeeModel extends Model
 
     public function department()
     {
-        return $this->belongsTo(DepartmentModel::class, 'Department_Id');
+        return $this->belongsTo(DepartmentModel::class, 'Department_Id', 'Id_Department');
     }
 
     public function position()
     {
         return $this->belongsTo(PositionModel::class, 'Position_Id');
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

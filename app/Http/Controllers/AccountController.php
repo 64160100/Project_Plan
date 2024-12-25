@@ -46,8 +46,6 @@ class AccountController extends Controller
         return redirect()->route('account.employee')->with('success', 'พนักงานถูกเพิ่มเรียบร้อยแล้ว');
     }
     
-    // user_account //
-
     public function userAccount()
     {
         $employees = EmployeeModel::with('permissions')->get();
@@ -78,8 +76,6 @@ class AccountController extends Controller
 
     public function updateUserPermissions(Request $request, $Id_Employee)
     {
-        Log::info('Request Data', $request->all());
-
         if (!$request->has('Id_Permission') || !$request->Id_Permission) {
             return redirect()->back()->with('error', 'กรุณาเลือกสิทธิ์เพิ่มเติม');
         }
@@ -91,7 +87,6 @@ class AccountController extends Controller
             return redirect()->back()->with('error', 'พนักงานมีสิทธิ์นี้อยู่แล้ว');
         }
 
-        // Attach the permission to the employee
         $employee->permissions()->attach($permission->Id_Permission);
 
         return redirect()->back()->with('success', 'สิทธิ์ถูกมอบเรียบร้อยแล้ว');

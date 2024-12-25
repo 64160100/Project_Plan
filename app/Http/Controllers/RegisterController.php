@@ -18,17 +18,14 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
-        // Log form data
         Log::info('Form Data:', $request->all());
 
-        // Validate the request
         $validator = $this->validator($request->all());
         if ($validator->fails()) {
             Log::error('Validation Errors:', $validator->errors()->toArray());
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Create the user
         try {
             $user = $this->create($request->all());
             Log::info('User Created:', ['user' => $user]);
@@ -37,7 +34,6 @@ class RegisterController extends Controller
             return redirect()->back()->with('error', 'Registration failed. Please try again.');
         }
 
-        // Log the user in
         Auth::login($user);
 
         return redirect()->intended('dashboard')->with('success', 'Registration successful!');

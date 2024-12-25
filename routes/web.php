@@ -2,6 +2,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ListProjectController;
+use App\Http\Controllers\StorageFileController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -26,4 +27,12 @@ Route::put('/approvals/{id}/status/{status}', [ListProjectController::class, 'up
 Route::get('/proposeProject', [ListProjectController::class, 'proposeProject'])->name('proposeProject');
 Route::post('/projects/{id}/submitForApproval', [ListProjectController::class, 'submitForApproval'])->name('projects.submitForApproval');
 
+Route::get('/editForm', [ListProjectController::class, 'approveProject'])->name('approveProject');
 
+
+// ... existing code
+Route::get('/storage-files', [StorageFileController::class, 'index'])->name('StorageFiles.index');
+Route::post('/storage-files', [StorageFileController::class, 'store'])->name('StorageFiles.store');
+Route::delete('/storage-files/{id}', [StorageFileController::class, 'destroy'])->name('StorageFiles.destroy');
+Route::get('/{id}/download', [StorageFileController::class, 'download'])->name('StorageFiles.download');
+Route::get('/storage-files/{id}/view', [StorageFileController::class, 'view'])->name('StorageFiles.view');

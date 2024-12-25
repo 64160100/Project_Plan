@@ -20,4 +20,9 @@ class ApproveModel extends Model
     {
         return $this->belongsTo(ListProjectModel::class, 'Project_Id', 'Id_Project');
     }
+
+    public function recordHistory()
+    {
+        return $this->hasMany(RecordHistory::class, 'Approve_Id', 'Id_Approve');
+    }
 }

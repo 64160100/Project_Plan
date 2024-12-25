@@ -27,7 +27,7 @@ class ListProjectModel extends Model
     {
         return $this->belongsTo(EmployeeModel::class, 'Employee_Id', 'Id_Employee');
     }
-
+    
     public function approvals()
     {
         return $this->hasMany(ApproveModel::class, 'Project_Id', 'Id_Project');

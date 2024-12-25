@@ -15,6 +15,8 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
+    'max_upload_size' => env('MAX_UPLOAD_SIZE_MB', 20),
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks
@@ -42,7 +44,6 @@ return [
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
-            'throw' => false,
         ],
 
         's3' => [

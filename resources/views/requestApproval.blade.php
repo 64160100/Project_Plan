@@ -57,7 +57,7 @@
                                         @method('PUT')
                                         <div class="mb-3">
                                             <label for="comment" class="form-label">ความคิดเห็น:</label>
-                                            <textarea class="form-control" id="comment2" name="comment2" rows="3"
+                                            <textarea class="form-control" id="comment" name="comment" rows="3"
                                                 required></textarea>
                                         </div>
                                         <button type="submit" class="btn btn-danger">ยืนยันการไม่อนุมัติ</button>

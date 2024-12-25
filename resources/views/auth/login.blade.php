@@ -8,7 +8,6 @@
     <meta name="description" content="">
     <meta name="keywords" content="">
 
-
     <!-- Fonts -->
     <!-- <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -49,18 +48,19 @@
                             </a>
                             <form method="POST" action="{{ route('login') }}">
                                 @csrf
+
                                 <div class="form-group mb-3 position-relative">
                                     <label for="email" class="form-label">อีเมล</label>
-                                    <input id="email" class="form-control" placeholder="กรุณาใส่อีเมล" name="email"
-                                        required>
+                                    <input id="email" type="email" class="form-control" placeholder="กรุณาใส่อีเมล"
+                                        name="email" required>
                                 </div>
 
                                 <div class="form-group mb-3 position-relative">
                                     <label for="password" class="form-label">รหัสผ่าน</label>
-                                    <input id="password" class="form-control" placeholder="กรุณาใส่รหัสผ่าน"
-                                        name="password" required>
+                                    <input id="password" type="password" class="form-control"
+                                        style="border: 1px solid #ccc;" placeholder="กรุณาใส่รหัสผ่าน" name="password"
+                                        required>
                                 </div>
-
                                 @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul class="mb-0">
@@ -80,7 +80,7 @@
 
                 </div>
             </div>
-        </section><!-- /Hero Section -->
+        </section>
     </main>
 
 

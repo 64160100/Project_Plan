@@ -12,6 +12,18 @@ INSERT INTO `Position` (`Id_Position`, `Name_Position`) VALUES
 (1, 'บรรณารักษ์ชำนาญการพิเศษ'),
 (2, 'บรรณารักษ์ชำนาญการ');
 
+INSERT INTO `Employee` (`Id_Employee`, `Firstname_Employee`, `Lastname_Employee`, `Email`, `Password`, `IsManager`, `IsDirector`, `Department_Id`, `Position_Id`) VALUES
+(1, 'สมชาย', 'แดง', '54160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'Y', 1, 1),
+(2, 'สมหญิง', 'เขียว', '64160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'Y', 'N', 1, 2),
+(3, 'บรูโน่', 'เหลือง', '74160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 1, 1),
+(4, 'เดเคอา', 'น้ำเงิน', '84160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 1, 2);
+
 INSERT INTO `Strategic` (`Id_Strategic`, `Name_Strategic_Plan`, `Goals_Strategic`) VALUES
 (1, 'ยุทธศาสตร์ที่ 1 การพัฒนาความเป็นเลิศด้านบริการด้วยมาตรฐ', 'GG'),
 (2, 'ยุทธศาสตร์ที่ 2 การพัฒนาโครงการ', 'TT');
+
+INSERT INTO `Users` (`Employee_Id_Employee`, `Premission_Id_Permission`) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4);

@@ -1,21 +1,8 @@
-<!-- ตัวชี้วัด -->
-<!-- <form id="dynamicForm"> -->
-    <!-- <label for="formGroupExampleInput" class="form-label"><b>กลยุทธ์ที่เกี่ยวข้อง</b></label> -->
-
-    <!-- <form id="projectKpiForm">
-        <div id="projectKpiContainer">
-            <label for="formGroupExampleInput" class="form-label"><b>ตัวชี้วัด</b></label>
-            <div class="form-group">
-                <input type="text" id="Indicators_Project" name="Indicators_Project" placeholder="กรอกตัวชี้วัด">
-            </div>
+    <div id="projectKpiContainer">
+        <div>
+            <button type="button" id="add-indicators" class="btn-addlist" onclick="addField('projectKpiContainer', 'Indicators_Project[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
         </div>
-    </form> -->
-
-    <!-- <label for="formGroupExampleInput" class="form-label"><b>ตัวชี้วัด</b></label> -->
-    <div class="form-group">
-        <input type="text" id="Indicators_Project" name="Indicators_Project" placeholder="กรอกตัวชี้วัด">
     </div>
-
     <!-- เพิ่มรายการ -->
 
     <!-- <form id="projectKpiForm">

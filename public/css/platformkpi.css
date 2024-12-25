@@ -65,3 +65,29 @@
     .btn-delete:hover {
       opacity: .8;
     }
+
+    .btn-addlist {
+      background-color: #e3c2ff;
+      border: 1px solid #f8f9fa;
+      border-radius: 4px;
+      color: #ffffff;
+      cursor: pointer;
+      font-family: arial,sans-serif;
+      font-size: 14px;
+      height: 30px;
+      width: 120px;
+      padding: 0 16px;
+      text-align: center;
+      white-space: pre;
+    }
+    
+    .btn-addlist:hover {
+      border-color: #650893;
+      box-shadow: rgba(104, 6, 139, 0.1) 0 1px 1px;
+      color: #7304c7;
+    }
+    
+    .btn-addlist:focus {
+      border-color: #650893;
+      outline: none;
+    }

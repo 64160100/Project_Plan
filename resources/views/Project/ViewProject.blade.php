@@ -12,7 +12,7 @@
 <body>
 @section('content')
 
-    <div class="container">
+    <div class="container-vp">
         <h3 class="head-project">
             <b>รายละเอียดโครงการ : {{ $projects->Name_Project }}</b>
         </h3>

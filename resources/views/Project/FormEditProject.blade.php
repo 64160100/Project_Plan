@@ -42,7 +42,6 @@
             
             <!-- ความสอดคล้องส่วนงาน -->
             <div class="content-box"><b>ความสอดคล้องกับยุทธศาสตร์ส่วนงาน</b>
-                <label for="strategicSelect" class="form-label">กลยุทธ์</label>
                 <select class="form-select" name="Strategic_Id" id="Strategic_Id" required>
                     <option value="" selected disabled>เลือกกลยุทธ์</option>
                     @forelse($strategies as $Strategies)
@@ -72,13 +71,10 @@
 
              <!-- วัตถุประสงค์โครงการ   -->
              <div class="content-box"><b>วัตถุประสงค์โครงการ</b>
-                <div for="formGroupExampleInput" class="form-label">วัตถุประสงค์โครงการ</div>
-                    <div class="form-group">
-                        <input type="text" id="Objective_Project" name="Objective_Project" value="{{ $projects->Objective_Project }}" placeholder="เพิ่มวัตถุประสงค์" required>
-                    </div>
+                <div class="form-group">
+                    <input type="text" id="Objective_Project" name="Objective_Project" value="{{ $projects->Objective_Project }}" placeholder="เพิ่มวัตถุประสงค์" required>
                 </div>
             </div><br>
-            <!-- end วัตถุประสงค์โครงการ   -->
 
             <!-- ตัวชี้วัด   -->
             <div class="content-box"><b>ตัวชี้วัด</b>
@@ -87,41 +83,31 @@
                 </div>
             </div><br>
                
-
             <!-- กลุ่มเป้าหมาย   -->
-            <details class="accordion">
-                <summary class="accordion-btn"><b>กลุ่มเป้าหมาย</b></summary>
-                <div class="accordion-content">
-                    <div class="mb-3">
-                        <div class="form-group">
-                            <input type="text" name="Target_Project" id="Target_Project" value="{{ $projects->Target_Project }}" placeholder="เพิ่มกลุ่มเป้าหมาย" required>
-                        </div>
-                    </div>
+            <div class="content-box"><b>กลุ่มเป้าหมาย</b>
+                <div class="form-group">
+                    <input type="text" name="Target_Project" id="Target_Project" value="{{ $projects->Target_Project }}" placeholder="เพิ่มกลุ่มเป้าหมาย" required>
                 </div>
-            </details>
-
+            </div><br>
+                
             <!-- ระยะเวลาดำเนินโครงการ   -->
-        <details class="accordion">
-            <summary class="accordion-btn"><b>ระยะเวลาดำเนินโครงการ</b></summary>
-            <div class="accordion-content">
-                <div class="mb-3">
-                    <!-- <form id="dynamicForm"> -->
-                        <div>
-                            <label for="First_Time">วันที่เริ่มต้น:</label><br>
-                            <input type="date" id="First_Time" name="First_Time" value="{{ $projects->First_Time }}" required>
-                        </div>
-                        <br>
-                        <div>
-                            <label for="End_Time">วันที่สิ้นสุด:</label><br>
-                            <input type="date" id="End_Time" name="End_Time" value="{{ $projects->End_Time }}" required>
-                        </div>
-                    <!-- </form> -->
+            <div class="content-box"><b>ระยะเวลาดำเนินโครงการ</b>
+                <div>
+                    <label for="First_Time">วันที่เริ่มต้น:</label><br>
+                    <input type="date" id="First_Time" name="First_Time" value="{{ $projects->First_Time }}" required>
                 </div>
-            </div>
-        </details>
-
-        <button type="submit" class="btn btn-primary">บันทึก</button>
-    </form> 
+                <br>
+                <div>
+                    <label for="End_Time">วันที่สิ้นสุด:</label><br>
+                    <input type="date" id="End_Time" name="End_Time" value="{{ $projects->End_Time }}" required>
+                </div>
+            </div><br>
+            
+        <!-- save -->   
+        <div class="container">
+            <button type="submit" class="btn-submit">บันทึก</button>
+        </div>
+        </form> 
 
     
         

@@ -1,10 +1,10 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,400i,700");
 
-.container {
+.container-vp {
   display: flex;
-  justify-content: space-between; /* กระจายองค์ประกอบให้ชิดซ้ายและขวา */
-  align-items: center; /* จัดให้อยู่ตรงกลางแนวตั้ง */
-  width: 100%; /* ใช้เต็มหน้าจอ */
+  justify-content: space-between; 
+  align-items: center; 
+  width: auto;
 }
 
 /* button */
@@ -136,9 +136,10 @@ h1 {
     font-size: 16px;
     list-style-image: none;
     transition: box-shadow .3s;
-    display: flex; /* ใช้ flexbox */
-    justify-content: space-between; /* กระจายเนื้อหาให้หัวเรื่องอยู่ซ้ายและปุ่มอยู่ขวา */
-    align-items: center; /* จัดกึ่งกลางแนวตั้ง */
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	}
 
   .accordion-btn:hover {
@@ -401,3 +402,27 @@ input[type="checkbox"] {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.btn-submit {
+  background-color: #007BFF; 
+  border: none; 
+  border-radius: 5px; /* ขอบโค้งมน */
+  color: #fff; /* สีข้อความ */
+  cursor: pointer; /* เปลี่ยนเคอร์เซอร์เมื่อ hover */
+  text-align: center;
+  padding: 8px 20px; /* ระยะห่างภายใน */
+  font-size: 16px; /* ขนาดข้อความ */
+  font-weight: bold; /* ข้อความหนา */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เงา */
+  transition: background-color 0.3s, transform 0.2s; /* เพิ่มเอฟเฟกต์ */
+}
+
+.btn-submit:hover {
+  background-color: #0056b3; /* สีเมื่อ hover */
+  transform: scale(1.05); /* ขยายเล็กน้อยเมื่อ hover */
+}
+
+.container {
+  display: flex; /* ใช้ flexbox */
+  justify-content: flex-end; /* จัดเนื้อหาไปชิดขวา */
+  padding: 10px; /* เพิ่มระยะห่างรอบๆ container */
+}

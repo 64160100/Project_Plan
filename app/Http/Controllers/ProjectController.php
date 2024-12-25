@@ -10,7 +10,6 @@ use App\Models\Sdg;
 use App\Models\Platform;
 use App\Models\Sup_Project;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class ProjectController extends Controller
 {
@@ -43,13 +42,16 @@ class ProjectController extends Controller
         $projects->Strategic_Id = $request->Strategic_Id;
         $projects->Name_Project = $request->Name_Project;
         $projects->Name_Strategy = $request->Name_Strategy;
+
         $projects->Objective_Project = $request->Objective_Project;
         $projects->Indicators_Project = $request->Indicators_Project;
         $projects->Target_Project = $request->Target_Project;
+
         $projects->First_Time = $request->First_Time;
         $projects->End_Time = $request->End_Time;
 
         $projects->save();
+
 
         if ($request->has('sdgs')) {
             $selectedSDGs = $request->sdgs; // รับค่าที่ส่งมาจากฟอร์ม (Array)
@@ -58,6 +60,16 @@ class ProjectController extends Controller
 
         if ($request->has('Name_Sup_Project')) {
             $this->createSupProjects($projects->Id_Project, $request->Name_Sup_Project);
+        }
+
+        if ($request->has('Objective_Project')) {
+            $this->createObjProjects($projects->Id_Project, $request->Objective_Project);
+        }
+        if ($request->has('Indicators_Project')) {
+            $this->createIndicatorsProjects($projects->Id_Project, $request->Indicators_Project);
+        }
+        if ($request->has('Target_Project')) {
+            $this->createTargetProjects($projects->Id_Project, $request->Target_Project);
         }
         
         return redirect()->route('index', ['Strategic_Id' => $Strategic_Id])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
@@ -77,6 +89,62 @@ class ProjectController extends Controller
                 Sup_Project::create([
                     'Project_Id_Project' => $Id_Project,
                     'Name_Sup_Project' => $supProjectName
+                ]);
+            }
+        }
+    }
+
+    private function createObjProjects($Id_Project, $objProjectNames)
+    {
+        if (!is_array($objProjectNames)) {
+            $objProjectNames = [$objProjectNames];
+        }
+    
+        foreach ($objProjectNames as $objProjectName) {
+            if (!empty($objProjectName)) {
+                if (is_array($objProjectName)) {
+                    $objProjectName = implode(', ', $objProjectName);
+                }
+                Project::create([
+                    'Id_Project' => $Id_Project,
+                    'Objective_Project' => $objProjectName
+                ]);
+            }
+        }
+    }
+
+    private function createIndicatorsProjects($Id_Project, $indicatorsProjects)
+    {
+        if (!is_array($indicatorsProjects)) {
+            $indicatorsProjects = [$indicatorsProjects];
+        }
+    
+        foreach ($indicatorsProjects as $indicatorsProject) {
+            if (!empty($indicatorsProject)) {
+                if (is_array($indicatorsProject)) {
+                    $indicatorsProject = implode(', ', $indicatorsProject);
+                }
+                Project::create([
+                    'Id_Project' => $Id_Project,
+                    'Indicators_Project' => $indicatorsProject
+                ]);
+            }
+        }
+    }
+
+    private function createTargetProjects($Id_Project, $targetProjects)
+    {
+        if (!is_array($targetProjects)) {
+            $targetProjects = [$targetProjects];
+        }
+        foreach ($targetProjects as $targetProject) {
+            if (!empty($targetProject)) {
+                if (is_array($targetProject)) {
+                    $targetProject = implode(', ', $targetProject);
+                }
+                Project::create([
+                    'Id_Project' => $Id_Project,
+                    'Target_Project' => $targetProject
                 ]);
             }
         }
@@ -130,6 +198,9 @@ class ProjectController extends Controller
         $projects->Objective_Project = $request->Objective_Project;
         $projects->Indicators_Project = $request->Indicators_Project;
         $projects->Target_Project = $request->Target_Project;
+
+        $projects->First_Time = $request->First_Time;
+        $projects->End_Time = $request->End_Time;
         $projects->save();
 
         // update Name_Strategy

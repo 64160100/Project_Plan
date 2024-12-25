@@ -1,15 +1,14 @@
-let projectFieldCounter = 2;  
-let objectiveFieldCounter = 2;
-let methodFieldCounter = 2;
-let outputFieldCounter = 2;
-let outcomeFieldCounter = 2;
-let resultFieldCounter = 2;
+let projectFieldCounter = 1;  
+let objectiveFieldCounter = 1;
+let methodFieldCounter = 1;
+let outputFieldCounter = 1;
+let outcomeFieldCounter = 1;
+let resultFieldCounter = 1;
 
-let projectKpiFieldCounter = 2;
-let kpiFieldCounter = 2;
+let projectKpiFieldCounter = 1;
+let kpiFieldCounter = 1;
 
-
-function addField(containerId, inputName) {
+function addField(containerId, inputName, projectId) {
     const container = document.getElementById(containerId); 
     const newField = document.createElement('div');
     const placeholderText = getPlaceholder(inputName);
@@ -17,40 +16,41 @@ function addField(containerId, inputName) {
 
     newField.innerHTML = `
        <input type="text" 
-            id="${placeholderText.Id_Sup_Project}" 
-            name="${inputName}[]" 
+            id="${placeholderText.fieldId}" 
+            name="${inputName}[]"  
             placeholder="${placeholderText.placeholder}"
             required 
             oninput="handleInput(this)">
         <button type="button" class="remove-btn" onclick="removeField(this)"><i class='bx bx-x'></i></button>
     `;
-    container.appendChild(newField);
+
+    const addButton = container.lastElementChild;
+    container.insertBefore(newField, addButton);
+
+    // updateHiddenInput(inputName);
 }
 
 // Function to remove a specific field
 function removeField(button, containerId) {
     const field = button.parentElement;
     field.remove();
-
-     // รีเซ็ต counter และเรียงลำดับใหม่
-    //  reorderFields(containerId);
 }
 
 function getPlaceholder(inputName) {
     let fieldId = "";
-    let Id_Sup_Project = "";
+    // let Id_Sup_Project = "";
 
     let placeholderText = "";
 
-    if (inputName === 'Name_Sup_Project[]') {
-        Id_Sup_Project = `Id_Sup_Project-${projectFieldCounter}`;
+    if (inputName === 'Name_Sup_Project[]') { //
+        fieldId = `field-${projectFieldCounter}`;
         placeholderText = "กรอกชื่อโครงการย่อย";
         projectFieldCounter++;  
 
-    } else if (inputName === 'projectObjective[]') {
+    } else if (inputName === 'Objective_Project[]') { //
         fieldId = `field-${objectiveFieldCounter}`;
         placeholderText = "เพิ่มวัตถุประสงค์";
-        objectiveFieldCounter++;  
+        objectiveFieldCounter++; 
 
     } else if (inputName === 'method[]') {
             fieldId = `field-${methodFieldCounter}`;
@@ -71,12 +71,13 @@ function getPlaceholder(inputName) {
         fieldId = `field-${resultFieldCounter}`;
         placeholderText = "กรอกข้อมูล";
         resultFieldCounter++;  
-    } else if (inputName === 'projectKpi[]') {
+        
+    } else if (inputName === 'Indicators_Project[]') { //
         fieldId = `field-${projectKpiFieldCounter}`;
         placeholderText = "กรอกตัวชี้วัด";
         projectKpiFieldCounter++;  
     }
-    else if (inputName === 'Kpi[]') {
+    else if (inputName === 'Target_Project[]') { //
         fieldId = `field-${kpiFieldCounter}`;
         placeholderText = "ระบุค่าเป้าหมาย ไม่น้อยกว่า...";
         kpiFieldCounter++;  
@@ -85,19 +86,41 @@ function getPlaceholder(inputName) {
 }
 
 
-// function handleInput(inputElement) {
-//     const fieldId = inputElement.id;         
-//     const fieldName = inputElement.name;     
-//     const fieldValue = inputElement.value;   
-//     console.log(`Field ID: ${fieldId}, Name: ${fieldName}, Value: ${fieldValue}`);
+// function updateHiddenInput(inputName) {
+//     const inputs = document.getElementsByName(inputName);
+
+//     // ลบ input ที่มีอยู่ก่อน เพื่ออัปเดตใหม่
+//     const existingInputs = document.querySelectorAll(`[data-input-name="${inputName}"]`);
+//     existingInputs.forEach(input => input.remove());
+
+//     // สร้าง input ใหม่แยกแต่ละรายการ
+//     inputs.forEach((input, index) => {
+//         const hiddenInput = document.createElement('input');
+//         hiddenInput.type = 'hidden';
+//         hiddenInput.name = `${inputName}[${index}]`; // ชื่อแบบ array เพื่อส่งแยก
+//         hiddenInput.value = input.value;
+//         hiddenInput.setAttribute('data-input-name', inputName); // ใช้สำหรับค้นหาและลบ
+//         document.querySelector('form').appendChild(hiddenInput);
+//     });
 // }
 
-function handleInput(inputElement) {
-    const Id_Sup_Project = inputElement.id;         
+function handleInput(inputElement, inputName) {
+    // updateHiddenInput(inputName);
+    const fieldId = inputElement.id;
     const fieldName = inputElement.name;     
     const fieldValue = inputElement.value;   
-    console.log(`Field ID: ${Id_Sup_Project}, Name: ${fieldName}, Value: ${fieldValue}`);
+    console.log(`Field ID: ${fieldId}, Name: ${fieldName}, Value: ${fieldValue}`);
 }
+
+
+// document.addEventListener('DOMContentLoaded', function() {
+//     const addButtons = document.querySelectorAll('[id^="add-"]');
+//     addButtons.forEach(button => {
+//         const containerId = button.getAttribute('data-container');
+//         const inputName = button.getAttribute('data-input');
+//         button.addEventListener('click', () => addField(containerId, inputName));
+//     });
+// });
 
 
 

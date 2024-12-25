@@ -65,14 +65,15 @@
                 </div><br>
              
 
-            <!-- กลุ่มเป้าหมาย   -->
-                <div class="content-box"><b>กลุ่มเป้าหมาย</b>
-                        <div class="form-group">
-                            <input type="text" name="Target_Project" id="Target_Project" placeholder="เพิ่มกลุ่มเป้าหมาย" required>
+            <!-- ค่าเป้าหมาย   -->
+                <div class="content-box"><b>ค่าเป้าหมาย</b>
+                    <div id="targetProjectContainer">
+                        <div>
+                            <button type="button" id="add-targetProject" class="btn-addlist" onclick="addField('targetProjectContainer', 'Target_Project[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
                         </div>
+                    </div>
                 </div><br>
                     
-
         <!-- ระยะเวลาดำเนินโครงการ   -->
                 <div class="content-box"><b>ระยะเวลาดำเนินโครงการ</b>
                     <div>
@@ -85,8 +86,12 @@
                         <input type="date" id="End_Time" name="End_Time" required>
                     </div>
                 </div><br>
-        
-        <button type="submit" class="btn btn-primary">บันทึก</button>
+                
+        <!-- save -->
+        <div class="container">
+            <button type="submit" class="btn-submit">บันทึก</button>
+        </div>
+    
     </form> 
         
 

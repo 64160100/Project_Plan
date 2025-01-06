@@ -1,37 +1,29 @@
-<select 
-    class="form-select @error('Id_Strategic') is-invalid @enderror" 
-    id="Id_Strategic"
-    name="Id_Strategic"
-    required>
-    
-    <option select>แพลตฟอร์ม 01</option>
+@csrf
+<div id="kpi-form-fields">
+    <div class="kpi-field">
+        <label for="Name_Platform">ชื่อ Platform</label>
+        <input type="text" class="form-control" name="platforms[]" placeholder="กรอกชื่อ Platform" required><br>
 
-    <!-- แสดงข้อมูลจากฐานข้อมูล -->
-    
-</select>
+        <label for="Name_Object">ชื่อ obj</label>
+        <input type="text" class="form-control" name="Name_Object" placeholder="กรอกชื่อ obj" required><br>
 
-<select 
-    class="form-select @error('Id_Strategic') is-invalid @enderror" 
-    id="Id_Strategic"
-    name="Id_Strategic"
-    required>
+        <label for="Name_Platfrom_Kpi">ชื่อ Kpi</label>
+        <input type="text" class="form-control" name="Name_Platfrom_Kpi" placeholder="กรอกชื่อ Kpi" required><br>
 
-    <option select>โปรแกรม 1</option>
+        <label for="Description_Platfrom_Kpi">รายละเอียด Kpi</label>
+        <input type="text" class="form-control" name="Description_Platfrom_Kpi" placeholder="กรอกชื่อ Kpi" required><br>
 
-    <!-- แสดงข้อมูลจากฐานข้อมูล -->
-    
-</select>
+        <label for="Budget_Year">ปีงบประมาณ</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" class="form-control" name="Budget_Year" placeholder="ปีงบประมาณ..." required>
+            <input type="text" class="form-control" name="Value_Platform" placeholder="จำนวน" required>
+            <input type="text" class="form-control" name="Value_Platform" placeholder="หน่วย" required>
+        </div>
+        <br>
+        <button type="button" class="remove-field" onclick="removeKpiField(this)">Remove</button>
+    </div>
+</div>
 
-<select 
-    class="form-select @error('Id_Strategic') is-invalid @enderror"  
-    id="Id_Strategic"
-    name="Id_Strategic"
-    required>
-
-    <option select>ตัวชี้วัดมหาวิทยาลัย(KPI)</option>
-    <!-- แสดงข้อมูลจากฐานข้อมูล -->
-    
-</select>
 <div>
-    <button type="submit" class="btn-addlist" onclick="alert('Use JavaScript for dynamic adding')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
+    <button type="button" class="btn-addlist" onclick="addKpiField()">เพิ่ม Platform</button>
 </div>

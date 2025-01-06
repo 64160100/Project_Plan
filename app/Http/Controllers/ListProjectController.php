@@ -10,6 +10,7 @@ use App\Models\StrategicModel;
 use App\Models\ApproveModel;
 use App\Models\EmployeeModel;
 use App\Models\RecordHistory;
+use App\Models\SustainableDevelopmentGoalsModel;
 use Carbon\Carbon;
 
 
@@ -17,72 +18,125 @@ class ListProjectController extends Controller
 {
     public function project()
     {
-        $strategics = StrategicModel::with('projects')->get();        
-        return view('Project.listProject', compact('strategics'));
-    }
-
-    public function showCreateForm()
-    {
         $strategics = StrategicModel::with('projects')->get();
-        $employees = EmployeeModel::all(); 
-    
-        return view('Project.createProject', compact('strategics', 'employees'));
+        $strategics->each(function ($strategics) {
+            $strategics->project_count = $strategics->projects->count();
+        });
+
+        return view('Project.listProject', compact('strategics')); 
     }
 
-    public function createProject(Request $request)
+    public function showCreateForm($Strategic_Id)
     {
+        $strategics = StrategicModel::with('strategies')->find($Strategic_Id); 
+        $strategics = StrategicModel::with('projects')->find($Strategic_Id); 
+        $strategies = $strategics->strategies;
+        $employees = EmployeeModel::all();
+        $sdgs = SustainableDevelopmentGoalsModel::all();
+    
+        return view('Project.createProject', compact('strategics', 'strategies', 'sdgs'));
+    }
+
+    public function createProject(Request $request, $Strategic_Id)
+    {
+        $strategics = StrategicModel::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
+        $strategies = $strategics->strategies;
+
         $project = new ListProjectModel;
-        $project->strategic_Id = $request->strategic_id;
-        $project->Name_Project = $request->project_name;
-        $project->Employee_Id = $request->employee_id; 
+        $project->Strategic_Id = $request->Strategic_Id;
+        $project->Name_Project = $request->Name_Project;
+        $project->Employee_Id = $request->employee_id;
+        $project->Objective_Project = $request->Objective_Project;
+        $project->Indicators_Project = $request->Indicators_Project;
+        $project->Target_Project = $request->Target_Project;
+        $project->First_Time = $request->First_Time;
+        $project->End_Time = $request->End_Time;
         $project->save();
 
-        Log::info('Project created with ID: '. $project->Id_Project);
+        Log::info('Project created with ID: ' . $project->Id_Project);
 
         if ($project->Id_Project) {
-            Log::info('Project created with ID: ' . $project->Id_Project);
             $approval = new ApproveModel;
-            $approval->Status = 'I'; 
-            $approval->Project_Id = $project->Id_Project; 
+            $approval->Status = 'I';
+            $approval->Project_Id = $project->Id_Project;
             $approval->save();
             Log::info('Approval record created for project ID: ' . $project->Id_Project);
         } else {
             Log::error('Failed to create project.');
         }
 
-        return redirect()->route('project')->with('success', 'Project created successfully and approval record created.');
+        if ($request->has('sdgs')) {
+            $selectedSDGs = $request->sdgs;
+            $project->sdgs()->sync($selectedSDGs);
+        }
+
+        if ($request->has('Name_Sup_Project')) {
+            $this->createSupProjects($project->Id_Project, $request->Name_Sup_Project);
+        }
+
+        if ($request->has('Objective_Project')) {
+            $this->createObjProjects($project->Id_Project, $request->Objective_Project);
+        }
+
+        if ($request->has('Indicators_Project')) {
+            $this->createIndicatorsProjects($project->Id_Project, $request->Indicators_Project);
+        }
+
+        if ($request->has('Target_Project')) {
+            $this->createTargetProjects($project->Id_Project, $request->Target_Project);
+        }
+
+        return redirect()->route('project', ['Strategic_Id' => $Strategic_Id])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
     }
     
     public function showAllApprovals(Request $request)
     {
         $approvals = collect();
-
+    
         $employee = $request->session()->get('employee');
         $permissions = $request->session()->get('permissions');
-
+    
         if ($employee) {
-
             if ($employee->IsManager === 'Y') {
-                $approvals = ApproveModel::whereHas('project', function ($query) {
-                    $query->where('Count_Steps', 1);
-                })->get();
+                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
+                    ->whereHas('project', function ($query) {
+                        $query->where('Count_Steps', 1);
+                    })->get();
             } elseif ($employee->IsDirector === 'Y') {
-                $approvals = ApproveModel::whereHas('project', function ($query) {
-                    $query->where('Count_Steps', 2);
-                })->get();
+                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
+                    ->whereHas('project', function ($query) {
+                        $query->where('Count_Steps', 2);
+                    })->get();
             } else {
-                $approvals = ApproveModel::whereHas('project', function ($query) use ($employee) {
-                    $query->where('Count_Steps', 0)
-                        ->where('Employee_Id', $employee->Id_Employee);
-                })->get();
+                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
+                    ->whereHas('project', function ($query) use ($employee) {
+                        $query->where('Count_Steps', 0)
+                            ->where('Employee_Id', $employee->Id_Employee);
+                    })->get();
+            }
+    
+            foreach ($approvals as $approval) {
+                foreach ($approval->recordHistory as $history) {
+                    $timeRecord = $history->Time_Record;
+                    $date = \Carbon\Carbon::parse($timeRecord);
+                    $thaiMonths = [
+                        1 => 'มกราคม', 2 => 'กุมภาพันธ์', 3 => 'มีนาคม', 4 => 'เมษายน',
+                        5 => 'พฤษภาคม', 6 => 'มิถุนายน', 7 => 'กรกฎาคม', 8 => 'สิงหาคม',
+                        9 => 'กันยายน', 10 => 'ตุลาคม', 11 => 'พฤศจิกายน', 12 => 'ธันวาคม'
+                    ];
+                    $day = $date->format('j');
+                    $month = $thaiMonths[(int)$date->format('m')];
+                    $year = $date->year + 543;
+                    $history->formattedDateTime = "$day / $month / $year";
+                }
             }
         } else {
             Log::warning('No employee data found in session.');
         }
-
+        
         return view('requestApproval', compact('approvals'));
     }
-
+    
     public function updateApprovalStatus(Request $request, $id, $status)
     {
         $approval = ApproveModel::find($id);
@@ -195,8 +249,6 @@ class ListProjectController extends Controller
                 }
             }
             
-            Log::info('Propose project page accessed by ' . $projects);
-
             return view('proposeProject', compact('projects'));
         } else {
             return redirect()->back()->with('error', 'You are not authorized to view these projects.');

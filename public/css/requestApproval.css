@@ -6,7 +6,7 @@
     margin-bottom: 20px;
     padding: 15px;
     background-color: #ffffff;
-    border-radius: 8px; 
+    border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -27,8 +27,8 @@
 
 .project-info {
     display: flex;
-    justify-content: center; 
-    gap: 200px; 
+    justify-content: center;
+    gap: 200px;
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 1px solid #e0e0e0;
@@ -93,58 +93,68 @@
     font-size: 14px;
 }
 
-.button-container {
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px;
-    border-top: 1px solid #e0e0e0;
+.status-button {
+    border: none;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 14px;
+    cursor: pointer;
 }
 
-.action-button {
-    background-color: #808080;
-    color: white;
-    border: none;
-    padding: 10px 10px;
-    border-radius: 4px;
+.approved {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+}
+
+.not-approved {
+    background-color: #FFEBEE;
+    color: #C62828;
+}
+
+.pending {
+    background-color: #FFF9C4;
+    color: #F9A825;
+}
+
+.action-buttons {
     display: flex;
-    align-items: center;
     gap: 8px;
+    margin-top: 8px;
+}
+
+.btn-action {
+    padding: 4px 12px;
+    border-radius: 16px;
+    border: none;
+    font-size: 14px;
     cursor: pointer;
+}
+
+.modal-content {
+    border-radius: 8px;
+}
+
+.modal-header {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 16px;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.form-control {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 8px;
+    width: 100%;
 }
 
 i {
     opacity: 0.7;
+    font-size: 25px;
 }
 
-.info-top i,
-.action-button i {
-    font-size: 25px; 
-}
-
-.status-left i{
+.status-left i {
     font-size: 40px;
 }
-
-.approved {
-    background-color: #E8F5E9; /* Light green */
-    color: #2E7D32; /* Dark green */
-}
-
-.not-approved {
-    background-color: #FFEBEE; /* Light red */
-    color: #C62828; /* Dark red */
-}
-
-.pending {
-    background-color: #FFF9C4; /* Light yellow */
-    color: #F9A825; /* Dark yellow */
-}
-
-.approval-status {
-    font-size: 14px;
-    padding: 4px 12px;
-    border-radius: 16px;
-    border: none;
-    cursor: pointer;
-}
-

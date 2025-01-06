@@ -30,4 +30,9 @@ class StrategyModel extends Model
         return $this->hasMany(StrategicObjectivesModel::class, 'Strategy_Id_Strategy', 'Id_Strategy');
     }
 
+    public function strategic()
+    {
+        return $this->belongsTo(StrategicModel::class, 'Strategic_Id', 'Id_Strategic');
+    }
+
 }

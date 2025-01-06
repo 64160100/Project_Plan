@@ -2,17 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\StrategyModel;
 use App\Models\ListProjectModel;
+use Illuminate\Support\Facades\DB;
+
 
 class StrategicModel extends Model
 {
     protected $connection = 'mydb';
     protected $table = 'Strategic';
     protected $primaryKey = 'Id_Strategic';
+    protected $keyType = 'int';
+
     protected $fillable = [
-        'Id_Strategic',
         'Name_Strategic_Plan',
         'Goals_Strategic',
     ];

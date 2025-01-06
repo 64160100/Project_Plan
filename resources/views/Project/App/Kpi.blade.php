@@ -1,21 +1,11 @@
-<!-- ตัวชี้วัด -->
-<form id="dynamicForm">
-    <label for="formGroupExampleInput" class="form-label"><b>กลยุทธ์ที่เกี่ยวข้อง</b></label>
-    <div class="form-group">
-        <select 
-        class="form-select @error('Id_Strategic') is-invalid @enderror" 
-        id="Id_Strategic"
-        name="Id_Strategic"
-        required>
-
-        <option select>เลือกกลยุทธ์</option>
-
-        <!-- แสดงข้อมูลจากฐานข้อมูล -->
-        
-        </select>
+    <div id="projectKpiContainer">
+        <div>
+            <button type="button" id="add-indicators" class="btn-addlist" onclick="addField('projectKpiContainer', 'Indicators_Project[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
+        </div>
     </div>
+    <!-- เพิ่มรายการ -->
 
-    <form id="projectKpiForm">
+    <!-- <form id="projectKpiForm">
         <div id="projectKpiContainer">
             <label for="formGroupExampleInput" class="form-label"><b>ตัวชี้วัด</b></label>
             <div class="form-group">
@@ -28,9 +18,9 @@
         </div>
     </form>
 
-    <br>
+    <br> -->
 
-    <form id="KpiForm">
+    <!-- <form id="KpiForm">
         <div id="KpiContainer">
             <label for="formGroupExampleInput" class="form-label"><b>ค่าเป้าหมาย</b></label>
             <div class="form-group">
@@ -62,11 +52,8 @@
             <input type="text" id="textbox-goal-unit" class="hidden" data-group="goal" placeholder="หน่วย">
         </div>
         <input type="text" id="textbox-goal-2" class="hidden" data-group="goal" placeholder="เชิงคุณภาพ">
-    </div>
+    </div> -->
     
 
 
-
-
-        
-</form>
+<!-- </form> -->

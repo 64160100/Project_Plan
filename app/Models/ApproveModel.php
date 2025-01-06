@@ -14,15 +14,25 @@ class ApproveModel extends Model
         'Project_Id',
     ];
 
-    public $timestamps = false; // Disable automatic timestamps
+    public $timestamps = false; 
 
     public function project()
     {
-        return $this->belongsTo(ListProjectModel::class, 'Project_Id', 'Id_Project');
+        return $this->belongsTo(ProjectModel::class, 'Project_Id', 'Id_Project');
     }
 
     public function recordHistory()
     {
         return $this->hasMany(RecordHistory::class, 'Approve_Id', 'Id_Approve');
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(EmployeeModel::class, 'Employee_Id', 'Id_Employee');
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(DepartmentModel::class, 'Department_Id', 'Id_Department');
     }
 }

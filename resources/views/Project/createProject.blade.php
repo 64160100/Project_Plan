@@ -2,7 +2,6 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <title>FormInsertProject</title>
     <link rel="stylesheet" href="{{ asset('css/listproject.css') }}">
@@ -10,61 +9,95 @@
     <script src="{{ asset('js/radioButton.js') }}" defer></script>
     <script src="{{ asset('js/toggleDropdown.js') }}" defer></script>
     <script src="{{ asset('js/filterSearch.js') }}" defer></script>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="{{ asset('js/sdgForm.js') }}" defer></script>
+    <script src="{{ asset('js/addKpiField.js') }}" defer></script>
+    <script src="{{ asset('js/datetime.js') }}" defer></script>
 
 </head>
-
 <body>
     @section('content')
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="addProjectModalLabel">เพิ่มโปรเจคใหม่</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <form action="{{ route('projects.createProject') }}" method="POST">
-                @csrf
-                <!-- ชื่อโครงการ -->
-                <details class="accordion">
-                    <summary class="accordion-btn"><b>ชื่อโครงการ</b></summary>
-                    <div class="accordion-content">
-                        <div class="mb-3">
-                            @include('Project.App.ProjectName')
+    <h3 class="card-header">กรอกข้อมูลโครงการใหม่</h3><br>
+    <form action="{{ route('createProject', ['Strategic_Id' => $strategics->Id_Strategic]) }}" method="POST">
+            @csrf 
+            <!-- ชื่อโครงการ -->
+            <!-- <details class="accordion">
+                <summary class="accordion-btn"><b>ชื่อโครงการ</b></summary>
+                <div class="accordion-content">
+                    <div class="mb-3">
+                        
+                    </div>
+
+                </div>
+            </details> -->
+            <!-- endชื่อโครงการ -->
+
+                <div class="content-box"><b>ชื่อโครงการ</b>
+                <hr>
+                    @include('Project.App.ProjectName')
+                </div><br>
+                
+
+            <!-- ความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย  -->
+                <div class="content-box"><b>ความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย</b>
+
+                </div><br>
+
+                <div class="content-box"><b>ผู้รับผิดชอบโครงการ</b>
+                    @include('Project.App.ProjectManager')
+                </div><br>
+            
+            <!-- ความสอดคล้องส่วนงาน -->
+                <div class="content-box"><b>ความสอดคล้องกับยุทธศาสตร์ส่วนงาน</b>
+                    @include('Project.App.Strategic_Strategy')
+                </div><br>
+
+            <!-- SDGs -->
+                <div class="content-box"><b>ความสอดคล้องกับ (SDGs)</b>
+                    @include('Project.App.SDGs')
+                </div><br>
+
+            <!-- วัตถุประสงค์โครงการ   -->
+                <div class="content-box"><b>วัตถุประสงค์โครงการ</b>
+                    @include('Project.App.ProjectObjective')
+                </div><br>
+                
+
+            <!-- ตัวชี้วัด   -->
+                <div class="content-box"><b>ตัวชี้วัด</b>
+                    @include('Project.App.Kpi')
+                </div><br>
+             
+
+            <!-- ค่าเป้าหมาย   -->
+                <div class="content-box"><b>ค่าเป้าหมาย</b>
+                    <div id="targetProjectContainer">
+                        <div>
+                            <button type="button" id="add-targetProject" class="btn-addlist" onclick="addField('targetProjectContainer', 'Target_Project[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
                         </div>
                     </div>
-                </details>
-                <!-- endชื่อโครงการ -->
-
-                <!-- ความสอดคล้องส่วนงาน -->
-                <details class="accordion">
-                    <summary class="accordion-btn"><b>ความสอดคล้องกับยุทธศาสตร์ส่วนงาน</b></summary>
-                    <div class="accordion-content">
-                        @include('Project.App.Strategic')
+                </div><br>
+                    
+        <!-- ระยะเวลาดำเนินโครงการ   -->
+                <div class="content-box"><b>ระยะเวลาดำเนินโครงการ</b>
+                    <div>
+                        <label for="First_Time">วันที่เริ่มต้น:</label><br>
+                        <input type="date" id="First_Time" name="First_Time" required>
                     </div>
-                </details>
-                <!-- end ความสอดคล้องยุทศาสตร์ -->
-
-                <!-- ผู้รับผิดชอบโครงการ -->
-                <!-- ผู้รับผิดชอบโครงการ -->
-                <details class="accordion">
-                    <summary class="accordion-btn"><b>ผู้รับผิดชอบโครงการ</b></summary>
-                    <div class="accordion-content">
-                        @include('Project.App.ProjectManager')
+                    <br>
+                    <div>
+                        <label for="End_Time">วันที่สิ้นสุด:</label><br>
+                        <input type="date" id="End_Time" name="End_Time" required>
                     </div>
-                </details>
-                <!-- end ผู้รับผิดชอบโครงการ -->
-                <!-- end ผู้รับผิดชอบโครงการ -->
-
-                <button type="submit" class="btn btn-primary">บันทึก</button>
-            </form>
+                </div><br>
+                
+        <!-- save -->
+        <div class="container">
+            <button type="submit" class="btn-submit">บันทึก</button>
         </div>
-    </div>
+    
+    </form> 
+        
+
     @endsection
 </body>
-
 </html>

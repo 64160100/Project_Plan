@@ -13,8 +13,14 @@ require __DIR__.'/strategic.php';
 Route::get('/setting', [SettingController::class, 'settings'])->name('setting');
 
 Route::get('/listProject', [ListProjectController::class, 'project'])->name('project');
-Route::get('/createProject', [ListProjectController::class, 'showCreateForm'])->name('showCreateForm');
-Route::post('/createProject', [ListProjectController::class, 'createProject'])->name('projects.createProject');
+Route::get('/createProject/{Strategic_Id}', [ListProjectController::class, 'showCreateForm'])->name('createProject');
+Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
+
+Route::get('/project/{id}/details', [ListProjectController::class, 'viewProjectDetails'])->name('project.details');
+
+Route::match(['get', 'post'],'/editProject/{Id_Project}', [ProjectController::class, 'editProject'])->name('editProject');
+Route::put('/editProject/{Id_Project}', [ProjectController::class, 'updateProject'])->name('updateProject');
+
 
 //แสดงหน้า Strategic
 Route::get('/viewProjectInStrategic/{Id_Strategic}', [ListProjectController::class, 'viewProjectInStrategic'])->name('viewProjectInStrategic');

@@ -32,3 +32,10 @@ view -> กรณีที่ดูถึงอย่างใช้ view ตา
 กรณีที่เป็น method ใช้ post
 delete -> กรณีที่ลบถึงอย่างใช้ delete ตามด้วยชื่อไฟล์ ตย. deleteEmployee
 update -> กรณีที่อัพเดทถึงอย่างใช้ update ตามด้วยชื่อไฟล์ ตย. updateEmployee
+
+suchapa.ch
+
+INSERT INTO `Employee` 
+(`Id_Employee`, `Firstname_Employee`, `Lastname_Employee`, `Email`, `Password`, `IsManager`, `IsDirector`, `Department_Id`, `Position_Id`) 
+VALUES 
+(1, 'สมชาย', 'แดง', '54160100@go.buu.ac.th', MD5('12345678'), 'N', 'Y', 1, 1);

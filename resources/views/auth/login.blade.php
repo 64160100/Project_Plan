@@ -26,7 +26,6 @@
 
     <!-- Main CSS File -->
     <link href="{{asset('Bootslander/assets/css/main.css')}}" rel="stylesheet">
-
 </head>
 
 <body class="index-page">
@@ -50,8 +49,8 @@
                                 @csrf
 
                                 <div class="form-group mb-3 position-relative">
-                                    <label for="email" class="form-label">อีเมล</label>
-                                    <input id="email" type="email" class="form-control" placeholder="กรุณาใส่อีเมล"
+                                    <label for="email" class="form-label">ชื่อผู้ใช้</label>
+                                    <input id="email" class="form-control" placeholder="กรุณาใส่ชื่อผู้ใช้"
                                         name="email" required>
                                 </div>
 
@@ -82,10 +81,6 @@
             </div>
         </section>
     </main>
-
-
-
-
     <!-- Vendor JS Files -->
     <script src="{{asset('Bootslander/assets/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{asset('Bootslander/assets/vendor/php-email-form/validate.js')}}"></script>

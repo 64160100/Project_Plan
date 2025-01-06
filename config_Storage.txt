@@ -1,0 +1,19 @@
+สร้างใหม่
+docker-compose exec app touch /usr/local/etc/php/conf.d/custom-php-config.ini
+
+เพิ่มข้อมุล
+docker-compose exec app sh -c 'echo "post_max_size = 100M" > /usr/local/etc/php/conf.d/custom-php-config.ini'
+docker-compose exec app sh -c 'echo "upload_max_filesize = 100M" >> /usr/local/etc/php/conf.d/custom-php-config.ini'
+
+ตรวจสอบไฟล์
+docker-compose exec app cat /usr/local/etc/php/conf.d/custom-php-config.ini
+
+# ตัวอย่างการแก้ไข post_max_size เป็น 200M
+docker-compose exec app sed -i 's/post_max_size = 100M/post_max_size = 200M/' /usr/local/etc/php/conf.d/custom-php-config.ini
+
+docker-compose restart app
+
+docker-compose exec app php -i | grep -E "post_max_size|upload_max_filesize"
+
+แก้ไข config ในไฟล์ custom-php-config.ini ใน container
+sed -i 's/post_max_size = 100M/post_max_size = 200M/' custom-php-config.ini

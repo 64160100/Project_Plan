@@ -59,21 +59,21 @@
 
 .project-actions {
     display: flex;
-    justify-content: flex-start; 
+    justify-content: flex-start;
     margin-top: 20px;
-    padding-bottom: 10px; 
-    border-bottom: 1px solid #e0e0e0; 
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .action-link {
     display: flex;
     align-items: center;
-    gap: 5px; 
+    gap: 5px;
     color: #007bff;
     text-decoration: none;
     font-size: 14px;
     transition: color 0.3s;
-    margin-right: 20px; 
+    margin-right: 20px;
 }
 
 .action-link:hover {
@@ -85,7 +85,7 @@
 }
 
 .status-section {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .status-header {
@@ -104,27 +104,25 @@
     background-color: #f9f9f9;
 }
 
-.status-text {
-    font-size: 14px;
-    color: #333;
+.status-button {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 150px;
+    height: 50px;
 }
 
 .action-buttons {
     display: flex;
     gap: 10px;
-}
-
-.status-button {
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 8px;
-    width: 120px;
+    align-items: center;
 }
 
 .status-button.approved {
@@ -177,10 +175,6 @@ i {
     opacity: 0.7;
     font-size: 25px;
 }
-
-.status-left i {
-    font-size: 40px;
-}
 </style>
 
 @section('content')
@@ -223,7 +217,7 @@ i {
                 </div>
 
                 <div class="project-actions">
-                    <a href="#" class="action-link">
+                    <a href="{{ route('project.showPdf', ['id' => $approval->project->id]) }}" class="action-link">
                         <i class='bx bx-info-circle'></i>
                         ดูรายละเอียดโครงการ
                     </a>

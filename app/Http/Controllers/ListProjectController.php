@@ -300,4 +300,16 @@ class ListProjectController extends Controller
 
         return redirect()->route('proposeProject')->with('error', 'Project not found.');
     }
+
+    public function showPdf($id)
+    {
+        $project = Project::findOrFail($id);
+        $pdfPath = storage_path('app/public/uploads/' . $project->pdf_filename);
+
+        if (!file_exists($pdfPath)) {
+            abort(404, 'PDF not found');
+        }
+
+        return response()->file($pdfPath);
+    }
 }

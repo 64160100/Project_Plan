@@ -21,7 +21,6 @@ Route::get('/project/{id}/details', [ListProjectController::class, 'viewProjectD
 Route::match(['get', 'post'],'/editProject/{Id_Project}', [ProjectController::class, 'editProject'])->name('editProject');
 Route::put('/editProject/{Id_Project}', [ProjectController::class, 'updateProject'])->name('updateProject');
 
-
 //แสดงหน้า Strategic
 Route::get('/viewProjectInStrategic/{Id_Strategic}', [ListProjectController::class, 'viewProjectInStrategic'])->name('viewProjectInStrategic');
 Route::get('/viewProject/{Id_Project}', [ListProjectController::class, 'viewProject'])->name('viewProject');
@@ -35,10 +34,11 @@ Route::post('/projects/{id}/submitForApproval', [ListProjectController::class, '
 
 Route::get('/editForm', [ListProjectController::class, 'approveProject'])->name('approveProject');
 
-
 // ... existing code
 Route::get('/storage-files', [StorageFileController::class, 'index'])->name('StorageFiles.index');
 Route::post('/storage-files', [StorageFileController::class, 'store'])->name('StorageFiles.store');
 Route::delete('/storage-files/{id}', [StorageFileController::class, 'destroy'])->name('StorageFiles.destroy');
 Route::get('/{id}/download', [StorageFileController::class, 'download'])->name('StorageFiles.download');
 Route::get('/storage-files/{id}/view', [StorageFileController::class, 'view'])->name('StorageFiles.view');
+
+Route::get('/project/{id}/pdf', [ProjectController::class, 'showPdf'])->name('project.showPdf');

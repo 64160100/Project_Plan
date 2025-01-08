@@ -123,7 +123,7 @@
                         @endif
                         @if($permission->Track_Status === 'Y' && !$renderedItems['track_status'])
                         <li class="nav-item">
-                            <a class="nav-link" href="">
+                            <a class="nav-link" href="{{ route('status.tracking') }}">
                                 <i class='bx bx-time-five bx-flip-horizontal'></i>
                                 <p>ติดตามสถานะ</p>
                             </a>

@@ -29,9 +29,8 @@
     display: flex;
     justify-content: center;
     gap: 200px;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
 }
 
 .info-item {
@@ -55,75 +54,94 @@
     margin-left: 28px;
 }
 
+.project-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.action-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+    margin-right: 20px;
+}
+
+.action-link:hover {
+    color: #0056b3;
+}
+
+.warning-icon {
+    color: #f39c12;
+}
+
+.status-section {
+    margin-top: 15px;
+}
+
 .status-header {
     font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 15px;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .status-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 15px;
     display: flex;
     justify-content: space-between;
-    align-items: start;
-    margin-bottom: 5px;
-}
-
-.status-left {
-    display: flex;
-    align-items: start;
-    gap: 12px;
-}
-
-.status-text {
-    font-size: 14px;
-}
-
-.status-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-}
-
-.status-date {
-    color: #666;
-    font-size: 14px;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
 }
 
 .status-button {
     border: none;
-    padding: 4px 12px;
-    border-radius: 16px;
-    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 16px;
     cursor: pointer;
-}
-
-.approved {
-    background-color: #E8F5E9;
-    color: #2E7D32;
-}
-
-.not-approved {
-    background-color: #FFEBEE;
-    color: #C62828;
-}
-
-.pending {
-    background-color: #FFF9C4;
-    color: #F9A825;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 150px;
+    height: 50px;
 }
 
 .action-buttons {
     display: flex;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.status-button.approved {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-button.approved:hover {
+    background-color: #218838;
+}
+
+.status-button.not-approved {
+    background-color: #dc3545;
+    color: white;
+}
+
+.status-button.not-approved:hover {
+    background-color: #c82333;
 }
 
 .btn-action {
-    padding: 4px 12px;
+    padding: 8px 16px;
     border-radius: 16px;
     border: none;
     font-size: 14px;
@@ -153,8 +171,4 @@
 i {
     opacity: 0.7;
     font-size: 25px;
-}
-
-.status-left i {
-    font-size: 40px;
 }

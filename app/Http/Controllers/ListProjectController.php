@@ -13,7 +13,6 @@ use App\Models\RecordHistory;
 use App\Models\SustainableDevelopmentGoalsModel;
 use Carbon\Carbon;
 
-
 class ListProjectController extends Controller
 {
     public function project()
@@ -116,18 +115,33 @@ class ListProjectController extends Controller
             }
     
             foreach ($approvals as $approval) {
-                foreach ($approval->recordHistory as $history) {
-                    $timeRecord = $history->Time_Record;
-                    $date = \Carbon\Carbon::parse($timeRecord);
+                $project = $approval->project;
+                if ($project && $project->First_Time) {
+                    $firstTime = \Carbon\Carbon::parse($project->First_Time);
                     $thaiMonths = [
                         1 => 'มกราคม', 2 => 'กุมภาพันธ์', 3 => 'มีนาคม', 4 => 'เมษายน',
                         5 => 'พฤษภาคม', 6 => 'มิถุนายน', 7 => 'กรกฎาคม', 8 => 'สิงหาคม',
                         9 => 'กันยายน', 10 => 'ตุลาคม', 11 => 'พฤศจิกายน', 12 => 'ธันวาคม'
                     ];
-                    $day = $date->format('j');
-                    $month = $thaiMonths[(int)$date->format('m')];
-                    $year = $date->year + 543;
-                    $history->formattedDateTime = "$day / $month / $year";
+                    $day = $firstTime->format('j');
+                    $month = $thaiMonths[(int)$firstTime->format('m')];
+                    $year = $firstTime->year + 543;
+                    $project->formattedFirstTime = "วันที่ $day $month พ.ศ $year";
+                }
+    
+                foreach ($approval->recordHistory as $history) {
+                    $timeRecord = $history->Time_Record;
+                    $date = \Carbon\Carbon::parse($timeRecord);
+                    $currentDate = \Carbon\Carbon::now()->setTimezone('Asia/Bangkok');
+                    $history->daysSinceTimeRecord = max(ceil($date->diffInDays($currentDate, false)), 0);
+                    
+                    if ($history->daysSinceTimeRecord == -0) {
+                        $history->daysSinceTimeRecord = 0;
+                    }
+
+                    Log::info('Time_Record: ' . $timeRecord);
+                    Log::info('Current Time: ' . $currentDate);
+                    Log::info('Difference in days: ' . $history->daysSinceTimeRecord);
                 }
             }
         } else {
@@ -213,7 +227,7 @@ class ListProjectController extends Controller
                     $day = $date->format('d');
                     $month = $thaiMonths[(int)$date->format('m')];
                     $year = (int)$date->format('Y') + 543; 
-                    $project->formattedFirstTime = "$day / $month / $year";
+                    $project->formattedFirstTime = "วันที่ $day $month พ.ศ $year";
                 } else {
                     $project->formattedFirstTime = '-';
                 }
@@ -301,15 +315,4 @@ class ListProjectController extends Controller
         return redirect()->route('proposeProject')->with('error', 'Project not found.');
     }
 
-    public function showPdf($id)
-    {
-        $project = Project::findOrFail($id);
-        $pdfPath = storage_path('app/public/uploads/' . $project->pdf_filename);
-
-        if (!file_exists($pdfPath)) {
-            abort(404, 'PDF not found');
-        }
-
-        return response()->file($pdfPath);
-    }
 }

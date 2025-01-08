@@ -41,12 +41,47 @@
                         <span class="info-value">500,000 บาท</span>
                     </div>
                 </div>
-                <ul>
-                    @foreach($project->approvals->first()->recordHistory as $history)
-                    <li>{{ $history->comment }}</li>
-                    @endforeach
-                </ul>
             </div>
+
+            <div class="project-actions">
+                <a href="{{ route('StorageFiles.index') }}" class="action-link">
+                    <i class='bx bx-info-circle'></i>
+                    ดูรายละเอียดโครงการ
+                </a>
+
+                <div class="dropdown">
+                    <a href="#" class="action-link dropdown-toggle" id="commentsDropdown-{{ $project->Id_Project }}"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class='bx bx-message'></i>
+                        ข้อเสนอแนะ({{ $project->approvals->first()->recordHistory->where('Status_Record', 'N')->count() }})
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="commentsDropdown-{{ $project->Id_Project }}"
+                        style="max-height: 200px; overflow-y: auto; width: 300px;">
+                        @php
+                        $filteredRecords = $project->approvals->first()->recordHistory->where('Status_Record', 'N');
+                        @endphp
+                        @if($filteredRecords->count() > 0)
+                        @foreach($filteredRecords as $record)
+                        <li class="p-2 border-bottom">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="font-weight-bold">{{ $record->Name_Record ?? 'Unknown' }}</span>
+                                <span class="text-muted small">{{ $record->formattedDateTime ?? 'N/A' }}</span>
+                            </div>
+                            <p class="mb-0">{{ $record->comment ?? 'No Comment' }}</p>
+                        </li>
+                        @endforeach
+                        @else
+                        <li class="p-2 text-center text-muted">ไม่มีข้อเสนอแนะ</li>
+                        @endif
+                    </ul>
+                </div>
+
+                <a href="#" class="action-link">
+                    <i class='bx bx-error warning-icon'></i>
+                    แจ้งเตือน
+                </a>
+            </div>
+
             <div class="status-section">
                 <div class="status-header">สถานะการพิจารณา</div>
                 <div class="project-status">
@@ -164,6 +199,7 @@
             </div>
         </div>
     </div>
-    </div>
-    @endforeach
-    @endsection
+</div>
+@endforeach
+</div>
+@endsection

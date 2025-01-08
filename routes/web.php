@@ -3,6 +3,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ListProjectController;
 use App\Http\Controllers\StorageFileController;
+use App\Http\Controllers\StatusController;
+use App\Http\Controllers\PdfController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -41,4 +43,5 @@ Route::delete('/storage-files/{id}', [StorageFileController::class, 'destroy'])-
 Route::get('/{id}/download', [StorageFileController::class, 'download'])->name('StorageFiles.download');
 Route::get('/storage-files/{id}/view', [StorageFileController::class, 'view'])->name('StorageFiles.view');
 
-Route::get('/project/{id}/pdf', [ProjectController::class, 'showPdf'])->name('project.showPdf');
+Route::get('/statusTracking', [StatusController::class, 'statusTracking'])->name('status.tracking');
+Route::get('/project/{Id_Project}', [StatusController::class, 'showDetails'])->name('project.details');

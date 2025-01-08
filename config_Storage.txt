@@ -17,3 +17,5 @@ docker-compose exec app php -i | grep -E "post_max_size|upload_max_filesize"
 
 แก้ไข config ในไฟล์ custom-php-config.ini ใน container
 sed -i 's/post_max_size = 100M/post_max_size = 200M/' custom-php-config.ini
+
+cat custom-php-config.ini

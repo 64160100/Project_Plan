@@ -2,7 +2,13 @@
 
 @section('content')
 <div class="container">
-    <h2>Storage Files</h2>
+
+    <h2>
+        <a href="{{ url()->previous() }}" style="color: inherit; text-decoration: none;">
+            <i class='bx bx-left-arrow-alt' style="cursor: pointer;"></i>
+        </a>
+        Storage Files
+    </h2>
 
     <form action="{{ route('StorageFiles.store') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
         @csrf
@@ -64,7 +70,7 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
 
         if (!isValid) {
             fileInfo.innerHTML +=
-            '<br><strong>Error: File must be a PDF or image and not exceed 10 MB.</strong>';
+                '<br><strong>Error: File must be a PDF or image and not exceed 10 MB.</strong>';
         }
     } else {
         fileInfo.innerHTML = '';
@@ -76,7 +82,7 @@ document.getElementById('uploadForm').onsubmit = function(event) {
     var file = fileInput.files[0];
     if (file) {
         var fileType = file.type;
-        var fileSize = file.size / (1024 * 1024); 
+        var fileSize = file.size / (1024 * 1024);
         if ((fileType !== 'application/pdf' && !fileType.startsWith('image/')) || fileSize > 10) {
             event.preventDefault();
             alert('Please upload only PDF or image files, not exceeding 10 MB.');

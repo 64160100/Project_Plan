@@ -5,9 +5,10 @@
     margin: auto;
     margin-bottom: 20px;
     padding: 15px;
-    background-color: #ffffff;
+    background-color: hsl(0, 0%, 100%);
     border-radius: 8px; 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 435px;
 }
 
 .container {
@@ -29,9 +30,8 @@
     display: flex;
     justify-content: center; 
     gap: 200px; 
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
 }
 
 .info-item {
@@ -99,6 +99,17 @@
     padding: 10px;
     border-top: 1px solid #e0e0e0;
 }
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn i {
+    display: inline-block;
+    vertical-align: middle;
+}
 
 .action-button {
     background-color: #808080;
@@ -126,18 +137,18 @@ i {
 }
 
 .approved {
-    background-color: #E8F5E9; /* Light green */
-    color: #2E7D32; /* Dark green */
+    background-color: #E8F5E9; 
+    color: #2E7D32;
 }
 
 .not-approved {
-    background-color: #FFEBEE; /* Light red */
-    color: #C62828; /* Dark red */
+    background-color: #FFEBEE;
+    color: #C62828; 
 }
 
 .pending {
-    background-color: #FFF9C4; /* Light yellow */
-    color: #F9A825; /* Dark yellow */
+    background-color: #FFF9C4; 
+    color: #F9A825; 
 }
 
 .approval-status {
@@ -146,5 +157,47 @@ i {
     border-radius: 16px;
     border: none;
     cursor: pointer;
+}
+
+.project-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.action-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+    margin-right: 20px;
+}
+
+.action-link:hover {
+    color: #0056b3;
+}
+
+.warning-icon {
+    color: #f39c12;
+}
+
+.status-section {
+    margin-top: 15px;
+}
+
+.status-header {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+i {
+    opacity: 0.7;
+    font-size: 25px;
 }
 

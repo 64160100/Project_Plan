@@ -1,183 +1,9 @@
 @extends('navbar.app')
 
-<style>
-.outer-container {
-    background: white;
-    border: 1px solid #e0e0e0;
-    max-width: 1300px;
-    margin: auto;
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.container {
-    padding: 10px;
-}
-
-.project-title {
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.project-subtitle {
-    color: #666;
-    font-size: 14px;
-    margin: 5px 0 20px 0;
-}
-
-.project-info {
-    display: flex;
-    justify-content: center;
-    gap: 200px;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-}
-
-.info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.info-top {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.info-label {
-    color: #666;
-    font-size: 14px;
-}
-
-.info-value {
-    margin-left: 28px;
-}
-
-.project-actions {
-    display: flex;
-    justify-content: flex-start;
-    margin-top: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.action-link {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: #007bff;
-    text-decoration: none;
-    font-size: 14px;
-    transition: color 0.3s;
-    margin-right: 20px;
-}
-
-.action-link:hover {
-    color: #0056b3;
-}
-
-.warning-icon {
-    color: #f39c12;
-}
-
-.status-section {
-    margin-top: 15px;
-}
-
-.status-header {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.status-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
-
-.status-button {
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 150px;
-    height: 50px;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
-}
-
-.status-button.approved {
-    background-color: #28a745;
-    color: white;
-}
-
-.status-button.approved:hover {
-    background-color: #218838;
-}
-
-.status-button.not-approved {
-    background-color: #dc3545;
-    color: white;
-}
-
-.status-button.not-approved:hover {
-    background-color: #c82333;
-}
-
-.btn-action {
-    padding: 8px 16px;
-    border-radius: 16px;
-    border: none;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.modal-content {
-    border-radius: 8px;
-}
-
-.modal-header {
-    border-bottom: 1px solid #e0e0e0;
-    padding: 16px;
-}
-
-.modal-body {
-    padding: 16px;
-}
-
-.form-control {
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 8px;
-    width: 100%;
-}
-
-i {
-    opacity: 0.7;
-    font-size: 25px;
-}
-</style>
-
 @section('content')
+<link rel="stylesheet" href="{{ asset('css/requestApproval.css') }}">
+
+
 <div class="container">
     <h1>การอนุมัติทั้งหมด</h1>
     @foreach($approvals as $approval)
@@ -194,7 +20,7 @@ i {
                             <span class="info-label">วันที่เริ่ม</span>
                         </div>
                         <span class="info-value">
-                            {{ $approval->recordHistory->first()->formattedDateTime ?? 'N/A' }}
+                            {{ $approval->project->formattedFirstTime ?? 'N/A' }}
                         </span>
                     </div>
                     <div class="info-item">
@@ -217,14 +43,39 @@ i {
                 </div>
 
                 <div class="project-actions">
-                    <a href="{{ route('project.showPdf', ['id' => $approval->project->id]) }}" class="action-link">
+                    <a href="{{ route('StorageFiles.index') }}" class="action-link">
                         <i class='bx bx-info-circle'></i>
                         ดูรายละเอียดโครงการ
                     </a>
-                    <a href="#" class="action-link">
-                        <i class='bx bx-message'></i>
-                        ข้อเสนอแนะ(1)
-                    </a>
+
+                    <div class="dropdown">
+                        <a href="#" class="action-link dropdown-toggle"
+                            id="commentsDropdown-{{ $approval->Id_Approve }}" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class='bx bx-message'></i>
+                            ข้อเสนอแนะ({{ $approval->recordHistory->where('Status_Record', 'N')->count() }})
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="commentsDropdown-{{ $approval->Id_Approve }}"
+                            style="max-height: 200px; overflow-y: auto; width: 300px;">
+                            @php
+                            $filteredRecords = $approval->recordHistory->where('Status_Record', 'N');
+                            @endphp
+                            @if($filteredRecords->count() > 0)
+                            @foreach($filteredRecords as $record)
+                            <li class="p-2 border-bottom">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="font-weight-bold">{{ $record->Name_Record ?? 'Unknown' }}</span>
+                                    <span class="text-muted small">{{ $record->formattedDateTime ?? 'N/A' }}</span>
+                                </div>
+                                <p class="mb-0">{{ $record->comment ?? 'No Comment' }}</p>
+                            </li>
+                            @endforeach
+                            @else
+                            <li class="p-2 text-center text-muted">ไม่มีข้อเสนอแนะ</li>
+                            @endif
+                        </ul>
+                    </div>
+
                     <a href="#" class="action-link">
                         <i class='bx bx-error warning-icon'></i>
                         แจ้งเตือน
@@ -236,9 +87,7 @@ i {
                     <div class="status-card">
                         <div class="status-left">
                             <div class="status-text">
-                                รออนุมัติ :
-                                {{ \Carbon\Carbon::parse($approval->recordHistory->first()->Time_Record)->diffInDays(\Carbon\Carbon::now()) < 1 ? 0 : \Carbon\Carbon::parse($approval->recordHistory->first()->Time_Record)->diffInDays(\Carbon\Carbon::now()) }}
-                                วัน
+                                รออนุมัติ: {{ floor($approval->recordHistory->last()->daysSinceTimeRecord ?? 0) }} วัน
                             </div>
                         </div>
                         <div class="status-right">

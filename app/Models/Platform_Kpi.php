@@ -16,7 +16,7 @@ class Platform_Kpi extends Model
         'Id_Platform_Kpi',
         'Name_Platfrom_Kpi',
         'Description_Platfrom_Kpi',
-        'Platform_Id_Platform ',
+        'Platform_Id_Platform',
     ];
     public $timestamps = false;
 
@@ -25,4 +25,16 @@ class Platform_Kpi extends Model
         return $this->belongsTo(Platform::class, 'Platform_Id_Platform','Id_Platform_Kpi');
     }
 
+    
+    public function platformYears()
+    {
+        return $this->hasMany(Platform_Year::class, 'Platform_Kpi_Id', 'Id_Platform_Kpi');
+    }
+
+    //
+    public function budgetYears()
+    {
+        return $this->belongsToMany(Platform_Budget_Year::class, 'Platform_Year', 'Platform_Kpi_Id', 'Platform_Budget_Year_Id')
+                    ->withPivot('Value_Platform');
+    }
 }

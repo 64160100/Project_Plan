@@ -91,3 +91,28 @@
       border-color: #650893;
       outline: none;
     }
+
+    .btn-submit {
+      background-color: #007BFF; 
+      border: none; 
+      border-radius: 5px; /* ขอบโค้งมน */
+      color: #fff; /* สีข้อความ */
+      cursor: pointer; /* เปลี่ยนเคอร์เซอร์เมื่อ hover */
+      text-align: center;
+      padding: 8px 20px; /* ระยะห่างภายใน */
+      font-size: 16px; /* ขนาดข้อความ */
+      font-weight: bold; /* ข้อความหนา */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เงา */
+      transition: background-color 0.3s, transform 0.2s; /* เพิ่มเอฟเฟกต์ */
+    }
+    
+    .btn-submit:hover {
+      background-color: #0056b3; /* สีเมื่อ hover */
+      transform: scale(1.05); /* ขยายเล็กน้อยเมื่อ hover */
+    }
+    
+    /* .container {
+      display: flex; 
+      justify-content: flex-end; 
+      padding: 10px; 
+    } */

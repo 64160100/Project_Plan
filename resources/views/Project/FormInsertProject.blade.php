@@ -6,11 +6,11 @@
     <title>FormInsertProject</title>
     <link rel="stylesheet" href="{{ asset('css/project.css') }}">
     <script src="{{ asset('js/addField.js') }}" defer></script>
+    <!-- <script src="{{ asset('js/addlist.js') }}" defer></script> -->
     <script src="{{ asset('js/radioButton.js') }}" defer></script>
     <script src="{{ asset('js/toggleDropdown.js') }}" defer></script>
     <script src="{{ asset('js/filterSearch.js') }}" defer></script>
     <script src="{{ asset('js/sdgForm.js') }}" defer></script>
-    <script src="{{ asset('js/addKpiField.js') }}" defer></script>
     <script src="{{ asset('js/datetime.js') }}" defer></script>
 
 </head>

@@ -1,8 +1,9 @@
 INSERT INTO `Premission` (`Id_Permission`, `Name_Permission`, `Dashborad`, `List_Project`, `Track_Status`, `Documents_Project`, `Report_results`, `Check_Budget`, `Approval_Project`, `Propose_Project`, `Manage_Users`, `Data_Employee`, `Setup_System`) VALUES
 (1, 'ผู้บริหาร', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
 (2, 'หัวหน้าฝ่าย', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
-(3, 'ผู้ดูแลระบบ', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N', 'N'),
-(4, 'ผู้รับผิดชอบโครงการ', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'N', 'N', 'N');
+(3, 'ผู้ดูแลระบบ', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y'),
+(4, 'การเงิน', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
+(5, 'ผู้รับผิดชอบโครงการ', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'N', 'N', 'N');
 
 INSERT INTO `Department` (`Id_Department`, `Name_Department`) VALUES
 (1, 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา'),
@@ -12,18 +13,12 @@ INSERT INTO `Position` (`Id_Position`, `Name_Position`) VALUES
 (1, 'บรรณารักษ์ชำนาญการพิเศษ'),
 (2, 'บรรณารักษ์ชำนาญการ');
 
-<?php
-$password = '12345678';
-$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-$sql = "INSERT INTO `Employee` (`Id_Employee`, `Firstname_Employee`, `Lastname_Employee`, `Email`, `Password`, `IsManager`, `IsDirector`, `Department_Id`, `Position_Id`) VALUES
-(1, 'สมชาย', 'แดง', '54160100@go.buu.ac.th', '$hashedPassword', 'N', 'Y', 1, 1)";
-
-echo $sql;
-?>
-(2, 'สมหญิง', 'เขียว', '64160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'Y', 'N', 1, 2),
-(3, 'บรูโน่', 'เหลือง', '74160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 1, 1),
-(4, 'เดเคอา', 'น้ำเงิน', '84160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 1, 2);
+INSERT INTO `Employee` (`Id_Employee`, `Firstname_Employee`, `Lastname_Employee`, `Email`, `Password`, `IsManager`, `IsDirector`, `IsFinance`, `IsAdmin`, `Department_Id`, `Position_Id`) VALUES
+(1, 'สมชาย', 'แดง', '54160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'Y', 'N', 'N', 'N', 1, 2),
+(2, 'สมหญิง', 'เขียว', '64160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'Y', 'N', 'N', 1, 2),
+(3, 'สมศรี', 'เหลือง', '74160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 'Y', 'N', 1, 1),
+(4, 'สมศักดิ์', 'น้ำเงิน', '84160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 'N', 'N', 1, 2),
+(5, 'Is', 'Admin', '94160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 'N', 'Y', 1, 2);
 
 INSERT INTO `Strategic` (`Id_Strategic`, `Name_Strategic_Plan`, `Goals_Strategic`) VALUES
 (1, 'ยุทธศาสตร์ที่ 1 การพัฒนาความเป็นเลิศด้านบริการด้วยมาตรฐ', 'GG'),
@@ -33,4 +28,17 @@ INSERT INTO `Users` (`Employee_Id_Employee`, `Premission_Id_Permission`) VALUES
 (1, 1),
 (2, 2),
 (3, 3),
-(4, 4);
+(4, 4),
+(5, 5);
+
+
+
+$sql = "INSERT INTO `Employee` (`Id_Employee`, `Firstname_Employee`, `Lastname_Employee`, `Email`, `Password`, `IsManager`, `IsFinance`, `IsDirector`, `IsAdmin`, `Department_Id`, `Position_Id`) VALUES
+(1, 'สมชาย', 'แดง', '54160100@go.buu.ac.th', '$hashedPassword', 'N', 'Y', 1, 1)";
+
+echo $sql;
+?>
+
+<?php
+$password = '12345678';
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);

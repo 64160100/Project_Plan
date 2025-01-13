@@ -14,8 +14,13 @@ class StatusController extends Controller
         $permissions = $request->session()->get('permissions');
     
         if ($employee) {
-            $projects = ListProjectModel::where('Employee_Id', $employee->Id_Employee)
-                ->whereHas('approvals', function($query) {
+            $projectsQuery = ListProjectModel::query();
+
+            if ($employee->IsAdmin !== 'Y') {
+                $projectsQuery->where('Employee_Id', $employee->Id_Employee);
+            }
+
+            $projects = $projectsQuery->whereHas('approvals', function($query) {
                     $query->whereIn('Status', ['I', 'N']);
                 })
                 ->with(['approvals.recordHistory', 'employee.department', 'employee'])
@@ -23,7 +28,7 @@ class StatusController extends Controller
     
             foreach ($projects as $project) {
                 $employeeData = $project->employee;
-                $project->employeeName = $employeeData->Firstname_Employee . ' ' . $employeeData->Lastname_Employee;
+                $project->employeeName = $employeeData ? $employeeData->Firstname_Employee . ' ' . $employeeData->Lastname_Employee : '-';
                 $project->departmentName = $employeeData->department->Name_Department ?? 'No Department';
     
                 if ($project->First_Time) {

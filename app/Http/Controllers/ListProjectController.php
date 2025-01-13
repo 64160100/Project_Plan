@@ -33,7 +33,7 @@ class ListProjectController extends Controller
         $employees = EmployeeModel::all();
         $sdgs = SustainableDevelopmentGoalsModel::all();
     
-        return view('Project.createProject', compact('strategics', 'strategies', 'sdgs'));
+        return view('Project.createProject', compact('strategics', 'strategies', 'employees', 'sdgs'));
     }
 
     public function createProject(Request $request, $Strategic_Id)
@@ -96,20 +96,30 @@ class ListProjectController extends Controller
         $permissions = $request->session()->get('permissions');
     
         if ($employee) {
-            if ($employee->IsManager === 'Y') {
+            if ($employee->IsAdmin === 'Y') {
                 $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
                     ->whereHas('project', function ($query) {
-                        $query->where('Count_Steps', 1);
+                        $query->whereNotIn('Count_Steps', [0, 2, 6, 9]);
+                    })->get();
+            } elseif ($employee->IsManager === 'Y') {
+                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
+                    ->whereHas('project', function ($query) {
+                        $query->whereIn('Count_Steps', [4, 7]);
                     })->get();
             } elseif ($employee->IsDirector === 'Y') {
                 $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
                     ->whereHas('project', function ($query) {
-                        $query->where('Count_Steps', 2);
+                        $query->whereIn('Count_Steps', [1, 5, 8]);
+                    })->get();
+            } elseif ($employee->IsFinance === 'Y') {
+                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
+                    ->whereHas('project', function ($query) {
+                        $query->whereIn('Count_Steps', [3]);
                     })->get();
             } else {
                 $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
                     ->whereHas('project', function ($query) use ($employee) {
-                        $query->where('Count_Steps', 0)
+                        $query->whereIn('Count_Steps', [0, 2, 6, 9])
                             ->where('Employee_Id', $employee->Id_Employee);
                     })->get();
             }
@@ -134,38 +144,34 @@ class ListProjectController extends Controller
                     $date = \Carbon\Carbon::parse($timeRecord);
                     $currentDate = \Carbon\Carbon::now()->setTimezone('Asia/Bangkok');
                     $history->daysSinceTimeRecord = max(ceil($date->diffInDays($currentDate, false)), 0);
-                    
+    
                     if ($history->daysSinceTimeRecord == -0) {
                         $history->daysSinceTimeRecord = 0;
                     }
-
-                    Log::info('Time_Record: ' . $timeRecord);
-                    Log::info('Current Time: ' . $currentDate);
-                    Log::info('Difference in days: ' . $history->daysSinceTimeRecord);
                 }
             }
         } else {
             Log::warning('No employee data found in session.');
         }
-        
+    
         return view('requestApproval', compact('approvals'));
     }
     
     public function updateApprovalStatus(Request $request, $id, $status)
     {
         $approval = ApproveModel::find($id);
-
+    
         if ($approval) {
             $approval->Status = $status;
             $approval->save();
-
+    
             $comment = $status === 'Y' ? 'เห็นควรอนุมัติโครงการตามที่เสนอ' : $request->input('comment');
             $employee = $request->session()->get('employee');
             $permissions = $employee ? $employee->permissions : collect();
-
+    
             $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
             $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
-
+    
             RecordHistory::create([
                 'Approve_Id' => $approval->Id_Approve,
                 'Approve_Project_Id' => $approval->Project_Id,
@@ -175,27 +181,51 @@ class ListProjectController extends Controller
                 'Name_Record' => $nameResponsible,
                 'Permission_Record' => $permissionName,
             ]);
-
+    
             if ($status === 'Y') {
                 $project = ListProjectModel::find($approval->Project_Id);
                 if ($project) {
-                    if ($project->Count_Steps === 0) {
-                        $project->Count_Steps = 1;
-                    } elseif ($project->Count_Steps === 1) {
-                        $project->Count_Steps = 2;
-                    } elseif ($project->Count_Steps === 2) {
-                        $project->Count_Steps = 3;
+                    switch ($project->Count_Steps) {
+                        case 0:
+                            $project->Count_Steps = 1;
+                            break;
+                        case 1:
+                            $project->Count_Steps = 2;
+                            break;
+                        case 2:
+                            $project->Count_Steps = 3;
+                            break;
+                        case 3:
+                            $project->Count_Steps = 4;
+                            break;
+                        case 4:
+                            $project->Count_Steps = 5;
+                            break;
+                        case 5:
+                            $project->Count_Steps = 6;
+                            break;
+                        case 6:
+                            $project->Count_Steps = 7;
+                            break;
+                        case 7:
+                            $project->Count_Steps = 8;
+                            break;
+                        case 8:
+                            $project->Count_Steps = 9;
+                            break;
+                        default:
+                            break;
                     }
                     $project->save();
-
-                    if ($project->Count_Steps === 1 || $project->Count_Steps === 2 || $project->Count_Steps === 3) {
+    
+                    if ($project->Count_Steps <= 9) {
                         $approval->Status = 'I';
                         $approval->save();
                     }
                 }
             }
         }
-
+    
         return redirect()->route('requestApproval');
     }
 
@@ -203,20 +233,25 @@ class ListProjectController extends Controller
     {
         $employee = $request->session()->get('employee');
         $permissions = $request->session()->get('permissions');
-
+    
         if ($employee) {
-            $projects = ListProjectModel::where('Employee_Id', $employee->Id_Employee)
-                ->whereHas('approvals', function($query) {
+            $projectsQuery = ListProjectModel::query();
+    
+            if ($employee->IsAdmin !== 'Y') {
+                $projectsQuery->where('Employee_Id', $employee->Id_Employee);
+            }
+    
+            $projects = $projectsQuery->whereHas('approvals', function($query) {
                     $query->whereIn('Status', ['I', 'N']);
                 })
                 ->with(['approvals.recordHistory', 'employee.department', 'employee'])
                 ->get();
-
+    
             foreach ($projects as $project) {
                 $employeeData = $project->employee;
-                $project->employeeName = $employeeData->Firstname_Employee . ' ' . $employeeData->Lastname_Employee;
+                $project->employeeName = $employeeData ? $employeeData->Firstname_Employee . ' ' . $employeeData->Lastname_Employee : '-';
                 $project->departmentName = $employeeData->department->Name_Department ?? 'No Department';
-
+    
                 if ($project->First_Time) {
                     $date = new \DateTime($project->First_Time);
                     $thaiMonths = [
@@ -231,7 +266,7 @@ class ListProjectController extends Controller
                 } else {
                     $project->formattedFirstTime = '-';
                 }
- 
+    
                 foreach ($project->approvals as $approval) {
                     foreach ($approval->recordHistory as $history) {
                         $timeRecord = $history->Time_Record;
@@ -244,7 +279,7 @@ class ListProjectController extends Controller
                         $history->formattedTimeRecord = $date->format('j') . ' ' . $thaiMonths[(int)$date->format('m')] . ' ' . ($date->year + 543);
                     }
                 }
-
+    
                 foreach ($project->approvals as $approval) {
                     foreach ($approval->recordHistory as $history) {
                         $timeRecord = $history->Time_Record;
@@ -261,57 +296,96 @@ class ListProjectController extends Controller
                         $history->formattedDateTime = "$day $month $year $time";
                     }
                 }
+    
+                if ($project->Count_Steps === 9) {
+                    $project->status = 'สิ้นสุด';
+                    $project->buttonText = 'สิ้นสุดโครงการ';
+                }
             }
-            
+    
             return view('proposeProject', compact('projects'));
         } else {
             return redirect()->back()->with('error', 'You are not authorized to view these projects.');
         }
     }
-
+    
     public function submitForApproval(Request $request, $id)
     {
         $project = ListProjectModel::find($id);
-
+    
         if ($project) {
-            if ($project->Count_Steps === 0) {
-                $approval = ApproveModel::where('Project_Id', $project->Id_Project)->first();
-
-                if ($approval) {
-                    $approval->Status = 'Y';
-                    $approval->save();
-
-                    $employee = $request->session()->get('employee');
-                    $permissions = $employee ? $employee->permissions : collect();
-
-                    $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
-                    $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
-
-                    RecordHistory::create([
-                        'Approve_Id' => $approval->Id_Approve,
-                        'Approve_Project_Id' => $approval->Project_Id,
-                        'Comment' => 'เสนอโครงการเพื่อขออนุมัติ',
-                        'Time_Record' => Carbon::now('Asia/Bangkok'),
-                        'Status_Record' => $approval->Status,
-                        'Name_Record' => $nameResponsible,
-                        'Permission_Record' => $permissionName,
-                    ]);
-
-                    $project->Count_Steps = 1;
-                    $project->save();
-
+            $approval = ApproveModel::where('Project_Id', $project->Id_Project)->first();
+    
+            if ($approval) {
+                $approval->Status = 'Y';
+                $approval->save();
+    
+                $employee = $request->session()->get('employee');
+                $permissions = $employee ? $employee->permissions : collect();
+    
+                $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
+                $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
+    
+                RecordHistory::create([
+                    'Approve_Id' => $approval->Id_Approve,
+                    'Approve_Project_Id' => $approval->Project_Id,
+                    'Comment' => 'เสนอโครงการเพื่อขออนุมัติ',
+                    'Time_Record' => Carbon::now('Asia/Bangkok'),
+                    'Status_Record' => $approval->Status,
+                    'Name_Record' => $nameResponsible,
+                    'Permission_Record' => $permissionName,
+                ]);
+    
+                switch ($project->Count_Steps) {
+                    case 0:
+                        $project->Count_Steps = 1;
+                        break;
+                    case 1:
+                        $project->Count_Steps = 2;
+                        break;
+                    case 2:
+                        $project->Count_Steps = 3;
+                        break;
+                    case 3:
+                        $project->Count_Steps = 4;
+                        break;
+                    case 4:
+                        $project->Count_Steps = 5;
+                        break;
+                    case 5:
+                        $project->Count_Steps = 6;
+                        break;
+                    case 6:
+                        $project->Count_Steps = 7;
+                        break;
+                    case 7:
+                        $project->Count_Steps = 8;
+                        break;
+                    case 8:
+                        $project->Count_Steps = 9;
+                        break;
+                    case 9:
+                        $project->Count_Steps = 10;
+                        $approval->Status = 'Y';
+                        $approval->save();
+                        break;
+                    default:
+                        break;
+                }
+    
+                $project->save();
+    
+                if ($project->Count_Steps <= 9) {
                     $approval->Status = 'I';
                     $approval->save();
-
-                    return redirect()->route('proposeProject')->with('success', 'Project submitted for approval.');
-                } else {
-                    return redirect()->route('proposeProject')->with('error', 'Approval record not found.');
                 }
+    
+                return redirect()->route('proposeProject')->with('success', 'Project submitted for approval.');
             } else {
-                return redirect()->route('proposeProject')->with('error', 'Project is not at the initial step.');
+                return redirect()->route('proposeProject')->with('error', 'Approval record not found.');
             }
         }
-
+    
         return redirect()->route('proposeProject')->with('error', 'Project not found.');
     }
 

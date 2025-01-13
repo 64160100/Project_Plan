@@ -2,6 +2,33 @@
 
 <head>
     <link rel="stylesheet" href="{{ asset('css/proposeProject.css') }}">
+    <style>
+    .project-status {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-out;
+    }
+
+    .project-status.show {
+        max-height: 1000px;
+        /* Adjust this value as needed */
+        transition: max-height 0.5s ease-in;
+    }
+
+    .status-header {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+
+    #toggle-icon {
+        transition: transform 0.5s ease;
+    }
+
+    .rotate {
+        transform: rotate(90deg);
+    }
+    </style>
 </head>
 
 @section('content')
@@ -12,7 +39,8 @@
         <div class="container">
             <div class="header">
                 <div class="project-title">{{ $project->Name_Project }}</div>
-                <div class="project-subtitle">{{ $project->employee->department->Name_Department ?? 'No Department' }}
+                <div class="project-subtitle">
+                    {{ $project->employee->department->Name_Department ?? 'ยังไม่มีผู้รับผิดชอบโครงการ' }}
                 </div>
                 <div class="project-info">
                     <div class="info-item">
@@ -20,9 +48,7 @@
                             <i class='bx bxs-calendar-event' style="width: 20px; height: 0px;"></i>
                             <span class="info-label">วันที่เริ่ม</span>
                         </div>
-                        <span class="info-value">
-                            {{ $project->formattedFirstTime }}
-                        </span>
+                        <span class="info-value">{{ $project->formattedFirstTime }}</span>
                     </div>
                     <div class="info-item">
                         <div class="info-top">
@@ -30,7 +56,13 @@
                             <span class="info-label">ผู้รับผิดชอบ</span>
                         </div>
                         <span class="info-value">
-                            {{ $project->employee->Firstname_Employee }} {{ $project->employee->Lastname_Employee }}
+                            @if($project->employee && ($project->employee->Firstname_Employee ||
+                            $project->employee->Lastname_Employee))
+                            {{ $project->employee->Firstname_Employee ?? '' }}
+                            {{ $project->employee->Lastname_Employee ?? '' }}
+                            @else
+                            -
+                            @endif
                         </span>
                     </div>
                     <div class="info-item">
@@ -83,8 +115,11 @@
             </div>
 
             <div class="status-section">
-                <div class="status-header">สถานะการพิจารณา</div>
-                <div class="project-status">
+                <div class="status-header">
+                    สถานะการพิจารณา
+                    <i class='bx bxs-chevron-right' id="toggle-icon"></i>
+                </div>
+                <div class="project-status" id="project-status">
                     @if($project->approvals->isNotEmpty() && $project->approvals->first()->recordHistory->isNotEmpty())
                     @foreach($project->approvals->first()->recordHistory as $history)
                     <div class="status-card">
@@ -95,7 +130,7 @@
                                     {{ $history->comment ?? 'No Comment' }}
                                 </div>
                                 <div class="status-text">
-                                    {{ $history->Name_Record ?? 'Unknown' }}
+                                    โดย {{ $history->Name_Record ?? 'Unknown' }}
                                 </div>
                                 <div class="status-text">({{ $history->Permission_Record ?? 'Unknown' }})
                                 </div>
@@ -129,26 +164,50 @@
                             <div>
                                 <div class="status-text">
                                     @if($project->Count_Steps === 0)
-                                    เสนอโครงการเพื่อขออนุมัติ หัวหน้าฝ่าย
+                                    ถึง : ผู้บริหาร
                                     @elseif($project->Count_Steps === 1)
-                                    รอ หัวหน้าฝ่าย
+                                    ผู้บริหารอนุมัติโครงการ กรอกข้อมูลเพิ่มเติม
                                     @elseif($project->Count_Steps === 2)
-                                    ผู้บริหาร
+                                    เสนอโครงการ
                                     @elseif($project->Count_Steps === 3)
-                                    เสร็จสิ้น
+                                    งบประมาณ
+                                    @elseif($project->Count_Steps === 4)
+                                    หัวหน้าฝ่ายอนุมัติโครงการ
+                                    @elseif($project->Count_Steps === 5)
+                                    ผู้บริหารอนุมัติโครงการ
+                                    @elseif($project->Count_Steps === 6)
+                                    รายงานผลการดำเนินงาน เสนอผลการดำเนินงาน
+                                    @elseif($project->Count_Steps === 7)
+                                    หัวหน้าฝ่าย
+                                    @elseif($project->Count_Steps === 8)
+                                    ผู้บริหาร
+                                    @elseif($project->Count_Steps === 9)
+                                    สิ้นสุด
                                     @else
                                     {{ $project->approvals->first()->Status ?? 'รอการอนุมัติ' }}
                                     @endif
                                 </div>
                                 <div class="status-text">
                                     @if($project->Count_Steps === 0)
-                                    เสนอเพื่อพิจารณา
+                                    เรื่อง : เสนอโครงการเพื่อขออนุมัติ
                                     @elseif($project->Count_Steps === 1)
-                                    รอหัวหน้าฝ่าย
+                                    ผู้บริหารอนุมัติโครงการ กรอกข้อมูลเพิ่มเติม
                                     @elseif($project->Count_Steps === 2)
-                                    รอผู้บริหาร พิจารณา
+                                    เสนอโครงการ
                                     @elseif($project->Count_Steps === 3)
-                                    เสร็จสิ้น
+                                    งบประมาณ
+                                    @elseif($project->Count_Steps === 4)
+                                    หัวหน้าฝ่ายอนุมัติโครงการ
+                                    @elseif($project->Count_Steps === 5)
+                                    ผู้บริหารอนุมัติโครงการ
+                                    @elseif($project->Count_Steps === 6)
+                                    รายงานผลการดำเนินงาน เสนอผลการดำเนินงาน
+                                    @elseif($project->Count_Steps === 7)
+                                    หัวหน้าฝ่าย
+                                    @elseif($project->Count_Steps === 8)
+                                    ผู้บริหาร
+                                    @elseif($project->Count_Steps === 9)
+                                    จบโครงการ
                                     @else
                                     {{ $project->approvals->first()->Status ?? 'รอการอนุมัติ' }}
                                     @endif
@@ -171,7 +230,19 @@
                                 @elseif($project->Count_Steps === 2)
                                 กำลังพิจารณา
                                 @elseif($project->Count_Steps === 3)
+                                กำลังพิจารณา
+                                @elseif($project->Count_Steps === 4)
+                                กำลังพิจารณา
+                                @elseif($project->Count_Steps === 5)
+                                กำลังพิจารณา
+                                @elseif($project->Count_Steps === 6)
+                                กำลังพิจารณา
+                                @elseif($project->Count_Steps === 7)
+                                กำลังพิจารณา
+                                @elseif($project->Count_Steps === 8)
                                 เสร็จสิ้น
+                                @elseif($project->Count_Steps === 9)
+                                สิ้นสุดโครงการ
                                 @else
                                 {{ $project->approvals->first()->Status ?? 'รอการอนุมัติ' }}
                                 @endif
@@ -179,7 +250,7 @@
                         </div>
                     </div>
                     <div class="button-container">
-                        @if($project->Count_Steps === 0)
+                        @if(in_array($project->Count_Steps, [0, 2, 6]))
                         <form action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
                             method="POST" style="display:inline;">
                             @csrf
@@ -189,6 +260,12 @@
                         </form>
                         @elseif($project->Count_Steps === 3)
                         <button type="button" class="btn btn-secondary" disabled>ดำเนินการเสร็จสิ้น</button>
+                        @elseif($project->Count_Steps === 9)
+                        <form action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
+                            method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-secondary">สิ้นสุดโครงการ</button>
+                        </form>
                         @else
                         <button type="button" class="btn btn-secondary" disabled>
                             <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
@@ -197,9 +274,19 @@
                     </div>
                 </div>
             </div>
+
+
         </div>
     </div>
+    @endforeach
 </div>
-@endforeach
-</div>
+
+<script>
+document.getElementById('toggle-icon').addEventListener('click', function() {
+    const projectStatus = document.getElementById('project-status');
+    const toggleIcon = document.getElementById('toggle-icon');
+    projectStatus.classList.toggle('show');
+    toggleIcon.classList.toggle('rotate');
+});
+</script>
 @endsection

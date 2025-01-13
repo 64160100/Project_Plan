@@ -12,7 +12,7 @@
         <div class="container">
             <div class="header">
                 <div class="project-title">{{ $approval->project->Name_Project }}</div>
-                <p>{{ $approval->project->employee->department->Name_Department ?? 'No Department' }}</p>
+                <p>{{ $approval->project->employee->department->Name_Department ?? 'ยังไม่มีผู้รับผิดชอบโครงการ' }}</p>
                 <div class="project-info">
                     <div class="info-item">
                         <div class="info-top">
@@ -20,7 +20,7 @@
                             <span class="info-label">วันที่เริ่ม</span>
                         </div>
                         <span class="info-value">
-                            {{ $approval->project->formattedFirstTime ?? 'N/A' }}
+                            {{ $approval->project->formattedFirstTime ?? '-' }}
                         </span>
                     </div>
                     <div class="info-item">
@@ -29,9 +29,15 @@
                             <span class="info-label">ผู้รับผิดชอบ</span>
                         </div>
                         <span class="info-value">
-                            {{ $approval->project->employee->Firstname_Employee ?? 'No Name' }}
+                            @if($approval->project->employee && ($approval->project->employee->Firstname_Employee ||
+                            $approval->project->employee->Lastname_Employee))
+                            {{ $approval->project->employee->Firstname_Employee ?? '' }}
                             {{ $approval->project->employee->Lastname_Employee ?? '' }}
+                            @else
+                            -
+                            @endif
                         </span>
+
                     </div>
                     <div class="info-item">
                         <div class="info-top">

@@ -19,18 +19,8 @@
     <h3 class="card-header">กรอกข้อมูลโครงการใหม่</h3><br>
     <form action="{{ route('createProject', ['Strategic_Id' => $strategics->Id_Strategic]) }}" method="POST">
             @csrf 
+
             <!-- ชื่อโครงการ -->
-            <!-- <details class="accordion">
-                <summary class="accordion-btn"><b>ชื่อโครงการ</b></summary>
-                <div class="accordion-content">
-                    <div class="mb-3">
-                        
-                    </div>
-
-                </div>
-            </details> -->
-            <!-- endชื่อโครงการ -->
-
                 <div class="content-box"><b>ชื่อโครงการ</b>
                 <hr>
                     @include('Project.App.ProjectName')
@@ -42,6 +32,7 @@
 
                 </div><br>
 
+            <!-- ผู้รับผิดชอบโครงการ -->
                 <div class="content-box"><b>ผู้รับผิดชอบโครงการ</b>
                     @include('Project.App.ProjectManager')
                 </div><br>

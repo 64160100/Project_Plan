@@ -17,6 +17,7 @@ class EmployeeModel extends Model implements JWTSubject
         'Password',
         'IsManager',
         'IsDirector',
+        'IsAdmin',
         'Department_Id',
         'Position_Id',
     ];

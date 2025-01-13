@@ -19,4 +19,28 @@ class Program_Kpi extends Model
         'Description_Program_Kpi',
     ];
     public $timestamps = false;
+
+    
+    public function programs()
+    {
+        return $this->belongsTo(Program::class, 'Program_Id', 'Id_Program');
+    }
+
+    public function programYears()
+    {
+        return $this->hasMany(Program_Year::class, 'Program_Kpi_Id', 'Id_Program_Kpi');
+    }
+
+    public function programKpis()
+    {
+        return $this->belongsTo(Program::class, 'Program_Id', 'Id_Program');
+    }
+
+    public function budgetYears()
+    {
+        return $this->belongsToMany(Program_Budget_Year::class, 'Program_Year', 'Program_Kpi_Id', 'Program_Budget_Year_Id')
+                    ->withPivot('Value_Program')
+                    ->orderBy('Budget_Year');
+    }
 }
+

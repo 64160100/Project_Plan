@@ -21,12 +21,12 @@
 
                         <div id="budget-years-container">
                             <div class="mb-3">
-                                <label for="Value_Platform_1">ปีงบประมาณที่ 1:</label>
-                                <input type="number" class="form-control" id="Value_Platform_1" name="Value_Platform[]" placeholder="ค่า KPI เช่น 4" required>
+                                <label for="Value_Platform_1">ค่า KPI ปีงบประมาณที่ 1:</label>
+                                <input type="number" class="form-control" id="Value_Platform_1" name="Value_Platform[]" min="1" step="any" placeholder="ค่า KPI เช่น 4" required>
                             </div>
                             <div class="mb-3">
-                                <label for="Value_Platform_2">ปีงบประมาณที่ 2:</label>
-                                <input type="number" class="form-control" id="Value_Platform_2" name="Value_Platform[]" placeholder="ค่า KPI เช่น 4" required>
+                                <label for="Value_Platform_2">ค่า KPI ปีงบประมาณที่ 2:</label>
+                                <input type="number" class="form-control" id="Value_Platform_2" name="Value_Platform[]" min="1" step="any" placeholder="ค่า KPI เช่น 4" required>
                             </div>
                         </div>
                         

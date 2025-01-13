@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Traits\HasCompositePrimaryKeyTrait;
 
 class Platform_Year extends Model
 {
+    use HasCompositePrimaryKeyTrait;
     protected $connection = 'mydb';
     protected $table = 'Platform_Year';
     protected $primaryKey = ['Platform_Kpi_Id', 'Platform_Budget_Year_Id'];
@@ -20,7 +22,6 @@ class Platform_Year extends Model
         'Value_Platform',
     ];
     public $timestamps = false;
-
 
     public function platformKpi()
     {

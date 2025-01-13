@@ -19,4 +19,23 @@ class Program extends Model
         'Platform_Id_Platform',
     ];
     public $timestamps = false;
+
+    public function platform()
+    {
+        return $this->belongsTo(Platform::class, 'Platform_Id_Platform', 'Id_Platform');
+    }
+
+    public function programKpis()
+    {
+        return $this->hasMany(Program_Kpi::class, 'Program_Id', 'Id_Program');
+    }
+
+    public function budgetYears()
+    {
+        return $this->hasMany(Program_Budget_Year::class, 'Program_Id', 'Id_Program');
+    }
+
+
+    
 }
+

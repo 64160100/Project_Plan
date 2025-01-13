@@ -62,15 +62,15 @@ Route::put('/editPlatformKpi/{Id_Platform}/{Id_Platform_Kpi}', [StrategicUniCont
 Route::delete('/deletePlatformKpi/{Id_Platform_Kpi}', [StrategicUniController::class, 'deletePlatformKpi'])->name('deletePlatformKpi');
 
 //Program
-Route::get('/showProgram/{Id_Platform}/{$Id_Program}', [StrategicUniController::class, 'showProgram'])->name('showProgram');
+Route::get('/showProgram/{Id_Platform}/{Id_Program}', [StrategicUniController::class, 'showProgram'])->name('showProgram');
 Route::post('/createProgram/{Id_Platform}', [StrategicUniController::class, 'createProgram'])->name('createProgram');
 Route::put('/editProgram/{Id_Platform}/{Id_Program}', [StrategicUniController::class, 'editProgram'])->name('editProgram');
 Route::delete('/deleteProgram/{Id_Program}', [StrategicUniController::class, 'deleteProgram'])->name('deleteProgram');
 
 //Program_Kpi
-Route::get('/showProgramKpi/{Id_Platform}/{$Id_Program}/{$Id_Program_Kpi}', [StrategicUniController::class, 'showProgramKpi'])->name('showProgramKpi');
-Route::post('/createProgramKpi/{Id_Platform}/{$Id_Program}', [StrategicUniController::class, 'createProgramKpi'])->name('createProgramKpi');
-Route::put('/editProgramKpi/{Id_Platform}/{$Id_Program}/{$Id_Program_Kpi}', [StrategicUniController::class, 'editProgramKpi'])->name('editProgramKpi');
+Route::get('/showProgramKpi/{Id_Program}', [StrategicUniController::class, 'showProgramKpi'])->name('showProgramKpi');
+Route::post('/createProgramKpi/{Id_Program}', [StrategicUniController::class, 'createProgramKpi'])->name('createProgramKpi');
+Route::put('/editProgramKpi/{Id_Program}/{Id_Program_Kpi}', [StrategicUniController::class, 'editProgramKpi'])->name('editProgramKpi');
 Route::delete('/deleteProgramKpi/{Id_Program_Kpi}', [StrategicUniController::class, 'deleteProgramKpi'])->name('deleteProgramKpi');
 
 

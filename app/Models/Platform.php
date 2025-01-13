@@ -25,10 +25,11 @@ class Platform extends Model
         return $this->hasMany(Platform_Kpi::class, 'Platform_Id_Platform', 'Id_Platform');
     }
 
-    // public function project()
-    // {
-    //     return $this->belongsTo(Project::class, 'Project_Id_Project', 'Id_Project');
-    // }
+    //project table
+    public function project()
+    {
+        return $this->belongsTo(Project::class, 'Project_Id_Project', 'Id_Project');
+    }
 
     // editPlatform
     public function budgetYears()

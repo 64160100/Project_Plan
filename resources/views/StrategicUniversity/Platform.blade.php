@@ -28,37 +28,37 @@
         <div class="modal-dialog">
             <form action="{{ route('createPlatform') }}" method="POST">
                 <div class="modal-content">
-                        @csrf
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addPlatformLabel">เพิ่มชื่อ Platform</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addPlatformLabel">เพิ่มชื่อ Platform</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="Name_Platform" class="col-form-label">ชื่อ Platform :</label>
+                            <input type="text" class="form-control" id="Name_Platform" name="Name_Platform" placeholder="กรอกชื่อ Platform" required>
                         </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label for="Name_Platform" class="col-form-label">ชื่อ Platform :</label>
-                                <input type="text" class="form-control" id="Name_Platform" name="Name_Platform" placeholder="กรอกชื่อ Platform" required>
-                            </div>
 
-                            <div class="mb-3">
-                                <label for="Name_Object" class="col-form-label">ชื่อวัตถุประสงค์ :</label>
-                                <input type="text" class="form-control" id="Name_Object" name="Name_Object" placeholder="กรอกชื่อวัตถุประสงค์" required>
-                            </div>
+                        <div class="mb-3">
+                            <label for="Name_Object" class="col-form-label">ชื่อวัตถุประสงค์ :</label>
+                            <input type="text" class="form-control" id="Name_Object" name="Name_Object" placeholder="กรอกชื่อวัตถุประสงค์" required>
+                        </div>
 
-                            <div id="budget-years-container">
-                                <div class="mb-3">
-                                    <label for="Budget_Year_1">ปีงบประมาณที่ 1:</label>
-                                    <input type="number" class="form-control" id="Budget_Year_1" name="Budget_Year[]" placeholder="กรอกปีงบประมาณ เช่น 2566" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="Budget_Year_2">ปีงบประมาณที่ 2:</label>
-                                    <input type="number" class="form-control" id="Budget_Year_2" name="Budget_Year[]" placeholder="กรอกปีงบประมาณ เช่น 2567" required>
-                                </div>
+                        <div id="budget-years-container">
+                            <div class="mb-3">
+                                <label for="Budget_Year_1">ปีงบประมาณที่ 1:</label>
+                                <input type="number" class="form-control" id="Budget_Year_1" name="Budget_Year[]" placeholder="กรอกปีงบประมาณ เช่น 2566" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="Budget_Year_2">ปีงบประมาณที่ 2:</label>
+                                <input type="number" class="form-control" id="Budget_Year_2" name="Budget_Year[]" placeholder="กรอกปีงบประมาณ เช่น 2567" required>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-                            <button type="submit" class="btn btn-primary">บันทึก</button>
-                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -122,63 +122,57 @@
             </tr>
 
             @foreach ($Platform->platformKpis as $PlatformKpi)
-            <tr>
-                <td>{{ $PlatformKpi->Name_Platfrom_Kpi }}</td>
-                <td>{{ $PlatformKpi->Description_Platfrom_Kpi }}</td>
+                <tr>
+                    <td>{{ $PlatformKpi->Name_Platfrom_Kpi }}</td>
+                    <td>{{ $PlatformKpi->Description_Platfrom_Kpi }}</td>
 
-                @foreach($Platform->budgetYears as $budgetYear)
-                    @php
-                        $platformYear = $PlatformKpi->platformYears()
-                        ->where('Platform_Budget_Year_Id', $budgetYear->Id_Platform_Budget_Year)
-                        ->where('Platform_Kpi_Id', $PlatformKpi->Id_Platform_Kpi)
-                        ->first();
-                    @endphp
+                    @foreach($Platform->budgetYears as $budgetYear)
+                        @php
+                            $platformYear = $PlatformKpi->platformYears()
+                            ->where('Platform_Budget_Year_Id', $budgetYear->Id_Platform_Budget_Year)
+                            ->where('Platform_Kpi_Id', $PlatformKpi->Id_Platform_Kpi)
+                            ->first();
+                        @endphp
+                        <td>
+                            @if($platformYear)
+                                {{ $platformYear->Value_Platform }}
+                            @else
+                                -
+                            @endif
+                        </td>
+                    @endforeach
+
                     <td>
-                        @if($platformYear)
-                            {{ $platformYear->Value_Platform }}
-                        @else
-                            -
-                        @endif
-                    </td>
-                @endforeach
+                        <a href="{{ route('showPlatformKpi', ['Id_Platform' => $Platform->Id_Platform]) }}"></a>
+                        <div class="bth-group">
 
-                <td>
-                    <a href="{{ route('showPlatformKpi', ['Id_Platform' => $Platform->Id_Platform]) }}"></a>
-                    <div class="bth-group">
-
-                        <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#editPlatformKpi{{$PlatformKpi->Id_Platform_Kpi}}" id="{{$PlatformKpi->Id_Platform_Kpi}}">
-                            <i class='bx bx-edit'></i>แก้ไข
-                        </button>
-                        
-                        <form action="{{ route('deletePlatformKpi', $PlatformKpi->Id_Platform_Kpi) }}" method="POST">
-                            @csrf
-                            @method('DELETE') 
-                            <button type="submit" class="btn-delete" onclick="return confirm('คุณต้องการลบ KPI นี้ใช่หรือไม่?')">
-                                <i class='bx bx-trash'></i>ลบ
+                            <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#editPlatformKpi{{$PlatformKpi->Id_Platform_Kpi}}" id="{{$PlatformKpi->Id_Platform_Kpi}}">
+                                <i class='bx bx-edit'></i>แก้ไข
                             </button>
-                        </form>
+                            
+                            <form action="{{ route('deletePlatformKpi', $PlatformKpi->Id_Platform_Kpi) }}" method="POST">
+                                @csrf
+                                @method('DELETE') 
+                                <button type="submit" class="btn-delete" onclick="return confirm('คุณต้องการลบ KPI นี้ใช่หรือไม่?')">
+                                    <i class='bx bx-trash'></i>ลบ
+                                </button>
+                            </form>
 
-                    </div>
-                </td>
-            </tr>
+                        </div>
+                    </td>
+                </tr>
             @endforeach
         </table>
         <!-- end table Platform -->
         <br><br>
         
-       
         @include('StrategicUniversity.Program')
+        @include('StrategicUniversity.editProgram')
         
-
-
-
-        <br><hr>
+        <hr>
 
     @endforeach
 
-    
-    
- 
 @endsection
 </body>
 </html>

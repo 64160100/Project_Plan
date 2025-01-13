@@ -33,4 +33,10 @@ class Platform_Budget_Year extends Model
         return $this->belongsTo(Platform::class, 'Platform_Id', 'Id_Platform');
     }
 
+    // ดึง Budget_Year จาก Platform_Budget_Year เพื่อแสดงใน Program_Budget_Year
+    public function programBudgetYears()
+    {
+        return $this->hasMany(Program_Budget_Year::class, 'Budget_Year', 'Budget_Year');
+    }
+
 }

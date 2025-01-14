@@ -76,7 +76,8 @@
     background-color: #e3c2ff;
     border: 1px solid #f8f9fa;
     border-radius: 4px;
-    color: #ffffff;
+    color: #000000;
+    border-color: #000000;
     cursor: pointer;
     font-family: arial,sans-serif;
     font-size: 14px;
@@ -93,8 +94,6 @@
   }
   
   .btn-addlist:hover {
-    border-color: #650893;
-    box-shadow: rgba(104, 6, 139, 0.1) 0 1px 1px;
     color: #7304c7;
   }
   
@@ -401,6 +400,9 @@ input[type="checkbox"] {
   list-style-image: none;
   transition: box-shadow .3s;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  width: 100%; 
+  box-sizing: border-box; 
 }
 
 .btn-submit {
@@ -427,3 +429,24 @@ input[type="checkbox"] {
   justify-content: flex-end; /* จัดเนื้อหาไปชิดขวา */
   padding: 10px; /* เพิ่มระยะห่างรอบๆ container */
 }
+
+
+.content-box-expense {
+  /* position: relative;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  width: calc(100% - 20px);
+  margin: 10px auto; 
+  padding: 10px; */
+
+  position: relative;
+  background-color: #fff;
+  border: 2px;
+  border-radius: 10px;
+  padding: 15px 20px;
+  text-align: left;
+  list-style-image: none;
+  transition: box-shadow .3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+

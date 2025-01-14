@@ -4,6 +4,7 @@ let methodFieldCounter = 1;
 let outputFieldCounter = 1;
 let outcomeFieldCounter = 1;
 let resultFieldCounter = 1;
+let functionalAreaFieldCounter = 1;
 
 let projectKpiFieldCounter = 1;
 let kpiFieldCounter = 1;
@@ -26,7 +27,6 @@ function addField(containerId, inputName) {
 
     const addButton = container.lastElementChild;
     container.insertBefore(newField, addButton);
-
 }
 
 function removeField(button, containerId) {
@@ -34,9 +34,25 @@ function removeField(button, containerId) {
     field.remove();
 }
 
+// function removeField(button, containerId) {
+//     const container = document.getElementById(containerId);
+//     const field = button.closest('.form-group');
+//     if (field && container.contains(field)) {
+//         container.removeChild(field);
+//     }
+
+//     // ถ้าไม่มีฟิลด์เหลืออยู่ ให้เพิ่มฟิลด์เริ่มต้นใหม่
+//     if (container.querySelectorAll('.form-group').length === 0) {
+//         const addButton = container.lastElementChild;
+//         const inputName = addButton.getAttribute('onclick').match(/'([^']+)'/)[1];
+//         addField(containerId, inputName);
+//     }
+// }
+
+
+
 function getPlaceholder(inputName) {
     let fieldId = "";
-    // let Id_Sup_Project = "";
 
     let placeholderText = "";
 
@@ -74,11 +90,16 @@ function getPlaceholder(inputName) {
         fieldId = `field-${projectKpiFieldCounter}`;
         placeholderText = "กรอกตัวชี้วัด";
         projectKpiFieldCounter++;  
-    }
-    else if (inputName === 'Target_Project[]') { //
+
+    } else if (inputName === 'Target_Project[]') { //
         fieldId = `field-${kpiFieldCounter}`;
         placeholderText = "ระบุค่าเป้าหมาย ไม่น้อยกว่า...";
-        kpiFieldCounter++;  
+        kpiFieldCounter++; 
+
+    } else if (inputName === 'functionalArea[]') { //
+        fieldId = `field-${functionalAreaFieldCounter}`;
+        placeholderText = "เช่น บุคลากรภาครัฐ";
+        functionalAreaFieldCounter++;  
     }
     return { fieldId, placeholder: placeholderText };
 }

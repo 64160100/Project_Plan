@@ -44,6 +44,7 @@ class Project extends Model
         return $this->hasMany(Sup_Project::class, 'Project_Id_Project', 'Id_Project');
     }
 
+    
 
     
     

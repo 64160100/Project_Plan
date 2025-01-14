@@ -1,4 +1,3 @@
-@csrf
 <div id="kpi-form-fields">
     <div class="kpi-field">
         <label for="Name_Platform">ชื่อ Platform</label>

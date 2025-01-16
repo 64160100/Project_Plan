@@ -6,7 +6,6 @@
     <title>FormInsertProject</title>
     <link rel="stylesheet" href="{{ asset('css/project.css') }}">
     <script src="{{ asset('js/addField.js') }}" defer></script>
-    <!-- <script src="{{ asset('js/addlist.js') }}" defer></script> -->
     <script src="{{ asset('js/radioButton.js') }}" defer></script>
     <script src="{{ asset('js/toggleDropdown.js') }}" defer></script>
     <script src="{{ asset('js/filterSearch.js') }}" defer></script>
@@ -68,13 +67,20 @@
 
             <!-- วัตถุประสงค์โครงการ   -->
                 <div class="content-box"><b>วัตถุประสงค์โครงการ</b>
+                    <textarea class="form-control" id="Objective_Project" name="Objective_Project" rows="5" placeholder="เพิ่มข้อความ" required></textarea>
                     @include('Project.App.ProjectObjective')
                 </div><br>
                 
-
                 <!-- กลุ่มเป้าหมาย   -->
                 <div class="content-box"><b>กลุ่มเป้าหมาย</b>
                     @include('Project.App.TargetGroup')
+                </div><br>
+
+                <!-- สถานที่   -->
+                <div class="content-box"><b>สถานที่ดำเนินงาน</b>
+                    <div class="form-group">
+                        <textarea class="form-control" rows="2" id="comment" placeholder="เพิ่มข้อความ"></textarea>
+                    </div>
                 </div><br>
                 
                 <!-- ตัวชี้วัด   -->
@@ -82,9 +88,6 @@
                     @include('Project.App.Kpi')
                 </div><br>
              
-
-                
-                    
                  <!-- ระยะเวลาดำเนินโครงการ  -->
                 <div class="content-box"><b>ระยะเวลาดำเนินโครงการ</b>
                     <div>
@@ -100,11 +103,9 @@
 
                 <div class="content-box"><b>หลักการและเหตุผล</b>
                     <div class="form-group">
-                        <textarea class="form-control" rows="5" id="comment" placeholder="เพิ่มข้อความ"></textarea>
+                        <textarea class="form-control" rows="15" id="comment" placeholder="เพิ่มข้อความ"></textarea>
                     </div>
                 </div><br>
-
-
 
                 <!-- บูรณาการ   -->
                 <div class="content-box"><b>การบูรณาการงานโครงการ/กิจกรรม</b>
@@ -128,10 +129,7 @@
                         <div class="mb-3">
                             <form id="outputForm">
                                 <div id="outputContainer">
-                                    <div class="form-group">
-                                        <input type="text" id="field-1" name="output[]" placeholder="กรอกข้อมูล" required oninput="handleInput(this)">
-                                        <button type="button" class="remove-btn" onclick="removeField(this)">Remove</button>
-                                    </div>
+                                    
                                 </div>
                                 <div>
                                     <button type="button" class="btn-addlist" onclick="addField('outputContainer', 'output[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
@@ -142,15 +140,12 @@
 
                 <div class="content-box"><b>เป้าหมายเชิงผลลัพธ์ (Outcome)</b>
                         <div class="mb-3">
-                            <form id="outputForm">
-                                <div id="outputContainer">
-                                    <div class="form-group">
-                                        <input type="text" id="field-1" name="output[]" placeholder="กรอกข้อมูล" required oninput="handleInput(this)">
-                                        <button type="button" class="remove-btn" onclick="removeField(this)">Remove</button>
-                                    </div>
+                            <form id="outcomeForm">
+                                <div id="outcomeContainer">
+                                    
                                 </div>
                                 <div>
-                                    <button type="button" class="btn-addlist" onclick="addField('outputContainer', 'output[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
+                                    <button type="button" class="btn-addlist" onclick="addField('outcomeContainer', 'outcome[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
                                 </div>
                             </form>
                         </div>
@@ -160,10 +155,7 @@
                 <div class="mb-3">
                     <form id="resultForm">
                         <div id="resultContainer">
-                            <div class="form-group">
-                                <input type="text" id="field-1" name="result[]" placeholder="กรอกข้อมูล" required oninput="handleInput(this)">
-                                <button type="button" class="remove-btn" onclick="removeField(this)">Remove</button>
-                            </div>
+                            
                         </div>
                         <div>
                             <button type="button" class="btn-addlist" onclick="addField('resultContainer', 'result[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
@@ -180,20 +172,12 @@
                     </div>    
                 </div><br>
 
-
-
-                
-        
-        
-        
                 <!-- save -->
         <div class="container">
             <button type="submit" class="btn-submit">บันทึก</button>
         </div>
     
     </form> 
-        
-
     @endsection
 
 </body>

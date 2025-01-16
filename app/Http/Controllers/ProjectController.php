@@ -36,22 +36,20 @@ class ProjectController extends Controller
     
     public function createProject(Request $request, $Strategic_Id)
     {
-        // ค้นหาข้อมูลกลยุทธ์
         $strategics = Strategic::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
         $strategies = $strategics->strategies;
 
-        // สร้างโครงการใหม่
         $projects = new Project;
         $projects->Strategic_Id = $request->Strategic_Id;
         $projects->Name_Project = $request->Name_Project;
         $projects->Name_Strategy = $request->Name_Strategy;
+        $projects->Objective_Project = $request->Objective_Project; // ไม่ต้องใช้ implode แล้ว
+        $projects->Indicators_Project = $request->Indicators_Project;
+        $projects->Target_Project = $request->Target_Project;
         $projects->First_Time = $request->First_Time;
         $projects->End_Time = $request->End_Time;
-        $projects->save();  // บันทึกโครงการใหม่
 
-        $objectiveProjects = $request->Objective_Project;
-        $indicatorsProjects = $request->Indicators_Project;
-        $targetProjects = $request->Target_Project;
+        $projects->save();
 
         if ($request->has('sdgs')) {
             $selectedSDGs = $request->sdgs; // รับค่าที่ส่งมาจากฟอร์ม (Array)
@@ -61,63 +59,9 @@ class ProjectController extends Controller
         if ($request->has('Name_Sup_Project')) {
             $this->createSupProjects($projects->Id_Project, $request->Name_Sup_Project);
         }
-
         
-        // ตรวจสอบว่ามีข้อมูลทั้งสามฟิลด์หรือไม่
-        if ($objectiveProjects && $indicatorsProjects && $targetProjects) {
-            
-            foreach ($objectiveProjects as $index => $objective) {
-                // ตรวจสอบว่า index ของ $indicatorsProjects และ $targetProjects มีข้อมูลตรงกันหรือไม่
-                $indicator = isset($indicatorsProjects[$index]) ? $indicatorsProjects[$index] : null;
-                $target = isset($targetProjects[$index]) ? $targetProjects[$index] : null;
-        
-                $projects->update([
-                    'Strategic_Id' => $projects->Strategic_Id,
-                    'Name_Project' => $projects->Name_Project,
-                    'Name_Strategy' => $projects->Name_Strategy,
-                    'First_Time' => $projects->First_Time,
-                    'End_Time' => $projects->End_Time,
-                    'Objective_Project' => $objective,
-                    'Indicators_Project' => $indicator,
-                    'Target_Project' => $target
-                ]);
-            }
-        }
-
-        return redirect()->route('index', ['Strategic_Id' => $Strategic_Id])
-                        ->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
+        return redirect()->route('index', ['Strategic_Id' => $Strategic_Id])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
     }
-
-    // public function createProject(Request $request, $Strategic_Id)
-    // {
-    //     // ค้นหาข้อมูลกลยุทธ์
-    //     $strategics = Strategic::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
-    
-    //     // สร้างโครงการใหม่
-    //     $projects = new Project;
-    //     $projects->Strategic_Id = $Strategic_Id;
-    //     $projects->Name_Project = $request->Name_Project;
-    //     $projects->Name_Strategy = $request->Name_Strategy;
-    //     $projects->First_Time = $request->First_Time;
-    //     $projects->End_Time = $request->End_Time;
-    
-    //     // บันทึกโครงการครั้งแรกโดยไม่รวม Objective, Indicators, Target
-    //     $projects->save();
-    
-    //     // อัปเดต Objective, Indicators, Target ทีละแถว
-    //     if ($request->has('Objective_Project') || $request->has('Indicators_Project') || $request->has('Target_Project')) {
-    //         $projects->Objective_Project = $request->Objective_Project; // ส่งเป็นข้อความธรรมดา
-    //         $projects->Indicators_Project = $request->Indicators_Project; // ส่งเป็นข้อความธรรมดา
-    //         $projects->Target_Project = $request->Target_Project; // ส่งเป็นข้อความธรรมดา
-    
-    //         // บันทึกการอัปเดต
-    //         $projects->save();
-    //     }
-    
-    //     // Redirect กลับไปหน้า index
-    //     return redirect()->route('index', ['Strategic_Id' => $Strategic_Id])
-    //                     ->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
-    // }
 
 
     private function createSupProjects($Id_Project, $supProjectNames)
@@ -138,8 +82,6 @@ class ProjectController extends Controller
             }
         }
     }
-
-
 
     public function editProject(Request $request, $Id_Project)
     {

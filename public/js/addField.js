@@ -1,6 +1,6 @@
 let projectFieldCounter = 1;  
 let objectiveFieldCounter = 1;
-let methodFieldCounter = 1;
+// let methodFieldCounter = 1;
 let outputFieldCounter = 1;
 let outcomeFieldCounter = 1;
 let resultFieldCounter = 1;
@@ -34,26 +34,10 @@ function removeField(button, containerId) {
     field.remove();
 }
 
-// function removeField(button, containerId) {
-//     const container = document.getElementById(containerId);
-//     const field = button.closest('.form-group');
-//     if (field && container.contains(field)) {
-//         container.removeChild(field);
-//     }
-
-//     // ถ้าไม่มีฟิลด์เหลืออยู่ ให้เพิ่มฟิลด์เริ่มต้นใหม่
-//     if (container.querySelectorAll('.form-group').length === 0) {
-//         const addButton = container.lastElementChild;
-//         const inputName = addButton.getAttribute('onclick').match(/'([^']+)'/)[1];
-//         addField(containerId, inputName);
-//     }
-// }
-
 
 
 function getPlaceholder(inputName) {
     let fieldId = "";
-
     let placeholderText = "";
 
     if (inputName === 'Name_Sup_Project[]') { //
@@ -65,11 +49,6 @@ function getPlaceholder(inputName) {
         fieldId = `field-${objectiveFieldCounter}`;
         placeholderText = "เพิ่มวัตถุประสงค์";
         objectiveFieldCounter++; 
-
-    } else if (inputName === 'method[]') {
-            fieldId = `field-${methodFieldCounter}`;
-            placeholderText = "เพิ่มวิธีการดำเนินงาน";
-            methodFieldCounter++;  
 
     } else if (inputName === 'output[]') {
         fieldId = `field-${outputFieldCounter}`;

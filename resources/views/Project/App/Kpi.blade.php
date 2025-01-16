@@ -1,21 +1,10 @@
-    <!-- ตัวชี้วัด -->
-    <div id="projectKpiContainer">
-        <div>
-            <button type="button" id="add-indicators" class="btn-addlist" onclick="addField('projectKpiContainer', 'Indicators_Project[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
-        </div>
-    </div>
-
-
+    <!-- ชื่อตัวชี้วัด -->
+    <textarea class="form-control" id="Indicators_Project" name="Indicators_Project" rows="5" placeholder="เพิ่มข้อความ" required></textarea>
     <br>
 
     <!-- ค่าเป้าหมาย -->
-    <div id="targetProjectContainer">
-        <div for="formGroupExampleInput" class="form-label"><b>ค่าเป้าหมาย</b></div>
-        <div>
-            <button type="button" id="add-targetProject" class="btn-addlist" onclick="addField('targetProjectContainer', 'Target_Project[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
-        </div>
-    </div>
-
+    <b>กลุ่มเป้าหมาย</b>
+    <textarea class="form-control" id="Target_Project" name="Target_Project" rows="5" placeholder="เพิ่มข้อความ" required></textarea>
     <br>
 
     <div id="itemContainer">
@@ -27,23 +16,21 @@
             เชิงคุณภาพ
         </div>
     </div>
-    
-    <div class="form-group">
-        <div id="quantitative-inputs" style="display: none;">
-            <input type="text" id="textbox-goal-1" placeholder="ข้อความ"><br>
-            <input type="text" id="textbox-goal-amount" placeholder="จำนวน">
-            <input type="text" id="textbox-goal-unit" placeholder="หน่วย">
-        </div>
-        <div id="qualitative-input" style="display: none;">
-            <input type="text" id="textbox-goal-2" placeholder="ข้อความ">
-        </div>
-    </div>
-    
 
 
-<!-- </form> -->
+        <div id="quantitative-inputs" class="quantitative-inputs" style="display: none;">
+            <div id="quantitative-items">
+                
+            </div>
+            <button type="button" class="btn-addlist" onclick="addQuantitativeItem()"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
+        </div>
+        <div id="qualitative-input" class="qualitative-input" style="display: none;">
+            <textarea class="form-control" id="textbox-goal-2" rows="3" placeholder="เพิ่มข้อความ"></textarea>
+        </div>
+
 
 <script>
+    //
     function toggleGoalInputs(value) {
         const quantitativeInputs = document.getElementById('quantitative-inputs');
         const qualitativeInput = document.getElementById('qualitative-input');
@@ -55,5 +42,26 @@
             quantitativeInputs.style.display = 'none';
             qualitativeInput.style.display = 'block';
         }
+    }
+
+    //
+    function addQuantitativeItem() {
+        const container = document.getElementById('quantitative-items');
+        const newItem = document.createElement('div');
+        newItem.className = 'quantitative-item';
+        newItem.innerHTML = `
+            <input type="text" class="full-width" placeholder="ข้อความ">
+            <div class="form-group">
+                <input type="text" placeholder="จำนวน">&nbsp;&nbsp;
+                <input type="text" placeholder="หน่วย">
+            </div>
+            <button type="button" class="btn-remove" onclick="removeQuantitativeItem(this)"><i class='bx bx-minus-circle'></i>ลบรายการ</button>
+        `;
+        container.appendChild(newItem);
+    }
+
+    function removeQuantitativeItem(button) {
+        const item = button.closest('.quantitative-item');
+        item.remove();
     }
 </script>

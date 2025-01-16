@@ -71,23 +71,15 @@
 
              <!-- วัตถุประสงค์โครงการ   -->
              <div class="content-box"><b>วัตถุประสงค์โครงการ</b>
-                <div class="form-group">
-                    <input type="text" id="Objective_Project" name="Objective_Project" value="{{ $projects->Objective_Project }}" placeholder="เพิ่มวัตถุประสงค์" required>
-                </div>
+                <textarea class="form-control" id="Objective_Project" name="Objective_Project" rows="5" placeholder="เพิ่มข้อความ" required>{{ $projects->Objective_Project }}</textarea>
             </div><br>
 
             <!-- ตัวชี้วัด   -->
             <div class="content-box"><b>ตัวชี้วัด</b>
-                <div class="form-group">
-                    <input type="text" id="Indicators_Project" name="Indicators_Project" value="{{ $projects->Indicators_Project }}" placeholder="กรอกตัวชี้วัด">
-                </div>
-            </div><br>
-               
-            <!-- กลุ่มเป้าหมาย   -->
-            <div class="content-box"><b>กลุ่มเป้าหมาย</b>
-                <div class="form-group">
-                    <input type="text" name="Target_Project" id="Target_Project" value="{{ $projects->Target_Project }}" placeholder="เพิ่มกลุ่มเป้าหมาย" required>
-                </div>
+                <textarea class="form-control" id="Indicators_Project" name="Indicators_Project" rows="5" placeholder="เพิ่มข้อความ" required>{{ $projects->Indicators_Project }}</textarea>
+                <br>
+                <b>กลุ่มเป้าหมาย</b>
+                <textarea class="form-control" id="Target_Project" name="Target_Project" rows="5" placeholder="เพิ่มข้อความ" required>{{ $projects->Target_Project }}</textarea>
             </div><br>
                 
             <!-- ระยะเวลาดำเนินโครงการ   -->

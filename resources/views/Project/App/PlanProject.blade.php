@@ -1,29 +1,25 @@
 <form id="dynamicForm">
     <div id="itemContainer">
-        <div class="form-group-radio">
+        <!-- <div class="form-group-radio">
             <input type="radio" name="planType" value="1" onchange="toggleTextbox(this, 'textbox-planType-')">
             โครงการระยะสั้น &nbsp;&nbsp;
             <input type="radio" name="planType" value="2" onchange="toggleTextbox(this, 'textbox-planType-')">
             โครงการระยะยาว 
-            
+        </div> -->
+
+        <div class="form-group-radio">
+            <input type="radio" name="planType" value="1" id="shortTermProject">
+            <label for="shortTermProject">โครงการระยะสั้น</label>
+            &nbsp;&nbsp;
+            <input type="radio" name="planType" value="2" id="longTermProject">
+            <label for="longTermProject">โครงการระยะยาว</label>
         </div>
 
+        <!-- วิธีการดำเนินงาน -->
         <div class="form-group">
-            <div id="textbox-planType-1" class="hidden" data-group="planType">
-            <form id="methodForm">
-                <div for="formGroupExampleInput" class="form-label">วิธีการดำเนินงาน</div>
-                    <div id="methodContainer">
-                        <div class="form-group">
-                            <input type="text" id="field-1" name="method[]" placeholder="เพิ่มวิธีการดำเนินงาน" required oninput="handleInput(this)">
-                            <button type="button" class="remove-btn" onclick="removeField(this)">Remove</button>
-                        </div>
-                    </div>
-                    <div>
-                        <button type="button" class="btn-addlist" onclick="addField('methodContainer', 'method[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
-                    </div>
-            </form>
-
-            </div>
+        <div id="textbox-planType-1" class="hidden" data-group="planType">
+            @include('Project.App.ProjectMethod')
+        </div>
  
             <div id="textbox-planType-2" class="hidden" data-group="planType">
                 @include('Project.App.PlanTable')
@@ -72,7 +68,7 @@
                     </div>
                 </div>
 
-                <div id="expenseContentBox" style="display: none;">
+                <div id="expenseContentBox" class="content-box-expense" style="display: none;">
                     <div id="selectedExpenses" class="mb-3">
                         <!-- ตัวเลือกที่ถูกเลือกจะถูกแสดงที่นี่ -->
                     </div>
@@ -81,17 +77,43 @@
             </div>
             <!-- end หมวดรายจ่าย -->
 
-            <br>
             <div>
                 <label>รวมค่าใช้จ่าย<br>
                 <input type="text" data-group="budgetType" placeholder="จำนวน"> 
                 <input type="text" data-group="budgetType" placeholder="หน่วย"> 
             </div>
+            
         </div>
     </div>
 </form>
+<div></div>
 
+<!-- ระยะโครงการ -->
+ <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const planTypeRadios = document.querySelectorAll('input[name="planType"]');
+        const shortTermContent = document.getElementById('textbox-planType-1');
+        const longTermContent = document.getElementById('textbox-planType-2');
+    
+        function togglePlanTypeContent() {
+            planTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === '1') {
+                        shortTermContent.classList.remove('hidden');
+                        longTermContent.classList.add('hidden');
+                    } else if (this.value === '2') {
+                        shortTermContent.classList.add('hidden');
+                        longTermContent.classList.remove('hidden');
+                    }
+                });
+            });
+        }
+    
+        togglePlanTypeContent();
+    });
+ </script>
 
+<!-- แหล่งงบประมาณ -->
 <script>
     function toggleIncomeForm(radio) {
         const incomeForm = document.getElementById('incomeForm');
@@ -111,6 +133,10 @@
     });
 </script>
 
+<!-- ระยะโครงการ -->
+
+
+<!-- หมวดรายจ่าย -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const expenseCategorySelect = document.getElementById('expenseCategory');
@@ -126,11 +152,21 @@ document.addEventListener('DOMContentLoaded', function() {
         if (expenseId) {
             expenseContentBox.style.display = 'block';
             expenseContentBox.style.width = '100%'
+            expenseContentBox.style.maxWidth = '100%';
             addExpenseItem(expenseId, expenseName);
             this.selectedIndex = 0; // รีเซ็ตการเลือกs
             addExpenseBtn.style.display = 'inline-block';
         }
     });
+
+    function adjustExpenseContentBoxWidth() {
+        const parentWidth = expenseContentBox.parentElement.offsetWidth;
+        expenseContentBox.style.width = parentWidth + 'px';
+        expenseContentBox.style.maxWidth = parentWidth + 'px';
+    }
+
+    window.addEventListener('load', adjustExpenseContentBoxWidth);
+    window.addEventListener('resize', adjustExpenseContentBoxWidth);
 
     addExpenseBtn.addEventListener('click', function() {
         const selectedOption = expenseCategorySelect.options[expenseCategorySelect.selectedIndex];
@@ -141,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const lastExpenseItem = selectedExpensesDiv.lastElementChild;
             if (lastExpenseItem) {
                 const lastExpenseId = lastExpenseItem.querySelector('input[name^="expense["]').name.match(/\d+/)[0];
-                const lastExpenseName = lastExpenseItem.querySelector('p').textContent.replace('✓', '').trim();
+                const lastExpenseName = lastExpenseItem.querySelector('div').textContent.replace('✓', '').trim();
                 addExpenseItem(lastExpenseId, lastExpenseName);
             }
         }
@@ -150,15 +186,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function addExpenseItem(id, name) {
         const expenseItem = document.createElement('div');
+        // const cleanName = name.replace(/ลบรายการนี้/g, '').trim();
+
         expenseItem.classList.add('expense-item', 'mb-2');
         expenseItem.innerHTML = `
-            <p><i class='bx bx-check-circle'></i>${name}</p><hr>
-            <input type="text" name="expense[${id}][desc]" placeholder="กรอกรายละเอียด" required> <br><br>
-            <input type="text" name="expense[${id}][amount]" placeholder="จำนวน" required style="width: 100%;">
-            <input type="text" name="expense[${id}][unit]" placeholder="หน่วย" required style="width: 100%;"><br><br>
+        <div style="width: 100%">
+            <div><i class='bx bx-check-circle'></i>${name}</div>
+            <input type="text" name="expense[${id}][desc]" placeholder="กรอกรายละเอียด" required>
+            <input type="text" name="expense[${id}][amount]" placeholder="จำนวน" required>
+            <input type="text" name="expense[${id}][unit]" placeholder="หน่วย" required>
             <button type="button" class="btn btn-danger btn-sm" onclick="removeExpenseItem(this)">
                 <i class='bx bx-trash'></i>
             </button>
+        </div>
         `;
         selectedExpensesDiv.appendChild(expenseItem);
     }

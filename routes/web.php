@@ -8,7 +8,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\StrategicController;
 use App\Http\Controllers\SDGController;
 use App\Http\Controllers\StrategicUniController;
-
+use App\Http\Controllers\ProjectAnalysisController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -73,6 +73,10 @@ Route::post('/createProgramKpi/{Id_Program}', [StrategicUniController::class, 'c
 Route::put('/editProgramKpi/{Id_Program}/{Id_Program_Kpi}', [StrategicUniController::class, 'editProgramKpi'])->name('editProgramKpi');
 Route::delete('/deleteProgramKpi/{Id_Program_Kpi}', [StrategicUniController::class, 'deleteProgramKpi'])->name('deleteProgramKpi');
 
+//Project Analysis
+Route::get('/report', [ProjectAnalysisController::class, 'report'])->name('report');
+Route::get('/checkBudget', [ProjectAnalysisController::class, 'checkBudget'])->name('checkBudget');
+Route::get('/allProject', [ProjectAnalysisController::class, 'allProject'])->name('allProject');
 
 
 

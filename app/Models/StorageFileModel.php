@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +16,8 @@ class StorageFileModel extends Model
         'Name_Storage_File',
         'Path_Storage_File',
         'Type_Storage_File',
-        'Size'
+        'Size',
+        'Project_Id',
     ];
 
     protected $casts = [
@@ -39,9 +39,9 @@ class StorageFileModel extends Model
         return round($bytes, 2) . ' ' . $units[$i];
     }
 
-    public static function createFromUploadedFile(UploadedFile $file, string $path): ?self
+    public static function createFromUploadedFile(UploadedFile $file, string $path, int $projectId): ?self
     {
-        if ($file->getClientMimeType() !== 'application/pdf') {
+        if ($file->getClientMimeType() !== 'application/pdf' && !str_starts_with($file->getClientMimeType(), 'image/')) {
             return null;
         }
 
@@ -55,6 +55,7 @@ class StorageFileModel extends Model
             'Path_Storage_File' => $filePath,
             'Type_Storage_File' => $file->getClientMimeType(),
             'Size' => $sizeInBytes,
+            'Project_Id' => $projectId,
         ]);
     }
 
@@ -73,5 +74,10 @@ class StorageFileModel extends Model
     {
         Storage::disk('public')->delete($this->Path_Storage_File);
         return parent::delete();
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(ProjectModel::class, 'Project_Id', 'Id_Project');
     }
 }

@@ -1,59 +1,67 @@
-    <div id="projectKpiContainer">
-        <div>
-            <button type="button" id="add-indicators" class="btn-addlist" onclick="addField('projectKpiContainer', 'Indicators_Project[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
-        </div>
-    </div>
-    <!-- เพิ่มรายการ -->
+    <!-- ชื่อตัวชี้วัด -->
+    <textarea class="form-control" id="Indicators_Project" name="Indicators_Project" rows="5" placeholder="เพิ่มข้อความ" required></textarea>
+    <br>
 
-    <!-- <form id="projectKpiForm">
-        <div id="projectKpiContainer">
-            <label for="formGroupExampleInput" class="form-label"><b>ตัวชี้วัด</b></label>
-            <div class="form-group">
-                <input type="text" id="field-1" name="projectKpi[]" placeholder="กรอกตัวชี้วัด" required oninput="handleInput(this)">
-                <button type="button" class="remove-btn" onclick="removeField(this)">Remove</button>
-            </div>
-        </div>
-        <div>
-            <button type="button" class="btn-addlist" onclick="addField('projectKpiContainer', 'projectKpi[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
-        </div>
-    </form>
-
-    <br> -->
-
-    <!-- <form id="KpiForm">
-        <div id="KpiContainer">
-            <label for="formGroupExampleInput" class="form-label"><b>ค่าเป้าหมาย</b></label>
-            <div class="form-group">
-                <input type="text" id="field-1" name="Kpi[]" placeholder="ระบุค่าเป้าหมาย ไม่น้อยกว่า..." required oninput="handleInput(this)">
-                <button type="button" class="remove-btn" onclick="removeField(this)">Remove</button>
-            </div>
-        </div>
-        <div>
-            <button type="button" class="btn-addlist" onclick="addField('KpiContainer', 'Kpi[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
-        </div>
-    </form>
-
+    <!-- ค่าเป้าหมาย -->
+    <b>กลุ่มเป้าหมาย</b>
+    <textarea class="form-control" id="Target_Project" name="Target_Project" rows="5" placeholder="เพิ่มข้อความ" required></textarea>
     <br>
 
     <div id="itemContainer">
         <div for="formGroupExampleInput" class="form-label"><b>ตัวชี้วัดตามเป้าหมายการให้บริการหน่วยงานและเป้าหมายผลผลิตของมหาวิทยาลัย</b></div>
         <div class="form-group-radio">
-            <input type="radio" name="goal" value="1" onchange="toggleTextbox(this, 'textbox-goal-')">
+            <input type="radio" name="goal" value="1" onchange="toggleGoalInputs(this.value)">
             เชิงปริมาณ &nbsp;&nbsp;
-            <input type="radio" name="goal" value="2" onchange="toggleTextbox(this, 'textbox-goal-')">
+            <input type="radio" name="goal" value="2" onchange="toggleGoalInputs(this.value)">
             เชิงคุณภาพ
         </div>
     </div>
-    
-    <div class="form-group">
-        <div>
-            <input type="text" id="textbox-goal-1" class="hidden" data-group="goal" placeholder="เชิงปริมาณ">
-            <input type="text" id="textbox-goal-" class="hidden" data-group="goal" placeholder="จำนวน">
-            <input type="text" id="textbox-goal-unit" class="hidden" data-group="goal" placeholder="หน่วย">
+
+
+        <div id="quantitative-inputs" class="quantitative-inputs" style="display: none;">
+            <div id="quantitative-items">
+                
+            </div>
+            <button type="button" class="btn-addlist" onclick="addQuantitativeItem()"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
         </div>
-        <input type="text" id="textbox-goal-2" class="hidden" data-group="goal" placeholder="เชิงคุณภาพ">
-    </div> -->
+        <div id="qualitative-input" class="qualitative-input" style="display: none;">
+            <textarea class="form-control" id="textbox-goal-2" rows="3" placeholder="เพิ่มข้อความ"></textarea>
+        </div>
+
+
+<script>
+    //
+    function toggleGoalInputs(value) {
+        const quantitativeInputs = document.getElementById('quantitative-inputs');
+        const qualitativeInput = document.getElementById('qualitative-input');
     
+        if (value === '1') {
+            quantitativeInputs.style.display = 'block';
+            qualitativeInput.style.display = 'none';
+        } else if (value === '2') {
+            quantitativeInputs.style.display = 'none';
+            qualitativeInput.style.display = 'block';
+        }
+    }
 
+    //
+    function addQuantitativeItem() {
+        const container = document.getElementById('quantitative-items');
+        const newItem = document.createElement('div');
+        newItem.className = 'quantitative-item';
+        newItem.innerHTML = `
+            <input type="text" class="full-width" placeholder="ข้อความ">
+            <div class="form-group">
+                <input type="text" placeholder="จำนวน">&nbsp;&nbsp;
+                <input type="text" placeholder="หน่วย">
+            </div>
+            <button type="button" class="btn-remove" onclick="removeQuantitativeItem(this)"><i class='bx bx-minus-circle'></i>ลบรายการ</button>
+        `;
+        container.appendChild(newItem);
+    }
 
-<!-- </form> -->
+    function removeQuantitativeItem(button) {
+        const item = button.closest('.quantitative-item');
+        item.remove();
+    }
+</script>

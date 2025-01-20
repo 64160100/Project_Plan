@@ -61,10 +61,11 @@
     cursor: pointer;
     display: inline-block;
     font-size: 16px;
-    height: 40px;
-    width: 80px;
-    text-align: center;
-    transition: all .3s cubic-bezier(.05, .03, .35, 1);
+    width: auto; 
+    padding: 0 10px; 
+    line-height: 40px;
+    display: inline-flex; 
+    align-items: center;
   }
   .btn-delete:hover {
     color: black;
@@ -75,25 +76,19 @@
     background-color: #e3c2ff;
     border: 1px solid #f8f9fa;
     border-radius: 4px;
-    color: #ffffff;
+    color: #000000;
+    border-color: #000000;
     cursor: pointer;
     font-family: arial,sans-serif;
     font-size: 14px;
-    height: 30px;
-    width: 120px;
-    /* line-height: 27px;
-    min-width: 54px; */
-    padding: 0 16px;
-    text-align: center;
-    /* user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation; */
-    white-space: pre;
+    width: auto;
+    padding: 0 10px; 
+    line-height: 35px;
+    display: inline-flex; 
+    align-items: center;
   }
   
   .btn-addlist:hover {
-    border-color: #650893;
-    box-shadow: rgba(104, 6, 139, 0.1) 0 1px 1px;
     color: #7304c7;
   }
   
@@ -400,20 +395,23 @@ input[type="checkbox"] {
   list-style-image: none;
   transition: box-shadow .3s;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  width: 100%; 
+  box-sizing: border-box; 
 }
 
 .btn-submit {
   background-color: #007BFF; 
   border: none; 
-  border-radius: 5px; /* ขอบโค้งมน */
-  color: #fff; /* สีข้อความ */
-  cursor: pointer; /* เปลี่ยนเคอร์เซอร์เมื่อ hover */
+  border-radius: 5px;
+  color: #fff; 
+  cursor: pointer; 
   text-align: center;
-  padding: 8px 20px; /* ระยะห่างภายใน */
-  font-size: 16px; /* ขนาดข้อความ */
-  font-weight: bold; /* ข้อความหนา */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เงา */
-  transition: background-color 0.3s, transform 0.2s; /* เพิ่มเอฟเฟกต์ */
+  padding: 8px 20px;
+  font-size: 16px; 
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, transform 0.2s; 
 }
 
 .btn-submit:hover {
@@ -425,4 +423,168 @@ input[type="checkbox"] {
   display: flex; /* ใช้ flexbox */
   justify-content: flex-end; /* จัดเนื้อหาไปชิดขวา */
   padding: 10px; /* เพิ่มระยะห่างรอบๆ container */
+}
+
+/* plan project */
+.content-box-expense {
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid #77007b;
+  border-radius: 10px;
+  padding: 15px 20px;
+  text-align: left;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+
+.expense-item {
+  width: 100%;
+}
+.expense-item > div {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.expense-item input[type="text"] {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin-bottom: 10px;
+}
+.expense-item .input-group {
+  display: flex;
+  gap: 10px;
+}
+.expense-item .input-group input {
+  flex: 1;
+}
+
+/* kpi */
+
+.full-width {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.quantitative-item {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.btn-remove {
+  margin-top: 5px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.btn-remove:hover {
+  background-color: #ff1a1a;
+}
+
+/* plan table */
+.table-PDCA {
+    width: auto;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 15px;
+}
+
+.PDCA {
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.plan-text {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.plan-textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    resize: none;
+    overflow-y: hidden;
+    transition: height 0.2s ease;
+    min-height: 30px;
+    box-sizing: border-box;
+}
+
+.plan-textarea:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+}
+
+.checkbox-container {
+    text-align: center;
+    vertical-align: middle;
+    /* width: 40px;  */
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+td.checkbox-container {
+  vertical-align: middle; 
+}
+
+.table-PDCA th, .table-PDCA td {
+    border: 1px solid #e0e0e0;
+    padding: 10px;
+    text-align: left;
+    vertical-align: middle;
+    /* word-wrap: break-word; */
+    white-space: nowrap; 
+}
+
+.table-PDCA th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    text-align: center;
+}
+
+.table-PDCA th:not(:first-child) {
+  width: 8.33%;
+  font-size: 12px; 
+  padding: 5px 2px; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+}
+
+.table-PDCA th:first-child {
+    width: 25%; /* Adjust the width of the first column */
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+    .table-PDCA {
+        font-size: 14px;
+    }
+    
+    .table-PDCA th, .table-PDCA td {
+        padding: 5px;
+    }
+    
+    .plan-textarea {
+        min-height: 40px;
+    }
 }

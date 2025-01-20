@@ -26,17 +26,18 @@ Route::post('/strategy/{Id_Strategy}/add-kpi', [StrategyController::class, 'addK
 Route::get('/strategy/{Id_Strategy}/Strategic_Objectives', [StrategyController::class, 'StrategicObjectives'])->name('StrategicObjectives.index');
 Route::post('/strategy/{Id_Strategy}/addStrategic_Objectives', [StrategyController::class, 'addStrategicObjectives'])->name('StrategicObjectives.add');
 
-
 Route::get('/strategy/{Id_Strategy}/edit', [StrategyController::class, 'editStrategy'])->name('strategy.edit');
 Route::put('/strategy/{Id_Strategy}', [StrategyController::class, 'updateStrategy'])->name('strategy.update');
 Route::delete('/strategy/{Id_Strategy}', [StrategyController::class, 'deleteStrategy'])->name('strategy.destroy');
-
 
 Route::post('/strategic-analysis/add', [StrategicAnalysisController::class, 'addDetail'])->name('StrategicAnalysis.addDetail');
 Route::put('/strategic-analysis/update-detail/{type}/{id}', [StrategicAnalysisController::class, 'updateDetail'])->name('StrategicAnalysis.updateDetail');
 Route::delete('/StrategicAnalysis/delete-detail/{type}/{id}', [StrategicAnalysisController::class, 'destroyDetail'])->name('StrategicAnalysis.destroyDetail');
 
-Route::post('/strategic-opportunity/add', [StrategicAnalysisController::class, 'addOpportunity'])->name('StrategicOpportunity.addOpportunity');
-Route::delete('/strategic-opportunity/delete/{id}', [StrategicAnalysisController::class, 'destroyOpportunity'])->name('StrategicOpportunity.destroyOpportunity');
+Route::get('generate-pdf', [PDFController::class, 'generatePDF']);
+Route::get('actionplan-pdf', [PDFController::class, 'ActionPlanPDF']);
+Route::get('strategic-pdf/{Id_Strategic}', [PDFController::class, 'PDFStrategic'])->name('PDF.strategic');
+Route::get('project-pdf/{Id_Project}', [PDFController::class, 'PDFProject'])->name('PDF.Project');
 
-Route::delete('/kpi/{id}', [StrategyController::class, 'destroy'])->name('kpi.destroy');
+Route::get('pdfStrategic/{Id_Project}', [PDFController::class, 'ctrlpPDFStrategic'])->name('pdf.strategicCtrlP');
+Route::get('pdfproject/{Id_Project}', [PDFController::class, 'ctrlpPDFProject'])->name('PDF.projectCtrlP');

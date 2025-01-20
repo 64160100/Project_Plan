@@ -362,6 +362,58 @@
         margin-bottom: 10px;
     }
 
+    .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .form-group input[type="text"] {
+        flex: 1;
+        border: 1px solid #007bff;
+        border-radius: 5px;
+        padding: 10px;
+        transition: border-color 0.3s;
+    }
+
+    .form-group input[type="text"]:focus {
+        border-color: #0056b3;
+        outline: none;
+    }
+
+    .btn-addlist {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    .btn-addlist:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
     /* ขั้นตอน */
     .hidden {
         display: none;
@@ -415,7 +467,7 @@
                         </div>
                         <div>
                             <button type="button" class="btn-addlist"
-                                onclick="addField1('projectContainer', 'Name_Sup_Project[]')">
+                                onclick="addField('projectContainer', 'Name_Sup_Project[]')">
                                 <i class='bx bx-plus-circle'></i>เพิ่มชื่อโครงการย่อย
                             </button>
                         </div>
@@ -478,7 +530,6 @@
                 </div>
 
                 <!-- ความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย -->
-                <!-- filepath: /home/aries/Project/Project_Plan/resources/views/Project/createProject.blade.php -->
                 <div class="content-box">
                     <div class="section-header">
                         <h4>
@@ -492,10 +543,6 @@
                             <div class="platform-card">
                                 <div class="card-header">
                                     <h3 class="card-title">แพลตฟอร์มที่ 1</h3>
-                                    <button type="button" class="btn btn-danger" onclick="removePlatform(this)"
-                                        style="display: none;">
-                                        <i class='bx bx-trash'></i> ลบแพลตฟอร์ม
-                                    </button>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">ชื่อแพลตฟอร์ม</label>
@@ -858,16 +905,16 @@
                                 onclick="togglePlanDetails()"></i>
                         </h4>
                     </div>
-                    <div id="planDetails" style="display: none;">
-                        <div class="form-group-radio mb-4">
-                            <input type="radio" name="planType" value="1" id="shortTermProject" checked>
-                            <label for="shortTermProject">โครงการระยะสั้น</label>
-                            &nbsp;&nbsp;
-                            <input type="radio" name="planType" value="2" id="longTermProject">
-                            <label for="longTermProject">โครงการระยะยาว</label>
-                        </div>
+                    <div class="form-group-radio mb-4">
+                        <input type="radio" name="planType" value="1" id="shortTermProject" checked>
+                        <label for="shortTermProject">โครงการระยะสั้น</label>
+                        &nbsp;&nbsp;
+                        <input type="radio" name="planType" value="2" id="longTermProject">
+                        <label for="longTermProject">โครงการระยะยาว</label>
+                    </div>
 
-                        <!-- วิธีการดำเนินงาน -->
+                    <!-- วิธีการดำเนินงาน -->
+                    <div class="form-group">
                         <div id="textbox-planType-1" data-group="planType">
                             <div class="method-form">
                                 <div class="form-label">วิธีการดำเนินงาน</div>
@@ -895,7 +942,8 @@
                                         <th colspan="12">ปีงบประมาณ พ.ศ. 2567</th>
                                     </tr>
                                     <tr>
-                                        @foreach($months as $month)
+                                        @foreach(['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                                        'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'] as $month)
                                         <th>{{ $month }}</th>
                                         @endforeach
                                     </tr>
@@ -928,183 +976,140 @@
                 <!-- แหล่งงบประมาณ -->
                 <div class="content-box">
                     <div class="section-header">
-                        <h4>
-                            15. แหล่งงบประมาณ
-                            <i class='bx bx-chevron-up' id="toggleIconBudget" style="cursor: pointer; font-size: 1.5em;"
-                                onclick="toggleBudgetDetails()"></i>
-                        </h4>
+                        <h5>แหล่งงบประมาณ</h5>
                     </div>
-                    <div id="budgetDetails" style="display: none;">
-                        <div class="form-group-radio">
-                            <label>ประเภทโครงการ</label>
-                            <div class="radio-group">
-                                <input type="radio" name="Status_Budget" value="N" id="non_income"
-                                    onchange="toggleIncomeForm(this)" checked>
-                                <label for="non_income">ไม่แสวงหารายได้</label>
+                    <div class="form-group-radio">
+                        <label>ประเภทโครงการ</label>
+                        <div class="radio-group">
+                            <input type="radio" name="Status_Budget" value="Y" id="income_seeking"
+                                onchange="toggleIncomeForm(this)">
+                            <label for="income_seeking">แสวงหารายได้</label>
 
-                                <input type="radio" name="Status_Budget" value="Y" id="income_seeking"
-                                    onchange="toggleIncomeForm(this)">
-                                <label for="income_seeking">แสวงหารายได้</label>
+                            <input type="radio" name="Status_Budget" value="N" id="non_income"
+                                onchange="toggleIncomeForm(this)">
+                            <label for="non_income">ไม่แสวงหารายได้</label>
+                        </div>
+                    </div>
+
+                    <div id="incomeForm" class="income-form hidden">
+                        <div class="form-group">
+                            <label>แหล่งงบประมาณ</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="budget_source" placeholder="เงินรายได้">
+                                <input type="number" class="form-control" name="budget_amount" placeholder="จำนวน">
+                                <input type="text" class="form-control" name="budget_unit" placeholder="หน่วย เช่น บาท">
                             </div>
                         </div>
 
-                        <div id="incomeForm" class="income-form" style="display: none;">
+                        <div class="form-group mt-3">
+                            <label>แผนงาน</label>
+                            <div id="funcAreaContainer">
+                                <button type="button" class="btn-addlist"
+                                    onclick="addField('funcAreaContainer', 'functionalArea[]')">
+                                    <i class='bx bx-plus-circle'></i>เพิ่มรายการ
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label>หน่วยงาน</label>
+                            <input type="text" class="form-control" name="department" placeholder="หน่วยงาน">
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label>ศูนย์ต้นทุน</label>
+                            <input type="text" class="form-control" name="cost_center" placeholder="ศูนย์ต้นทุน">
+                        </div>
+
+                        <!-- หมวดรายจ่าย -->
+                        <div class="expense-category mt-4">
+                            <div class="section-subheader">
+                                <h5>หมวดรายจ่าย</h5>
+                            </div>
                             <div class="form-group">
-                                <label>แหล่งงบประมาณ</label>
+                                <select class="form-select" name="expenseCategory" id="expenseCategory" required>
+                                    <option value="" selected disabled>เลือกหมวดรายจ่าย</option>
+                                    <option value="1">ค่าตอบแทน</option>
+                                    <option value="2">งบบุคลากร</option>
+                                </select>
+                            </div>
+
+                            <div id="expenseContentBox" class="expense-content mt-3" style="display: none;">
+                                <div id="selectedExpenses" class="selected-expenses"></div>
+                                <button type="button" id="addExpenseBtn" class="btn-addlist">
+                                    <i class='bx bx-plus-circle'></i>เพิ่มรายการ
+                                </button>
+                            </div>
+
+                            <div class="form-group mt-4">
+                                <label>รวมค่าใช้จ่าย</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="budget_source"
-                                        placeholder="เงินรายได้">
-                                    <input type="number" class="form-control" name="budget_amount" placeholder="จำนวน">
-                                    <input type="text" class="form-control" name="budget_unit"
-                                        placeholder="หน่วย เช่น บาท">
-                                </div>
-                            </div>
-
-                            <div class="form-group mt-3">
-                                <label>แผนงาน</label>
-                                <div id="funcAreaContainer">
-                                    <button type="button" class="btn-addlist"
-                                        onclick="addField('funcAreaContainer', 'functionalArea[]')">
-                                        <i class='bx bx-plus-circle'></i>เพิ่มรายการ
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="form-group mt-3">
-                                <label>หน่วยงาน</label>
-                                <input type="text" class="form-control" name="department" placeholder="หน่วยงาน">
-                            </div>
-
-                            <div class="form-group mt-3">
-                                <label>ศูนย์ต้นทุน</label>
-                                <input type="text" class="form-control" name="cost_center" placeholder="ศูนย์ต้นทุน">
-                            </div>
-
-                            <!-- หมวดรายจ่าย -->
-                            <div class="expense-category mt-4">
-                                <div class="section-subheader">
-                                    <h5>หมวดรายจ่าย</h5>
-                                </div>
-                                <div class="form-group">
-                                    <select class="form-select" name="expenseCategory" id="expenseCategory" required>
-                                        <option value="" selected disabled>เลือกหมวดรายจ่าย</option>
-                                        <option value="1">ค่าตอบแทน</option>
-                                        <option value="2">งบบุคลากร</option>
-                                    </select>
-                                </div>
-
-                                <div id="expenseContentBox" class="expense-content mt-3" style="display: none;">
-                                    <div id="selectedExpenses" class="selected-expenses"></div>
-                                    <button type="button" id="addExpenseBtn" class="btn-addlist">
-                                        <i class='bx bx-plus-circle'></i>เพิ่มรายการ
-                                    </button>
-                                </div>
-
-                                <div class="form-group mt-4">
-                                    <label>รวมค่าใช้จ่าย</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" name="total_amount"
-                                            placeholder="จำนวน">
-                                        <input type="text" class="form-control" name="total_unit" placeholder="หน่วย">
-                                    </div>
+                                    <input type="number" class="form-control" name="total_amount" placeholder="จำนวน">
+                                    <input type="text" class="form-control" name="total_unit" placeholder="หน่วย">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+        </div>
 
-                <!-- Output -->
-                <div class="content-box">
-                    <div class="section-header">
-                        <h4>
-                            16. เป้าหมายเชิงผลผลิต (Output)
-                            <i class='bx bx-chevron-up' id="toggleIconOutput" style="cursor: pointer; font-size: 1.5em;"
-                                onclick="toggleOutputDetails()"></i>
-                        </h4>
-                    </div>
-                    <div id="outputDetails" style="display: none;">
-                        <div id="outputContainer" class="dynamic-container">
-                            <div class="form-group mt-2">
-                                <input type="text" class="form-control" name="output[]" placeholder="เพิ่มรายการ">
-                                <button type="button" class="btn btn-danger btn-sm remove-field mt-2"
-                                    style="display: none;">
-                                    <i class='bx bx-trash'></i>
-                                </button>
-                            </div>
-                        </div>
-                        <button type="button" class="btn-addlist" onclick="addField('outputContainer', 'output[]')">
-                            <i class='bx bx-plus-circle'></i>เพิ่มรายการ
-                        </button>
-                    </div>
+        <!-- Output -->
+        <div class="content-box">
+            <div class="section-header">
+                <h4>เป้าหมายเชิงผลผลิต (Output)</h4>
+            </div>
+            <div id="outputContainer">
+                <div id="outputContainer" class="dynamic-container">
+                    <!-- ส่วนรายการ Output จะถูกเพิ่มที่นี่ -->
                 </div>
+                <button type="button" class="btn-addlist" onclick="addField('outputContainer', 'output[]')">
+                    <i class='bx bx-plus-circle'></i>เพิ่มรายการ
+                </button>
+            </div>
 
-                <!-- Outcome -->
-                <div class="content-box">
-                    <div class="section-header">
-                        <h4>
-                            17. เป้าหมายเชิงผลลัพธ์ (Outcome)
-                            <i class='bx bx-chevron-up' id="toggleIconOutcome"
-                                style="cursor: pointer; font-size: 1.5em;" onclick="toggleOutcomeDetails()"></i>
-                        </h4>
-                    </div>
-                    <div id="outcomeDetails" style="display: none;">
-                        <div id="outcomeContainer" class="dynamic-container">
-                            <div class="form-group mt-2">
-                                <input type="text" class="form-control" name="outcome[]" placeholder="เพิ่มรายการ">
-                                <button type="button" class="btn btn-danger btn-sm remove-field mt-2"
-                                    style="display: none;">
-                                    <i class='bx bx-trash'></i>
-                                </button>
-                            </div>
-                        </div>
-                        <button type="button" class="btn-addlist" onclick="addField('outcomeContainer', 'outcome[]')">
-                            <i class='bx bx-plus-circle'></i>เพิ่มรายการ
-                        </button>
-                    </div>
+            <!-- Outcome -->
+            <div class="content-box">
+                <div class="section-header">
+                    <h4>เป้าหมายเชิงผลลัพธ์ (Outcome)</h4>
                 </div>
+                <div id="outcomeContainer" class="dynamic-container">
+                    <!-- ส่วนรายการ Outcome จะถูกเพิ่มที่นี่ -->
+                </div>
+                <button type="button" class="btn-addlist" onclick="addField('outcomeContainer', 'outcome[]')">
+                    <i class='bx bx-plus-circle'></i>เพิ่มรายการ
+                </button>
+            </div>
 
-                <!-- ผลที่คาดว่าจะได้รับ -->
-                <div class="content-box">
-                    <div class="section-header">
-                        <h4>
-                            18. ผลที่คาดว่าจะได้รับ
-                            <i class='bx bx-chevron-up' id="toggleIconResult" style="cursor: pointer; font-size: 1.5em;"
-                                onclick="toggleResultDetails()"></i>
-                        </h4>
-                    </div>
-                    <div id="resultDetails" style="display: none;">
-                        <div id="resultContainer" class="dynamic-container">
-                            <div class="form-group mt-2">
-                                <input type="text" class="form-control" name="result[]" placeholder="เพิ่มรายการ">
-                                <button type="button" class="btn btn-danger btn-sm remove-field mt-2"
-                                    style="display: none;">
-                                    <i class='bx bx-trash'></i>
-                                </button>
-                            </div>
-                        </div>
-                        <button type="button" class="btn-addlist" onclick="addField('resultContainer', 'result[]')">
-                            <i class='bx bx-plus-circle'></i>เพิ่มรายการ
-                        </button>
-                    </div>
+            <!-- ผลที่คาดว่าจะได้รับ -->
+            <div class="content-box">
+                <div class="section-header">
+                    <h4>ผลที่คาดว่าจะได้รับ</h4>
                 </div>
+                <div id="resultContainer" class="dynamic-container">
+                    <!-- ส่วนรายการผลที่คาดว่าจะได้รับจะถูกเพิ่มที่นี่ -->
+                </div>
+                <button type="button" class="btn-addlist" onclick="addField('resultContainer', 'result[]')">
+                    <i class='bx bx-plus-circle'></i>เพิ่มรายการ
+                </button>
+            </div>
 
-                <!-- เอกสารเพิ่มเติม -->
-                <div class="content-box">
-                    <div class="section-header">
-                        <h4>19. เอกสารเพิ่มเติม</h4>
-                    </div>
-                    <div class="form-group">
-                        <input type="file" class="form-control" id="myFile" name="filename">
-                        <small class="form-text text-muted">อัพโหลดไฟล์เอกสารที่เกี่ยวข้องกับโครงการ</small>
-                    </div>
+            <!-- เอกสารเพิ่มเติม -->
+            <div class="content-box">
+                <div class="section-header">
+                    <h4>เอกสารเพิ่มเติม</h4>
                 </div>
+                <div class="form-group">
+                    <input type="file" class="form-control" id="myFile" name="filename">
+                    <small class="form-text text-muted">อัพโหลดไฟล์เอกสารที่เกี่ยวข้องกับโครงการ</small>
+                </div>
+            </div>
 
-                <!-- ปุ่มบันทึก -->
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class='bx bx-save'></i> บันทึกข้อมูล
-                    </button>
-                </div>
+            <!-- ปุ่มบันทึก -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class='bx bx-save'></i> บันทึกข้อมูล
+                </button>
+            </div>
             </form>
         </div>
     </div>
@@ -1113,22 +1118,22 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // ====== ชื่อโครงการ =======
-    window.addField1 = function(containerId, fieldName) {
+    window.addField = function(containerId, fieldName) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        const index = container.children.length; // Start from 1
+        const index = container.children.length;
         const div = document.createElement('div');
         div.classList.add('form-group', 'mb-2', 'dynamic-field');
         div.innerHTML = `
-        <div class="input-group">
-            <span class="input-group-text">1.${index}</span>
-            <input type="text" class="form-control" name="${fieldName}" placeholder="กรอกชื่อโครงการย่อย" required>
-            <button type="button" class="btn btn-danger" onclick="removeField(this)">
-                <i class='bx bx-trash'></i>
-            </button>
-        </div>
-    `;
+            <div class="input-group">
+                <span class="input-group-text">1.${index}</span>
+                <input type="text" class="form-control" name="${fieldName}" placeholder="กรอกชื่อโครงการย่อย" required>
+                <button type="button" class="btn btn-danger" onclick="removeField(this)">
+                    <i class='bx bx-trash'></i>
+                </button>
+            </div>
+        `;
         container.appendChild(div);
         updateRemoveButtons(container);
     };
@@ -1255,18 +1260,8 @@ document.addEventListener('DOMContentLoaded', function() {
             kpiGroups[i].remove();
         }
 
-        const removeBtn = platformTemplate.querySelector('.btn-danger');
-        removeBtn.style.display = 'block';
-
         container.appendChild(platformTemplate);
         platformCount++;
-        updatePlatformNumbers();
-    }
-
-    window.removePlatform = function(button) {
-        const platformCard = button.closest('.platform-card');
-        platformCard.remove();
-        updatePlatformNumbers();
     }
 
     window.addKpi = function(btn) {
@@ -1314,19 +1309,6 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleIcon.classList.remove('bx-chevron-down');
             toggleIcon.classList.add('bx-chevron-up');
         }
-    }
-
-    function updatePlatformNumbers() {
-        const platformCards = document.querySelectorAll('.platform-card');
-        platformCards.forEach((card, index) => {
-            card.querySelector('.card-title').textContent = `แพลตฟอร์มที่ ${index + 1}`;
-            const inputs = card.querySelectorAll('input');
-            inputs.forEach(input => {
-                const name = input.name.replace(/\[\d+\]/, `[${index}]`);
-                input.name = name;
-            });
-        });
-        platformCount = platformCards.length;
     }
 
     // ============ ความสอดคล้องกับยุทธศาสตร์ส่วนงาน ============
@@ -1648,17 +1630,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const textboxPlanType1 = document.getElementById('textbox-planType-1');
     const textboxPlanType2 = document.getElementById('textbox-planType-2');
 
+    // Show short term project by default
+    textboxPlanType1.classList.remove('hidden');
+    textboxPlanType2.classList.add('hidden');
+
     shortTermProject.addEventListener('change', function() {
         if (shortTermProject.checked) {
-            textboxPlanType1.style.display = 'block';
-            textboxPlanType2.style.display = 'none';
+            textboxPlanType1.classList.remove('hidden');
+            textboxPlanType2.classList.add('hidden');
         }
     });
 
     longTermProject.addEventListener('change', function() {
         if (longTermProject.checked) {
-            textboxPlanType2.style.display = 'block';
-            textboxPlanType1.style.display = 'none';
+            textboxPlanType2.classList.remove('hidden');
+            textboxPlanType1.classList.add('hidden');
         }
     });
 
@@ -1695,7 +1681,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Toggle plan details
     window.togglePlanDetails = function() {
-        const planDetails = document.getElementById('planDetails');
+        const planDetails = document.getElementById('textbox-planType-1').parentElement;
         const toggleIcon = document.getElementById('toggleIconPlan');
 
         if (planDetails.style.display === 'none' || planDetails.style.display === '') {
@@ -1708,187 +1694,14 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleIcon.classList.add('bx-chevron-up');
         }
     }
-
-    // ============ แหล่งงบประมาณ ============
-    // Toggle income form based on project type
-    window.toggleIncomeForm = function(radio) {
-        const incomeForm = document.getElementById('incomeForm');
-        if (radio.value === 'Y') {
-            incomeForm.style.display = 'block';
-        } else {
-            incomeForm.style.display = 'none';
-        }
-    }
-
-    // Add new field for functional area
-    window.addField = function(containerId, fieldName) {
-        const container = document.getElementById(containerId);
-        const newField = document.createElement('div');
-        newField.className = 'form-group mt-2';
-        newField.innerHTML = `
-            <input type="text" class="form-control" name="${fieldName}" placeholder="เพิ่มรายการ">
-            <button type="button" class="btn btn-danger btn-sm remove-field mt-2">
-                <i class='bx bx-trash'></i>
-            </button>
-        `;
-        container.appendChild(newField);
-        updateFieldButtons(containerId);
-    }
-
-    // Remove field
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.remove-field')) {
-            e.target.closest('.form-group').remove();
-        }
-    });
-
-    // Update visibility of remove buttons
-    function updateFieldButtons(containerId) {
-        const container = document.getElementById(containerId);
-        const buttons = container.querySelectorAll('.remove-field');
-        buttons.forEach(btn => {
-            btn.style.display = buttons.length > 1 ? 'block' : 'none';
-        });
-    }
-
-    // Toggle expense content box based on selected category
-    const expenseCategory = document.getElementById('expenseCategory');
-    const expenseContentBox = document.getElementById('expenseContentBox');
-
-    expenseCategory.addEventListener('change', function() {
-        if (expenseCategory.value) {
-            expenseContentBox.style.display = 'block';
-        } else {
-            expenseContentBox.style.display = 'none';
-        }
-    });
-
-    // Add new expense item
-    document.getElementById('addExpenseBtn').addEventListener('click', function() {
-        const selectedExpenses = document.getElementById('selectedExpenses');
-        const newExpense = document.createElement('div');
-        newExpense.className = 'form-group mt-2';
-        newExpense.innerHTML = `
-            <input type="text" class="form-control" name="expenses[]" placeholder="เพิ่มรายการ">
-            <button type="button" class="btn btn-danger btn-sm remove-expense mt-2">
-                <i class='bx bx-trash'></i>
-            </button>
-        `;
-        selectedExpenses.appendChild(newExpense);
-        updateExpenseButtons();
-    });
-
-    // Remove expense item
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.remove-expense')) {
-            e.target.closest('.form-group').remove();
-            updateExpenseButtons();
-        }
-    });
-
-    // Update visibility of remove buttons for expenses
-    function updateExpenseButtons() {
-        const selectedExpenses = document.getElementById('selectedExpenses');
-        const buttons = selectedExpenses.querySelectorAll('.remove-expense');
-        buttons.forEach(btn => {
-            btn.style.display = buttons.length > 1 ? 'block' : 'none';
-        });
-    }
-
-    // Toggle budget details
-    window.toggleBudgetDetails = function() {
-        const budgetDetails = document.getElementById('budgetDetails');
-        const toggleIcon = document.getElementById('toggleIconBudget');
-
-        if (budgetDetails.style.display === 'none' || budgetDetails.style.display === '') {
-            budgetDetails.style.display = 'block';
-            toggleIcon.classList.remove('bx-chevron-up');
-            toggleIcon.classList.add('bx-chevron-down');
-        } else {
-            budgetDetails.style.display = 'none';
-            toggleIcon.classList.remove('bx-chevron-down');
-            toggleIcon.classList.add('bx-chevron-up');
-        }
-    }
-
-    // ============ เป้าหมายเชิงผลผลิต (Output) ============
-    window.addField = function(containerId, fieldName) {
-        const container = document.getElementById(containerId);
-        const newField = document.createElement('div');
-        newField.className = 'form-group mt-2';
-        newField.innerHTML = `
-            <input type="text" class="form-control" name="${fieldName}" placeholder="เพิ่มรายการ">
-            <button type="button" class="btn btn-danger btn-sm remove-field mt-2">
-                <i class='bx bx-trash'></i>
-            </button>
-        `;
-        container.appendChild(newField);
-        updateFieldButtons(containerId);
-    }
-
-    // Remove field
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.remove-field')) {
-            e.target.closest('.form-group').remove();
-        }
-    });
-
-    // Update visibility of remove buttons
-    function updateFieldButtons(containerId) {
-        const container = document.getElementById(containerId);
-        const buttons = container.querySelectorAll('.remove-field');
-        buttons.forEach(btn => {
-            btn.style.display = buttons.length > 1 ? 'block' : 'none';
-        });
-    }
-
-    // Toggle output details
-    window.toggleOutputDetails = function() {
-        const outputDetails = document.getElementById('outputDetails');
-        const toggleIcon = document.getElementById('toggleIconOutput');
-
-        if (outputDetails.style.display === 'none' || outputDetails.style.display === '') {
-            outputDetails.style.display = 'block';
-            toggleIcon.classList.remove('bx-chevron-up');
-            toggleIcon.classList.add('bx-chevron-down');
-        } else {
-            outputDetails.style.display = 'none';
-            toggleIcon.classList.remove('bx-chevron-down');
-            toggleIcon.classList.add('bx-chevron-up');
-        }
-    }
-
-    // Toggle outcome details
-    window.toggleOutcomeDetails = function() {
-        const outcomeDetails = document.getElementById('outcomeDetails');
-        const toggleIcon = document.getElementById('toggleIconOutcome');
-
-        if (outcomeDetails.style.display === 'none' || outcomeDetails.style.display === '') {
-            outcomeDetails.style.display = 'block';
-            toggleIcon.classList.remove('bx-chevron-up');
-            toggleIcon.classList.add('bx-chevron-down');
-        } else {
-            outcomeDetails.style.display = 'none';
-            toggleIcon.classList.remove('bx-chevron-down');
-            toggleIcon.classList.add('bx-chevron-up');
-        }
-    }
-
-    // Toggle result details
-    window.toggleResultDetails = function() {
-        const resultDetails = document.getElementById('resultDetails');
-        const toggleIcon = document.getElementById('toggleIconResult');
-
-        if (resultDetails.style.display === 'none' || resultDetails.style.display === '') {
-            resultDetails.style.display = 'block';
-            toggleIcon.classList.remove('bx-chevron-up');
-            toggleIcon.classList.add('bx-chevron-down');
-        } else {
-            resultDetails.style.display = 'none';
-            toggleIcon.classList.remove('bx-chevron-down');
-            toggleIcon.classList.add('bx-chevron-up');
-        }
-    }
 });
 </script>
 @endsection
+
+
+
+
+                                        @foreach(['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                                        'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'] as $month)
+                                        <th>{{ $month }}</th>
+                                        @endforeach

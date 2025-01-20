@@ -1,10 +1,3 @@
-INSERT INTO `Premission` (`Id_Permission`, `Name_Permission`, `Dashborad`, `List_Project`, `Track_Status`, `Documents_Project`, `Report_results`, `Check_Budget`, `Approval_Project`, `Propose_Project`, `Manage_Users`, `Data_Employee`, `Setup_System`) VALUES
-(1, 'ผู้บริหาร', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
-(2, 'หัวหน้าฝ่าย', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
-(3, 'ผู้ดูแลระบบ', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y'),
-(4, 'การเงิน', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
-(5, 'ผู้รับผิดชอบโครงการ', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'N', 'N', 'N');
-
 INSERT INTO `Department` (`Id_Department`, `Name_Department`) VALUES
 (1, 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา'),
 (2, 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล');
@@ -13,6 +6,13 @@ INSERT INTO `Position` (`Id_Position`, `Name_Position`) VALUES
 (1, 'บรรณารักษ์ชำนาญการพิเศษ'),
 (2, 'บรรณารักษ์ชำนาญการ');
 
+INSERT INTO `Premission` (`Id_Permission`, `Name_Permission`, `Dashborad`, `List_Project`, `Track_Status`, `Documents_Project`, `Report_results`, `Check_Budget`, `Approval_Project`, `Propose_Project`, `Manage_Users`, `Data_Employee`, `Setup_System`) VALUES
+(1, 'ผู้บริหาร', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
+(2, 'หัวหน้าฝ่าย', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
+(3, 'ผู้ดูแลระบบ', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y'),
+(4, 'การเงิน', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
+(5, 'ผู้รับผิดชอบโครงการ', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'N', 'N', 'N');
+
 INSERT INTO `Employee` (`Id_Employee`, `Firstname_Employee`, `Lastname_Employee`, `Email`, `Password`, `IsManager`, `IsDirector`, `IsFinance`, `IsAdmin`, `Department_Id`, `Position_Id`) VALUES
 (1, 'สมชาย', 'แดง', '54160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'Y', 'N', 'N', 'N', 1, 2),
 (2, 'สมหญิง', 'เขียว', '64160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'Y', 'N', 'N', 1, 2),
@@ -20,24 +20,71 @@ INSERT INTO `Employee` (`Id_Employee`, `Firstname_Employee`, `Lastname_Employee`
 (4, 'สมศักดิ์', 'น้ำเงิน', '84160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 'N', 'N', 1, 2),
 (5, 'Is', 'Admin', '94160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 'N', 'Y', 1, 2);
 
+INSERT INTO `Users` (`Employee_Id_Employee`, `Premission_Id_Permission`) VALUES
+(2, 1),
+(1, 2),
+(5, 3),
+(3, 4),
+(4, 5);
+
 INSERT INTO `Strategic` (`Id_Strategic`, `Name_Strategic_Plan`, `Goals_Strategic`) VALUES
 (1, 'ยุทธศาสตร์ที่ 1 การพัฒนาความเป็นเลิศด้านบริการด้วยมาตรฐ', 'GG'),
 (2, 'ยุทธศาสตร์ที่ 2 การพัฒนาโครงการ', 'TT');
 
-INSERT INTO `Users` (`Employee_Id_Employee`, `Premission_Id_Permission`) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5);
+INSERT INTO `Strategy` (`Id_Strategy`, `Strategic_Id`, `Name_Strategy`) VALUES
+(1, 1, 'กลยุทธ์ที่ 1.1 การพัฒนาการกระบวนการปฏิบัติงานด้วยเกณฑ์มาตรฐาน'),
+(2, 1, 'กลยุทธ์ที่ 1.2 การบริหารจัดการของสำนักหอสมุดเพื่อการพัฒนาที่ยั่งยืน'),
+(3, 1, 'กลยุทธ์ที่ 1.3 พัฒนาบริการที่ทันสมัยด้วยเทคโนโลยีและนวัตกรรม'),
+(4, 1, 'กลยุทธ์ที่ 1.4 สนับสนุนและส่งเสริมการพัฒนาด้านวิจัยและนวัตกรรม'),
+(5, 2, 'กลยุทธ์ที่ 2.1 จัดหาและวิเคราะห์ทรัพยากรสารสนเทศอย่างมีคุณภาพครอบคลุมทุกภารกิจด้านการวิจัย (Research Mission) และสาขาวิชาที่เปิดสอน \n'),
+(6, 2, 'กลยุทธ์ที่ 2.2 สนับสนุนและส่งเสริมการใช้ทรัพยากรสารสนเทศและนิเวศน์การเรียนรู้'),
+(7, 2, 'กลยุทธ์ที่ 2.3  พัฒนานิเวศการเรียนรู้สำหรับพลเมืองดิจิทัล');
+
+INSERT INTO `Project` (`Id_Project`, `Strategic_Id`, `Name_Strategy`, `Name_Project`, `Objective_Project`, `Indicators_Project`, `Target_Project`, `First_Time`, `End_Time`, `Count_Steps`, `Employee_Id`) VALUES
+(14, 1, NULL, 'ระบบป้องกัน', NULL, NULL, NULL, '2025-01-15', '2025-01-16', 4, 4),
+(15, 2, NULL, 'ระบบการเงิน', NULL, NULL, NULL, '2025-01-16', '2025-01-17', 0, NULL);
+
+INSERT INTO `Approve` (`Id_Approve`, `Status`, `Project_Id`) VALUES
+(4, 'I', 14),
+(5, 'I', 15);
+
+INSERT INTO `Budget` (`Id_Budget`, `Status_Budget`, `Project_Id`) VALUES
+(3, 'N', 14),
+(4, 'Y', 15);
+
+INSERT INTO `Record_History` (`Id_Record_History`, `comment`, `Name_Record`, `Permission_Record`, `Status_Record`, `Approve_Id`, `Approve_Project_Id`, `Time_Record`) VALUES
+(4, 'เสนอโครงการเพื่อขออนุมัติ', 'สมศักดิ์ น้ำเงิน', 'ผู้รับผิดชอบโครงการ', 'Y', 4, 14, '2025-01-15 14:08:46'),
+(5, 'เห็นชอบการดำเนินโครงการในขั้นต้น', 'สมหญิง เขียว', 'ผู้บริหาร', 'Y', 4, 14, '2025-01-15 14:18:39'),
+(6, 'เสนอโครงการเพื่อขออนุมัติ', 'สมศักดิ์ น้ำเงิน', 'ผู้รับผิดชอบโครงการ', 'Y', 4, 14, '2025-01-15 14:18:59');
+
+INSERT INTO `Storage_File` (`Id_Storage_File`, `Name_Storage_File`, `Path_Storage_File`, `Type_Storage_File`, `Size`, `Project_Id`) VALUES
+(2, '1736914557_The_Analysis_of_Artificial_Intelligence_Digital_Technology_in_Art_Education_Under_the_Internet_of_Things.pdf', 'uploads/project_14/1736914557_The_Analysis_of_Artificial_Intelligence_Digital_Technology_in_Art_Education_Under_the_Internet_of_Things.pdf', 'application/pdf', 1677803, 14),
+(3, '1736914582_INS005 64160100 บุณยกร แก่นประธูป.pdf', 'uploads/project_14/1736914582_INS005 64160100 บุณยกร แก่นประธูป.pdf', 'application/pdf', 505800, 14),
+(6, '1736991647_The_Analysis_of_Artificial_Intelligence_Digital_Technology_in_Art_Education_Under_the_Internet_of_Things.pdf', 'uploads/project_15/1736991647_The_Analysis_of_Artificial_Intelligence_Digital_Technology_in_Art_Education_Under_the_Internet_of_Things.pdf', 'application/pdf', 1677803, 15),
+(7, '1736991819_project-table (1).pdf', 'uploads/project_15/1736991819_project-table (1).pdf', 'application/pdf', 1493973, 15),
+(8, '1736992353_Bunyakorn Kanpratoop - ร่างขอบเขตและวิเคราะห์ความเป็นไปได้.pdf', 'uploads/project_14/1736992353_Bunyakorn Kanpratoop - ร่างขอบเขตและวิเคราะห์ความเป็นไปได้.pdf', 'application/pdf', 102173, 14);
+
+INSERT INTO `Sustainable_Development_Goals` (`id_SDGs`, `Name_SDGs`) VALUES
+(1, 'SDG1 ขจัดความยากจน'),
+(2, 'SDG2 ขจัดความหิวโหยและความอดอยาก'),
+(3, 'SDG3 มีคุณภาพและความเป็นอยู่ที่ดี'),
+(4, 'SDG4 การศึกษาที่เท่าเทียม'),
+(5, 'SDG5 ความเท่าเทียมทางเพศ'),
+(6, 'SDG6 การจัดการน้ำและสุขาภิบาล'),
+(7, 'SDG7 พลังงานสะอาดที่ทุกคนเข้าถึงได้'),
+(8, 'SDG8 การจ้างงานที่มีคุณค่าและการเติบโตทางเศรษฐกิจ'),
+(9, 'SDG9 อุตสาหกรรม นวัตกรรมโครงสร้างพื้นฐาน'),
+(10, 'SDG10 ลดความเหลื่อมล้ำทั้งภายในและระหว่างประเทศ'),
+(11, 'SDG11 เมืองและถิ่นฐานมนุษย์อย่างยั่งยืน'),
+(12, 'SDG12 แผนการบริโภคและการพัฒนาที่ยั่งยืน'),
+(13, 'SDG13 การรับมือการเปลี่ยนแปลงสภาพภูมิอากาศ'),
+(14, 'SDG14 การใช้ประโยชน์จากมหาสมุทรและทรัพยากรทางทะเล'),
+(15, 'SDG15 การใช้ประโยชน์จากระบบนิเวศทางบก'),
+(16, 'SDG16 สังคมสงบสุข ยุติธรรม ไม่แบ่งแยก'),
+(17, 'SDG17 ความร่วมมือเพื่อการพัฒนาที่ยั่งยืน');
 
 
 
-$sql = "INSERT INTO `Employee` (`Id_Employee`, `Firstname_Employee`, `Lastname_Employee`, `Email`, `Password`, `IsManager`, `IsFinance`, `IsDirector`, `IsAdmin`, `Department_Id`, `Position_Id`) VALUES
-(1, 'สมชาย', 'แดง', '54160100@go.buu.ac.th', '$hashedPassword', 'N', 'Y', 1, 1)";
-
-echo $sql;
-?>
 
 <?php
 $password = '12345678';

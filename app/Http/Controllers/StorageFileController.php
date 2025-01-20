@@ -3,16 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\StorageFileModel;
+use App\Models\ListProjectModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
 class StorageFileController extends Controller
 {
-    public function index()
+    public function index($project_id = null)
     {
-        $files = StorageFileModel::all();
-        return view('StorageFiles.index', compact('files'));
+        
+        if ($project_id) {
+            $files = StorageFileModel::where('Project_Id', $project_id)->get();
+        } else {
+            $files = StorageFileModel::all();
+        }
+
+        return view('StorageFiles.index', compact('files', 'project_id'));
     }
 
     public function view($id)
@@ -23,7 +30,7 @@ class StorageFileController extends Controller
             return response()->file(storage_path('app/public/' . $file->Path_Storage_File));
         }
     
-        return redirect()->back()->with('err3or', 'File not found');
+        return redirect()->back()->with('error', 'File not found');
     }
 
     public function store(Request $request)
@@ -31,9 +38,27 @@ class StorageFileController extends Controller
         $maxFileSizeInMB = config('filesystems.max_upload_size', 20);
         $maxFileSizeInBytes = $maxFileSizeInMB * 1024 * 1024; 
 
-        // ตรวจสอบว่ามีไฟล์ถูกส่งมาหรือไม่
+        // ตรวจสอบ project_id
+        $projectId = $request->input('project_id');
+        if (!$projectId) {
+            Log::error('File upload failed: Missing project ID', [
+                'request_data' => $request->all()
+            ]);
+            return redirect()->back()->with('error', 'Project ID is required for file upload.');
+        }
+
+        // ตรวจสอบว่าโครงการมีอยู่จริง
+        $project = ListProjectModel::find($projectId);
+        if (!$project) {
+            Log::error('File upload failed: Invalid project ID', [
+                'project_id' => $projectId
+            ]);
+            return redirect()->back()->with('error', 'Invalid project ID.');
+        }
+
         if (!$request->hasFile('file')) {
             Log::warning('File upload request: No file present in the request', [
+                'project_id' => $projectId,
                 'request_data' => $request->all(),
                 'files' => $request->allFiles(),
             ]);
@@ -47,6 +72,7 @@ class StorageFileController extends Controller
             $errorCode = $file->getError();
             $errorMessage = $this->getUploadErrorMessage($errorCode);
             Log::error('File upload failed', [
+                'project_id' => $projectId,
                 'error_code' => $errorCode,
                 'error_message' => $errorMessage,
             ]);
@@ -57,6 +83,7 @@ class StorageFileController extends Controller
         $fileSizeInMB = round($file->getSize() / (1024 * 1024), 2);
         if ($fileSizeInMB > $maxFileSizeInMB) {
             Log::warning('File size exceeds limit', [
+                'project_id' => $projectId,
                 'file_size' => $fileSizeInMB,
                 'max_size' => $maxFileSizeInMB,
             ]);
@@ -66,47 +93,41 @@ class StorageFileController extends Controller
         // ตรวจสอบประเภทไฟล์
         $allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif'];
         if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
-            Log::warning('Invalid file type', ['mime_type' => $file->getMimeType()]);
+            Log::warning('Invalid file type', [
+                'project_id' => $projectId,
+                'mime_type' => $file->getMimeType()
+            ]);
             return redirect()->back()->with('error', 'Invalid file type. Only PDF and image files are allowed.');
         }
 
         try {
-            $storageFile = StorageFileModel::createFromUploadedFile($file, 'uploads');
+            // สร้างชื่อโฟลเดอร์ตาม project_id
+            $folderPath = 'uploads/project_' . $projectId;
+            
+            // สร้าง StorageFile record
+            $storageFile = StorageFileModel::createFromUploadedFile($file, $folderPath, $projectId);
             
             if (!$storageFile) {
                 throw new \Exception('Failed to create storage file record');
             }
 
             Log::info('File uploaded successfully', [
+                'project_id' => $projectId,
                 'file_name' => $storageFile->Name_Storage_File,
                 'file_size' => $fileSizeInMB,
+                'path' => $storageFile->Path_Storage_File
             ]);
-            return redirect()->back()->with('success', "File uploaded successfully. Size: {$fileSizeInMB} MB");
-        } catch (\Exception $e) {
-            Log::error('File upload failed', ['error' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'File upload failed: ' . $e->getMessage());
-        }
-    }
 
-    private function getUploadErrorMessage($errorCode)
-    {
-        switch ($errorCode) {
-            case UPLOAD_ERR_INI_SIZE:
-                return 'The uploaded file exceeds the upload_max_filesize directive in php.ini';
-            case UPLOAD_ERR_FORM_SIZE:
-                return 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form';
-            case UPLOAD_ERR_PARTIAL:
-                return 'The uploaded file was only partially uploaded';
-            case UPLOAD_ERR_NO_FILE:
-                return 'No file was uploaded';
-            case UPLOAD_ERR_NO_TMP_DIR:
-                return 'Missing a temporary folder';
-            case UPLOAD_ERR_CANT_WRITE:
-                return 'Failed to write file to disk';
-            case UPLOAD_ERR_EXTENSION:
-                return 'File upload stopped by extension';
-            default:
-                return 'Unknown upload error';
+            // ส่งกลับไปที่หน้าแสดงไฟล์ของโครงการนั้นๆ
+            return redirect()->route('StorageFiles.index', ['project_id' => $projectId])
+                ->with('success', "File uploaded successfully. Size: {$fileSizeInMB} MB");
+
+        } catch (\Exception $e) {
+            Log::error('File upload failed', [
+                'project_id' => $projectId,
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'File upload failed: ' . $e->getMessage());
         }
     }
 

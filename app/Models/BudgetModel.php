@@ -4,15 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SupProjectModel extends Model
+class BudgetModel extends Model
 {
     protected $connection = 'mydb';
-    protected $table = 'Sup_Project';
-    protected $primaryKey = 'Id_Sup_Project';
+    protected $table = 'Budget';
+    protected $primaryKey = 'Id_Budget';
     protected $keyType = 'int';
     protected $fillable = [
-        'Project_Id',
-        'Name_Sup_Project'
+        'Status_Budget',
+        'Project_Id'
     ];
     public $timestamps = false;
 

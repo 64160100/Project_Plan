@@ -7,10 +7,14 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ListProjectModel;
 use App\Models\StrategicModel;
+use App\Models\StrategyModel;
 use App\Models\ApproveModel;
 use App\Models\EmployeeModel;
 use App\Models\RecordHistory;
 use App\Models\SustainableDevelopmentGoalsModel;
+use App\Models\BudgetModel;
+use App\Models\IntegrationModel;
+use App\Models\SupProjectModel;
 use Carbon\Carbon;
 
 class ListProjectController extends Controller
@@ -27,64 +31,61 @@ class ListProjectController extends Controller
 
     public function showCreateForm($Strategic_Id)
     {
-        $strategics = StrategicModel::with('strategies')->find($Strategic_Id); 
-        $strategics = StrategicModel::with('projects')->find($Strategic_Id); 
+        $strategics = StrategicModel::with(['strategies', 'projects'])->find($Strategic_Id);
         $strategies = $strategics->strategies;
+        $projects = $strategics->projects; 
         $employees = EmployeeModel::all();
         $sdgs = SustainableDevelopmentGoalsModel::all();
+        $nameStrategicPlan = $strategics->Name_Strategic_Plan;
+        $integrationCategories = IntegrationModel::orderBy('Id_Integration_Category', 'asc')->get();
+        $months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
     
-        return view('Project.createProject', compact('strategics', 'strategies', 'employees', 'sdgs'));
+        return view('Project.createProject', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months'));
     }
 
     public function createProject(Request $request, $Strategic_Id)
     {
         $strategics = StrategicModel::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
         $strategies = $strategics->strategies;
-
+    
         $project = new ListProjectModel;
-        $project->Strategic_Id = $request->Strategic_Id;
+        $project->Strategic_Id = $Strategic_Id;
         $project->Name_Project = $request->Name_Project;
-        $project->Employee_Id = $request->employee_id;
-        $project->Objective_Project = $request->Objective_Project;
-        $project->Indicators_Project = $request->Indicators_Project;
-        $project->Target_Project = $request->Target_Project;
-        $project->First_Time = $request->First_Time;
-        $project->End_Time = $request->End_Time;
+        $project->Employee_Id = $request->employee_id ?? null;
+        $project->Objective_Project = $request->Objective_Project ?? null;
+        $project->Indicators_Project = $request->Indicators_Project ?? null;
+        $project->Target_Project = $request->Target_Project ?? null;
+        $project->First_Time = $request->First_Time ?? null;
+        $project->End_Time = $request->End_Time ?? null;
         $project->save();
-
-        Log::info('Project created with ID: ' . $project->Id_Project);
-
+    
         if ($project->Id_Project) {
             $approval = new ApproveModel;
             $approval->Status = 'I';
             $approval->Project_Id = $project->Id_Project;
             $approval->save();
             Log::info('Approval record created for project ID: ' . $project->Id_Project);
+    
+            $budget = new BudgetModel;
+            $budget->Status_Budget = $request->Status_Budget ?? null;
+            $budget->Project_Id = $project->Id_Project;
+            $budget->save();
+            Log::info('Budget record created for project ID: ' . $project->Id_Project);
+    
+            // Save sub-projects
+            if ($request->has('Name_Sup_Project')) {
+                foreach ($request->Name_Sup_Project as $supProjectName) {
+                    $supProject = new SupProjectModel;
+                    $supProject->Project_Id = $project->Id_Project;
+                    $supProject->Name_Sup_Project = $supProjectName;
+                    $supProject->save();
+                    Log::info('Sub-project created with name: ' . $supProjectName);
+                }
+            }
         } else {
             Log::error('Failed to create project.');
         }
-
-        if ($request->has('sdgs')) {
-            $selectedSDGs = $request->sdgs;
-            $project->sdgs()->sync($selectedSDGs);
-        }
-
-        if ($request->has('Name_Sup_Project')) {
-            $this->createSupProjects($project->Id_Project, $request->Name_Sup_Project);
-        }
-
-        if ($request->has('Objective_Project')) {
-            $this->createObjProjects($project->Id_Project, $request->Objective_Project);
-        }
-
-        if ($request->has('Indicators_Project')) {
-            $this->createIndicatorsProjects($project->Id_Project, $request->Indicators_Project);
-        }
-
-        if ($request->has('Target_Project')) {
-            $this->createTargetProjects($project->Id_Project, $request->Target_Project);
-        }
-
+    
         return redirect()->route('project', ['Strategic_Id' => $Strategic_Id])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
     }
     
@@ -109,7 +110,7 @@ class ListProjectController extends Controller
             } elseif ($employee->IsDirector === 'Y') {
                 $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
                     ->whereHas('project', function ($query) {
-                        $query->whereIn('Count_Steps', [1, 5, 8]);
+                        $query->whereIn('Count_Steps', [1, 5, 8, 11]);
                     })->get();
             } elseif ($employee->IsFinance === 'Y') {
                 $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
@@ -160,18 +161,60 @@ class ListProjectController extends Controller
     public function updateApprovalStatus(Request $request, $id, $status)
     {
         $approval = ApproveModel::find($id);
-    
+
         if ($approval) {
             $approval->Status = $status;
             $approval->save();
-    
-            $comment = $status === 'Y' ? 'เห็นควรอนุมัติโครงการตามที่เสนอ' : $request->input('comment');
+
             $employee = $request->session()->get('employee');
             $permissions = $employee ? $employee->permissions : collect();
-    
             $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
             $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
-    
+
+            $project = ListProjectModel::find($approval->Project_Id);
+            
+            if ($status === 'Y') {
+                switch ($project->Count_Steps) {
+                    case 0:
+                        $comment = "อนุมัติการเริ่มต้นโครงการตามที่เสนอ";
+                        break;
+                    case 1:
+                        $comment = "เห็นชอบการดำเนินโครงการในขั้นต้น";
+                        break;
+                    case 2:
+                        $comment = "อนุมัติการจัดสรรงบประมาณตามที่เสนอ";
+                        break;
+                    case 3:
+                        $comment = "ยืนยันความเหมาะสมของงบประมาณโครงการ";
+                        break;
+                    case 4:
+                        $comment = "เห็นชอบการดำเนินงานในส่วนของฝ่าย";
+                        break;
+                    case 5:
+                        $comment = "อนุมัติการดำเนินโครงการอย่างเป็นทางการ";
+                        break;
+                    case 6:
+                        $comment = "รับทราบรายงานความคืบหน้าการดำเนินโครงการ";
+                        break;
+                    case 7:
+                        $comment = "รับรองผลการดำเนินงานระดับฝ่าย";
+                        break;
+                    case 8:
+                        $comment = "รับรองผลการดำเนินโครงการเสร็จสมบูรณ์";
+                        break;
+                    case 11:
+                        $comment = "อนุมัติการดำเนินการแก้ไขความล่าช้าของโครงการ";
+                        break;
+                    default:
+                        $comment = "เห็นชอบการดำเนินการตามที่เสนอ";
+                }
+            } else {
+                $comment = $request->input('comment');
+                if (empty($comment)) {
+                    $comment = "ไม่อนุมัติโครงการ กรุณาแก้ไขตามคำแนะนำ";
+                }
+            }
+
             RecordHistory::create([
                 'Approve_Id' => $approval->Id_Approve,
                 'Approve_Project_Id' => $approval->Project_Id,
@@ -181,9 +224,8 @@ class ListProjectController extends Controller
                 'Name_Record' => $nameResponsible,
                 'Permission_Record' => $permissionName,
             ]);
-    
+
             if ($status === 'Y') {
-                $project = ListProjectModel::find($approval->Project_Id);
                 if ($project) {
                     switch ($project->Count_Steps) {
                         case 0:
@@ -213,11 +255,14 @@ class ListProjectController extends Controller
                         case 8:
                             $project->Count_Steps = 9;
                             break;
+                        case 11:
+                            $project->Count_Steps = 2; 
+                            break;
                         default:
                             break;
                     }
                     $project->save();
-    
+
                     if ($project->Count_Steps <= 9) {
                         $approval->Status = 'I';
                         $approval->save();
@@ -225,8 +270,8 @@ class ListProjectController extends Controller
                 }
             }
         }
-    
-        return redirect()->route('requestApproval');
+
+        return redirect()->route('requestApproval')->with('success', 'บันทึกการพิจารณาเรียบร้อยแล้ว');
     }
 
     public function proposeProject(Request $request)
@@ -244,7 +289,7 @@ class ListProjectController extends Controller
             $projects = $projectsQuery->whereHas('approvals', function($query) {
                     $query->whereIn('Status', ['I', 'N']);
                 })
-                ->with(['approvals.recordHistory', 'employee.department', 'employee'])
+                ->with(['approvals.recordHistory', 'employee.department', 'employee', 'budgets'])
                 ->get();
     
             foreach ($projects as $project) {
@@ -301,7 +346,10 @@ class ListProjectController extends Controller
                     $project->status = 'สิ้นสุด';
                     $project->buttonText = 'สิ้นสุดโครงการ';
                 }
+    
+                $project->budgetStatus = $project->budgets->first()->Status_Budget ?? 'N/A';
             }
+
     
             return view('proposeProject', compact('projects'));
         } else {
@@ -312,20 +360,20 @@ class ListProjectController extends Controller
     public function submitForApproval(Request $request, $id)
     {
         $project = ListProjectModel::find($id);
-    
+
         if ($project) {
             $approval = ApproveModel::where('Project_Id', $project->Id_Project)->first();
-    
+
             if ($approval) {
                 $approval->Status = 'Y';
                 $approval->save();
-    
+
                 $employee = $request->session()->get('employee');
                 $permissions = $employee ? $employee->permissions : collect();
-    
+
                 $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
                 $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
-    
+
                 RecordHistory::create([
                     'Approve_Id' => $approval->Id_Approve,
                     'Approve_Project_Id' => $approval->Project_Id,
@@ -335,58 +383,120 @@ class ListProjectController extends Controller
                     'Name_Record' => $nameResponsible,
                     'Permission_Record' => $permissionName,
                 ]);
-    
-                switch ($project->Count_Steps) {
-                    case 0:
-                        $project->Count_Steps = 1;
-                        break;
-                    case 1:
-                        $project->Count_Steps = 2;
-                        break;
-                    case 2:
-                        $project->Count_Steps = 3;
-                        break;
-                    case 3:
-                        $project->Count_Steps = 4;
-                        break;
-                    case 4:
-                        $project->Count_Steps = 5;
-                        break;
-                    case 5:
-                        $project->Count_Steps = 6;
-                        break;
-                    case 6:
-                        $project->Count_Steps = 7;
-                        break;
-                    case 7:
-                        $project->Count_Steps = 8;
-                        break;
-                    case 8:
-                        $project->Count_Steps = 9;
-                        break;
-                    case 9:
-                        $project->Count_Steps = 10;
-                        $approval->Status = 'Y';
-                        $approval->save();
-                        break;
-                    default:
-                        break;
+
+                if ($project->Count_Steps == 2) {
+                    $budget = BudgetModel::where('Project_Id', $project->Id_Project)->first();
+                    if ($budget && $budget->Status_Budget == 'N') {
+                        $project->Count_Steps = 4; 
+                    } else {
+                        $project->Count_Steps = 3; 
+                    }
+                } else {
+                    switch ($project->Count_Steps) {
+                        case 0:
+                            $project->Count_Steps = 1;
+                            break;
+                        case 1:
+                            $project->Count_Steps = 2;
+                            break;
+                        case 3:
+                            $project->Count_Steps = 4;
+                            break;
+                        case 4:
+                            $project->Count_Steps = 5;
+                            break;
+                        case 5:
+                            $project->Count_Steps = 6;
+                            break;
+                        case 6:
+                            if (\Carbon\Carbon::now()->gt(\Carbon\Carbon::parse($project->End_Time))) {
+                                $project->Count_Steps = 11; 
+                            } else {
+                                $project->Count_Steps = 7;
+                            }
+                            break;
+                        case 7:
+                            $project->Count_Steps = 8;
+                            break;
+                        case 8:
+                            $project->Count_Steps = 9;
+                            break;
+                        case 9:
+                            $project->Count_Steps = 10;
+                            $approval->Status = 'Y';
+                            $approval->save();
+                            break;
+                        case 11:
+                            $project->Count_Steps = 2;
+                            break;
+                        default:
+                            break;
+                    }
                 }
-    
+
                 $project->save();
-    
-                if ($project->Count_Steps <= 9) {
+
+                if ($project->Count_Steps <= 11) {
                     $approval->Status = 'I';
                     $approval->save();
                 }
-    
+
                 return redirect()->route('proposeProject')->with('success', 'Project submitted for approval.');
             } else {
                 return redirect()->route('proposeProject')->with('error', 'Approval record not found.');
             }
         }
-    
+
         return redirect()->route('proposeProject')->with('error', 'Project not found.');
+    }
+
+    public function edit($id, Request $request)
+    {
+        $project = ListProjectModel::with('supProjects')->findOrFail($id);
+        $strategies = StrategyModel::all();
+        $sdgs = SustainableDevelopmentGoalsModel::all();
+        return view('Project.editProject', compact('project', 'strategies', 'sdgs'));
+    }
+    
+    public function update(Request $request, $id)
+    {   
+        Log::info($request->all()); 
+    
+        $request->validate([
+            'Strategic_Id' => 'required|integer',
+            'Name_Project' => 'required|string|max:255',
+            'Count_Steps' => 'nullable|integer',
+            'Employee_Id' => 'required|integer',
+        ]);
+    
+        $project = ListProjectModel::findOrFail($id);
+    
+        $project->update($request->only([
+            'Strategic_Id',
+            'Name_Project',
+            'Count_Steps',
+            'Employee_Id'
+        ]));
+    
+        if (in_array($project->Count_Steps, [3, 4, 5])) {
+            $project->Count_Steps = 2;
+            $project->save();
+        }
+    
+        if (in_array($project->Count_Steps, [7, 8])) {
+            $project->Count_Steps = 6;
+            $project->save();
+        }
+    
+        $approve = ApproveModel::where('Project_Id', $project->Id_Project)->first();
+        if ($approve) {
+            $approve->Status = 'I';
+            $approve->save();
+        }
+    
+        Log::info('Project after update: ', $project->toArray());
+    
+        return redirect()->route('proposeProject')->with('success', 'Project updated successfully');
     }
 
 }

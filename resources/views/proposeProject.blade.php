@@ -2,33 +2,6 @@
 
 <head>
     <link rel="stylesheet" href="{{ asset('css/proposeProject.css') }}">
-    <style>
-    .project-status {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.5s ease-out;
-    }
-
-    .project-status.show {
-        max-height: 1000px;
-        /* Adjust this value as needed */
-        transition: max-height 0.5s ease-in;
-    }
-
-    .status-header {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-    }
-
-    #toggle-icon {
-        transition: transform 0.5s ease;
-    }
-
-    .rotate {
-        transform: rotate(90deg);
-    }
-    </style>
 </head>
 
 @section('content')
@@ -70,13 +43,19 @@
                             <i class='bx bx-wallet-alt' style="width: 20px; height: 0px;"></i>
                             <span class="info-label">งบประมาณ</span>
                         </div>
-                        <span class="info-value">500,000 บาท</span>
+                        <span class="info-value">
+                            @if($project->budgetStatus === 'Y')
+                            500,000 บาท
+                            @else
+                            -
+                            @endif
+                        </span>
                     </div>
                 </div>
             </div>
 
             <div class="project-actions">
-                <a href="{{ route('StorageFiles.index') }}" class="action-link">
+                <a href="{{ route('StorageFiles.index', ['project_id' => $project->Id_Project]) }}" class="action-link">
                     <i class='bx bx-info-circle'></i>
                     ดูรายละเอียดโครงการ
                 </a>
@@ -117,9 +96,9 @@
             <div class="status-section">
                 <div class="status-header">
                     สถานะการพิจารณา
-                    <i class='bx bxs-chevron-right' id="toggle-icon"></i>
+                    <i class='bx bxs-chevron-right toggle-icon' id="toggle-icon-{{ $project->Id_Project }}"></i>
                 </div>
-                <div class="project-status" id="project-status">
+                <div class="project-status" id="project-status-{{ $project->Id_Project }}">
                     @if($project->approvals->isNotEmpty() && $project->approvals->first()->recordHistory->isNotEmpty())
                     @foreach($project->approvals->first()->recordHistory as $history)
                     <div class="status-card">
@@ -130,9 +109,10 @@
                                     {{ $history->comment ?? 'No Comment' }}
                                 </div>
                                 <div class="status-text">
-                                    โดย {{ $history->Name_Record ?? 'Unknown' }}
+                                    อนุมัติโดย: {{ $history->Name_Record ?? 'Unknown' }}
                                 </div>
-                                <div class="status-text">({{ $history->Permission_Record ?? 'Unknown' }})
+                                <div class="status-text">
+                                    ตำแหน่ง: {{ $history->Permission_Record ?? 'Unknown' }}
                                 </div>
                             </div>
                         </div>
@@ -158,60 +138,100 @@
                     </div>
                     @endforeach
                     @endif
+                    @if($project->approvals->first()->Status !== 'N')
                     <div class="status-card">
                         <div class="status-left">
                             <i class='bx bx-envelope' style="width: 40px;"></i>
                             <div>
                                 <div class="status-text">
                                     @if($project->Count_Steps === 0)
-                                    ถึง : ผู้บริหาร
+                                    <div class="status-text">
+                                        ขั้นตอนที่ 1: เริ่มต้นการเสนอโครงการ
+                                    </div>
+                                    <div class="status-text">
+                                        ถึง: ผู้บริหารพิจารณาเบื้องต้น
+                                    </div>
                                     @elseif($project->Count_Steps === 1)
-                                    ผู้บริหารอนุมัติโครงการ กรอกข้อมูลเพิ่มเติม
+                                    <div class="status-text">
+                                        ขั้นตอนที่ 2: อยู่ระหว่างการพิจารณาเบื้องต้น
+                                    </div>
+                                    <div class="status-text">
+                                        สถานะ: รอการพิจารณาจากผู้บริหาร
+                                    </div>
                                     @elseif($project->Count_Steps === 2)
-                                    เสนอโครงการ
+                                    <div class="status-text">
+                                        ขั้นตอนที่ 3: การพิจารณาด้านงบประมาณ
+                                    </div>
+                                    <div class="status-text">
+                                        ถึง: ฝ่ายการเงินตรวจสอบงบประมาณ
+                                    </div>
                                     @elseif($project->Count_Steps === 3)
-                                    งบประมาณ
+                                    <div class="status-text">
+                                        ขั้นตอนที่ 4: การตรวจสอบความเหมาะสมด้านงบประมาณ
+                                    </div>
+                                    <div class="status-text">
+                                        สถานะ: อยู่ระหว่างการตรวจสอบโดยฝ่ายการเงิน
+                                    </div>
                                     @elseif($project->Count_Steps === 4)
-                                    หัวหน้าฝ่ายอนุมัติโครงการ
+                                    <div class="status-text">
+                                        ขั้นตอนที่ 5: การพิจารณาโดยหัวหน้าฝ่าย
+                                    </div>
+                                    <div class="status-text">
+                                        สถานะ: อยู่ระหว่างการตรวจสอบโดยหัวหน้าฝ่าย
+                                    </div>
                                     @elseif($project->Count_Steps === 5)
-                                    ผู้บริหารอนุมัติโครงการ
+                                    <div class="status-text">
+                                        ขั้นตอนที่ 6: การพิจารณาขั้นสุดท้าย
+                                    </div>
+                                    <div class="status-text">
+                                        สถานะ: อยู่ระหว่างการพิจารณาโดยผู้บริหาร
+                                    </div>
                                     @elseif($project->Count_Steps === 6)
-                                    รายงานผลการดำเนินงาน เสนอผลการดำเนินงาน
+                                    <div class="status-text">
+                                        ขั้นตอนที่ 7: การดำเนินโครงการ
+                                    </div>
+                                    <div class="status-text">
+                                        สถานะ: อยู่ระหว่างการดำเนินงาน
+                                    </div>
                                     @elseif($project->Count_Steps === 7)
-                                    หัวหน้าฝ่าย
+                                    <div class="status-text">
+                                        ขั้นตอนที่ 8: การตรวจสอบผลการดำเนินงาน
+                                    </div>
+                                    <div class="status-text">
+                                        สถานะ: รอการตรวจสอบจากหัวหน้าฝ่าย
+                                    </div>
                                     @elseif($project->Count_Steps === 8)
-                                    ผู้บริหาร
+                                    <div class="status-text">
+                                        ขั้นตอนที่ 9: การรับรองผลการดำเนินงาน
+                                    </div>
+                                    <div class="status-text">
+                                        สถานะ: รอการรับรองจากผู้บริหาร
+                                    </div>
                                     @elseif($project->Count_Steps === 9)
-                                    สิ้นสุด
+                                    <div class="status-text">
+                                        ขั้นตอนที่ 10: การปิดโครงการ
+                                    </div>
+                                    <div class="status-text">
+                                        สถานะ: ดำเนินการเสร็จสิ้นสมบูรณ์
+                                    </div>
+                                    @elseif($project->Count_Steps === 11)
+                                    <div class="status-text">
+                                        สถานะพิเศษ: การดำเนินการล่าช้า
+                                    </div>
+                                    <div class="status-text">
+                                        สถานะ: รอการพิจารณาจากผู้บริหาร
+                                    </div>
                                     @else
-                                    {{ $project->approvals->first()->Status ?? 'รอการอนุมัติ' }}
+                                    <div class="status-text">
+                                        {{ $project->approvals->first()->Status ?? 'รอการพิจารณา' }}
+                                    </div>
                                     @endif
                                 </div>
+                                @if($project->Count_Steps === 6 || $project->Count_Steps === 11)
                                 <div class="status-text">
-                                    @if($project->Count_Steps === 0)
-                                    เรื่อง : เสนอโครงการเพื่อขออนุมัติ
-                                    @elseif($project->Count_Steps === 1)
-                                    ผู้บริหารอนุมัติโครงการ กรอกข้อมูลเพิ่มเติม
-                                    @elseif($project->Count_Steps === 2)
-                                    เสนอโครงการ
-                                    @elseif($project->Count_Steps === 3)
-                                    งบประมาณ
-                                    @elseif($project->Count_Steps === 4)
-                                    หัวหน้าฝ่ายอนุมัติโครงการ
-                                    @elseif($project->Count_Steps === 5)
-                                    ผู้บริหารอนุมัติโครงการ
-                                    @elseif($project->Count_Steps === 6)
-                                    รายงานผลการดำเนินงาน เสนอผลการดำเนินงาน
-                                    @elseif($project->Count_Steps === 7)
-                                    หัวหน้าฝ่าย
-                                    @elseif($project->Count_Steps === 8)
-                                    ผู้บริหาร
-                                    @elseif($project->Count_Steps === 9)
-                                    จบโครงการ
-                                    @else
-                                    {{ $project->approvals->first()->Status ?? 'รอการอนุมัติ' }}
-                                    @endif
+                                    วันที่สิ้นสุด: {{ $project->End_Time }}
                                 </div>
+                                @endif
                             </div>
                         </div>
                         <div class="status-right">
@@ -243,14 +263,27 @@
                                 เสร็จสิ้น
                                 @elseif($project->Count_Steps === 9)
                                 สิ้นสุดโครงการ
+                                @elseif($project->Count_Steps === 11)
+                                โครงการเสร็จไม่ทันเวลา
                                 @else
                                 {{ $project->approvals->first()->Status ?? 'รอการอนุมัติ' }}
                                 @endif
                             </button>
                         </div>
                     </div>
+                    @endif
                     <div class="button-container">
                         @if(in_array($project->Count_Steps, [0, 2, 6]))
+                        @if($project->Count_Steps === 6 &&
+                        \Carbon\Carbon::now()->gt(\Carbon\Carbon::parse($project->End_Time)))
+                        <form action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
+                            method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-primary">
+                                <i class='bx bx-log-in-circle'></i> ส่งให้ผู้บริหารตรวจสอบ
+                            </button>
+                        </form>
+                        @else
                         <form action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
                             method="POST" style="display:inline;">
                             @csrf
@@ -258,14 +291,17 @@
                                 <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
                             </button>
                         </form>
-                        @elseif($project->Count_Steps === 3)
-                        <button type="button" class="btn btn-secondary" disabled>ดำเนินการเสร็จสิ้น</button>
+                        @endif
                         @elseif($project->Count_Steps === 9)
                         <form action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
                             method="POST" style="display:inline;">
                             @csrf
                             <button type="submit" class="btn btn-secondary">สิ้นสุดโครงการ</button>
                         </form>
+                        @elseif($project->approvals->first()->Status === 'N')
+                        <a href="{{ route('projects.edit', ['id' => $project->Id_Project ]) }}" class="btn btn-warning">
+                            <i class='bx bx-edit'></i> กลับไปแก้ไขฟอร์ม
+                        </a>
                         @else
                         <button type="button" class="btn btn-secondary" disabled>
                             <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
@@ -275,18 +311,31 @@
                 </div>
             </div>
 
-
         </div>
     </div>
     @endforeach
 </div>
 
 <script>
-document.getElementById('toggle-icon').addEventListener('click', function() {
-    const projectStatus = document.getElementById('project-status');
-    const toggleIcon = document.getElementById('toggle-icon');
-    projectStatus.classList.toggle('show');
-    toggleIcon.classList.toggle('rotate');
+document.addEventListener('DOMContentLoaded', function() {
+    const statusHeaders = document.querySelectorAll('.status-header');
+
+    statusHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const projectStatus = this.nextElementSibling;
+            const toggleIcon = this.querySelector('.toggle-icon');
+
+            if (projectStatus.classList.contains('show')) {
+                projectStatus.style.maxHeight = 0;
+                projectStatus.classList.remove('show');
+                toggleIcon.classList.remove('rotate');
+            } else {
+                projectStatus.style.maxHeight = projectStatus.scrollHeight + 'px';
+                projectStatus.classList.add('show');
+                toggleIcon.classList.add('rotate');
+            }
+        });
+    });
 });
 </script>
 @endsection

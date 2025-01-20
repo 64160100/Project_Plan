@@ -32,4 +32,19 @@ class ListProjectModel extends Model
     {
         return $this->hasMany(ApproveModel::class, 'Project_Id', 'Id_Project');
     }
+
+    public function supProjects()
+    {
+        return $this->hasMany(SupProjectModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function budgets()
+    {
+        return $this->hasMany(BudgetModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function storageFiles()
+    {
+        return $this->hasMany(StorageFileModel::class, 'Project_Id', 'Id_Project');
+    }
 }

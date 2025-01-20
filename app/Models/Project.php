@@ -23,7 +23,7 @@ class Project extends Model
         'First_Time',
         'End_Time',
         // 'Count_Steps',
-        // 'Employee_Id',
+        'Employee_Id',
     ];
 
     public $timestamps = false;

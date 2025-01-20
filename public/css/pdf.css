@@ -1,0 +1,55 @@
+body {
+    font-family: 'THSarabunNew', sans-serif;
+    overflow-wrap: break-word;
+    margin-top: 0.2in;
+    margin-left: 0.5in;
+    margin-right: 0.2in;
+    line-height: 0.8;
+}
+
+h1 {
+    text-align: center;
+    font-weight: bold;
+    font-size: 24px;
+    padding-bottom: 20px;
+}
+
+p {
+    font-size: 21.33px;
+    padding: 0;
+    margin-top: 10px;
+    margin-bottom: 1px;
+}
+
+b {
+    margin-top: 30px;
+}
+
+.space {
+    margin-top: 20px;
+}
+
+.checkbox {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    margin-top: 14px;
+    font-family: 'DejaVu Sans', sans-serif;
+}
+
+.paragraph {
+    margin-left: 70px;
+    margin-top: 1px;
+}
+
+.paragraph-two {
+    margin-left: 120px;
+}
+
+.line {
+    border-bottom: 1px dotted black;
+    display: inline-block;
+    padding-left: 30px;
+    height: 20px;
+}

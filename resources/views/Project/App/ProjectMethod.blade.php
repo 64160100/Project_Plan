@@ -1,4 +1,4 @@
-<form id="methodForm">
+<!-- <form id="methodForm"> -->
     <div for="formGroupExampleInput" class="form-label">วิธีการดำเนินงาน</div>
     <div id="methodContainer">
         <!-- <div class="form-group">
@@ -7,14 +7,14 @@
         </div> -->
     </div>
     <div>
-        <button type="button" class="btn-addlist"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
+        <button type="button" id="addMethodButton" class="btn-addlist"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
     </div>
-</form>
+<!-- </form> -->
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const methodContainer = document.getElementById('methodContainer');
-        const addButton = document.querySelector('.btn-addlist');
+        const addButton = document.getElementById('addMethodButton');
     
         function addField() {
             const newField = document.createElement('div');
@@ -33,6 +33,13 @@
         window.handleInput = function(input) {
             console.log('Input changed:', input.value);
         }
-        addButton.addEventListener('click', addField);
+
+        if (addButton) {
+            addButton.addEventListener('click', addField);
+        } else {
+            console.error('Add button not found');
+        }
+        window.removeField = removeField;
+        window.handleInput = handleInput;
     });
 </script>

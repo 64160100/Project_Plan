@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Index</title>
-  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="{{ asset('css/project.css') }}">
 </style>
 </head>
@@ -23,10 +22,10 @@
   @foreach ( $strategics as $Strategic )
   <details class="accordion" id="{{ $Strategic->Id_Strategic }}">
     <summary class="accordion-btn">
-    <b><a href="{{ route('viewProjectInStrategic', ['Id_Strategic' => $Strategic->Id_Strategic]) }}">
+    <b><a href="{{ route('viewProjectInStrategic', $Strategic->Id_Strategic) }}">
         {{ $Strategic->Name_Strategic_Plan }}</a><br>จำนวนโครงการ : {{ $Strategic->project_count }} โครงการ</b>
         
-        <a href="{{ route('showCreateProject', ['Strategic_Id' => $Strategic->Id_Strategic]) }}" class="btn-add">
+        <a href="{{ route('showCreateProject', $Strategic->Id_Strategic) }}" class="btn-add">
           <i class='bx bx-plus'></i>เพิ่มโครงการ
         </a>
     </summary>
@@ -35,7 +34,12 @@
             <p>ไม่มีโครงการที่เกี่ยวข้อง</p>
           @else
               @foreach ($Strategic->projects as $Project)
-                <li><strong>{{ $Project->Name_Project }}</strong></li>
+              <li>
+                  <strong>{{ $Project->Name_Project }}</strong>  {{ $Project->Id_Project }}
+                  <!-- dompdf -->
+                  <a href="{{ route('PDF.Project', $Project->Id_Project) }}" class='bx bx-folder-open' style='color:#bd7ff9; font-size: 20px; padding-right: 5px;'></a>
+                  <a href="{{ route('PDF.projectCtrlP', $Project->Id_Project) }}" class='bx bx-folder-open' style='color:#000; font-size: 20px; padding-right: 5px;'></a>
+              </li>
               @endforeach
           @endif
     </div>

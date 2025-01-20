@@ -9,6 +9,7 @@ use App\Models\Strategy;
 use App\Models\Sdg;
 use App\Models\Platform;
 use App\Models\Sup_Project;
+use App\Models\EmployeeModel;
 use Illuminate\Support\Facades\DB;
 
 class ProjectController extends Controller
@@ -29,6 +30,7 @@ class ProjectController extends Controller
         $strategics = Strategic::with('projects')->find($Strategic_Id); // ดึงข้อมูล Strategic พร้อมกับ projects
         $strategies = $strategics->strategies; //ดึงข้อมูล strategics เพื่อเข้าถึงฟังก์ชัน strategies ในตาราง Strategic
         $sdgs = Sdg::all();
+        // $employee = EmployeeModel::all();
 
         return view('Project.FormInsertProject', compact('strategics', 'strategies','sdgs'));
     }
@@ -43,11 +45,13 @@ class ProjectController extends Controller
         $projects->Strategic_Id = $request->Strategic_Id;
         $projects->Name_Project = $request->Name_Project;
         $projects->Name_Strategy = $request->Name_Strategy;
-        $projects->Objective_Project = $request->Objective_Project; // ไม่ต้องใช้ implode แล้ว
+        $projects->Objective_Project = $request->Objective_Project;
         $projects->Indicators_Project = $request->Indicators_Project;
         $projects->Target_Project = $request->Target_Project;
         $projects->First_Time = $request->First_Time;
         $projects->End_Time = $request->End_Time;
+
+        // $projects->Employee_Id = $request->Employee_Id;
 
         $projects->save();
 

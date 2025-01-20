@@ -50,7 +50,7 @@
 
                 <!-- ความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย  -->
                 <div class="content-box"><b>ความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย</b>
-                    <!-- include('Project.App.UniStrategic') -->
+                    @include('Project.App.UniStrategic')
                 </div><br>
             
             

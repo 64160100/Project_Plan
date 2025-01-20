@@ -19,17 +19,26 @@ class Strategy extends Model
     ];
     public $timestamps = false;
 
-    // Strategic มีหลายโปรเจค
-    // public function projects()
-    // {
-    //     return $this->hasMany(Project::class, 'Strategic_Id', 'Id_Strategy');
-    // }
-
      // แต่ละ Strategy เชื่อมกับหนึ่ง Strategic
      public function strategic()
      {
          return $this->belongsTo(Strategic::class, 'Strategic_Id', 'Id_Strategic');
      }
     
+     
+     public function kpis()
+    {
+        return $this->hasMany(KpiModel::class, 'Strategy_Id', 'Id_Strategy');
+    }
+
+    public function strategicObjectives()
+    {
+        return $this->hasMany(StrategicObjectivesModel::class, 'Strategy_Id_Strategy', 'Id_Strategy');
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class, 'Strategy_Id', 'Id_Strategy');
+    }
     
 }

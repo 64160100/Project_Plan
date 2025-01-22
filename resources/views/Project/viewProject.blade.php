@@ -256,8 +256,6 @@
                 <div class="section-header">
                     <h4>
                         10. กลุ่มเป้าหมาย
-                        <i class='bx bx-chevron-up' id="toggleIconTargetGroup"
-                            style="cursor: pointer; font-size: 1.5em;" onclick="toggleTargetGroupDetails()"></i>
                     </h4>
                 </div>
                 <div id="targetGroupDetails" style="display: block;">
@@ -287,13 +285,211 @@
                 </div>
             </div>
 
+            <!-- สถานที่ดำเนินงาน -->
+            <div class="content-box">
+                <div class="section-header">
+                    <h4>
+                        11. สถานที่ดำเนินงาน
+                    </h4>
+                </div>
+                <div id="locationDetails" style="display: block;">
+                    <div id="locationContainer">
+                        @if($project->locations->isNotEmpty())
+                        @foreach($project->locations as $location)
+                        <div class="form-group location-item">
+                            <input type="text" class="form-control small-input" name="location[]"
+                                value="{{ $location->Name_Location }}" disabled>
+                        </div>
+                        @endforeach
+                        @else
+                        <div class="form-group location-item">
+                            <input type="text" class="form-control small-input" value="-" disabled>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- ตัวชี้วัด -->
+            <div class="content-box">
+                <div class="section-header">
+                    <h4>
+                        12. ตัวชี้วัด
+                    </h4>
+                </div>
+                <div id="indicatorsDetails" style="display: block;">
+                    @php
+                    $quantitativeIndicators = $project->projectHasIndicators->filter(function($indicator) {
+                    return $indicator->indicators->Type_Indicators === 'Quantitative';
+                    });
+                    $qualitativeIndicators = $project->projectHasIndicators->filter(function($indicator) {
+                    return $indicator->indicators->Type_Indicators === 'Qualitative';
+                    });
+                    @endphp
+
+                    @if($quantitativeIndicators->isNotEmpty())
+                    <div class="form-group">
+                        <h6>เชิงปริมาณ</h6>
+                        @foreach($quantitativeIndicators as $indicator)
+                        <div class="form-group">
+                            <textarea class="form-control" name="indicators_details[]" placeholder="กรอกรายละเอียด"
+                                disabled>{{ $indicator->Details_Indicators }}</textarea>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="form-group">
+                        <h6>เชิงปริมาณ</h6>
+                        <div class="form-group">
+                            <textarea class="form-control" placeholder="-" disabled>-</textarea>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($qualitativeIndicators->isNotEmpty())
+                    <div class="form-group">
+                        <h6>เชิงคุณภาพ</h6>
+                        @foreach($qualitativeIndicators as $indicator)
+                        <div class="form-group">
+                            <textarea class="form-control" name="indicators_details[]" placeholder="กรอกรายละเอียด"
+                                disabled>{{ $indicator->Details_Indicators }}</textarea>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="form-group">
+                        <h6>เชิงคุณภาพ</h6>
+                        <div class="form-group">
+                            <textarea class="form-control" placeholder="-" disabled>-</textarea>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- filepath: /home/aries/Project/Project_Plan/resources/views/Project/viewProject.blade.php -->
+
+            <div class="content-box">
+                <div class="section-header">
+                    <h4>
+                        13. ระยะเวลาดำเนินโครงการ
+                    </h4>
+                </div>
+                <div id="projectDurationDetails" style="display: block;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="First_Time">วันที่เริ่มต้น:</label>
+                                <input type="text" class="form-control" id="First_Time" name="First_Time"
+                                    value="{{ $firstTime ?? '-' }}" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="End_Time">วันที่สิ้นสุด:</label>
+                                <input type="text" class="form-control" id="End_Time" name="End_Time"
+                                    value="{{ $endTime ?? '-' }}" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--  -->
+            <div class="content-box">
+                <div class="section-header">
+                    <h4>
+                        14. ขั้นตอนและแผนการดำเนินงาน (PDCA)
+                        <i class='bx bx-chevron-up' id="toggleIconPlan" style="cursor: pointer; font-size: 1.5em;"
+                            onclick="togglePlanDetails()"></i>
+                    </h4>
+                </div>
+                <div id="planDetails">
+                    <div class="form-group-radio mb-4">
+                        <input type="radio" name="Project_Type" value="S" id="shortTermProject"
+                            {{ $project->Project_Type == 'S' ? 'checked' : '' }} disabled>
+                        <label for="shortTermProject">โครงการระยะสั้น</label>
+                        &nbsp;&nbsp;
+                        <input type="radio" name="Project_Type" value="L" id="longTermProject"
+                            {{ $project->Project_Type == 'L' ? 'checked' : '' }} disabled>
+                        <label for="longTermProject">โครงการระยะยาว</label>
+                    </div>
+
+                    @if($project->Project_Type == 'S')
+                    <!-- วิธีการดำเนินงาน -->
+                    <div id="textbox-planType-1" data-group="planType">
+                        <div class="method-form">
+                            <div class="form-label">วิธีการดำเนินงาน</div>
+                            <div id="methodContainer" class="method-items">
+                                @foreach($project->methods as $method)
+                                <div class="form-group mt-2">
+                                    <input type="text" class="form-control" value="{{ $method }}" readonly>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($project->Project_Type == 'L')
+                    <div id="textbox-planType-2" data-group="planType">
+                        <table class="table-PDCA">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">กิจกรรมและแผนการเบิกจ่ายงบประมาณ</th>
+                                    <th colspan="12">ปีงบประมาณ พ.ศ. 2567</th>
+                                </tr>
+                                <tr>
+                                    @foreach($months as $month)
+                                    <th>{{ $month }}</th>
+                                    @endforeach
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pdcaStages as $stage)
+                                <tr>
+                                    <td class="PDCA">
+                                        <div class="plan-text">{{ $stage->Name_PDCA }}</div>
+                                        @php
+                                        $details = $pdcaDetails->where('PDCA_Stages_Id',
+                                        $stage->Id_PDCA_Stages)->first();
+                                        @endphp
+                                        <textarea class="plan-textarea auto-expand"
+                                            name="pdca[{{ $stage->Id_PDCA_Stages }}][detail]"
+                                            placeholder="เพิ่มรายละเอียด">{{ $details ? $details->Details_PDCA : '' }}</textarea>
+                                    </td>
+                                    @for($i = 1; $i <= 12; $i++) <td class="checkbox-container">
+                                        <input type="checkbox" name="pdca[{{ $stage->Id_PDCA_Stages }}][months][]"
+                                            value="{{ $i }}"
+                                            {{ $monthlyPlans->where('PDCA_Stages_Id', $stage->Id_PDCA_Stages)->where('Months_Id', $i)->isNotEmpty() ? 'checked' : '' }}>
+                                        </td>
+                                        @endfor
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
 
         </div>
     </div>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // หลักการและเหตุผล&&วัตถุประสงค์โครงการ
     const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(textarea => {
+        const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight);
+        const rows = Math.ceil(textarea.scrollHeight / lineHeight);
+        textarea.setAttribute('rows', rows);
+    });
+
+    // ตัวชี้วัด
+    const textareas = document.querySelectorAll('#indicatorsDetails textarea');
     textareas.forEach(textarea => {
         const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight);
         const rows = Math.ceil(textarea.scrollHeight / lineHeight);

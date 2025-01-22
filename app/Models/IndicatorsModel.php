@@ -14,12 +14,10 @@ class IndicatorsModel extends Model
 
     protected $fillable = [
         'Type_Indicators',
-        'Details_Indicators',
-        'Project_Id'
     ];
 
-    public function project()
+    Public function projectHasIndicators()
     {
-        return $this->belongsTo(ListProjectModel::class, 'Project_Id', 'Id_Project');
+        return $this->hasMany(ProjectHasIndicatorsModel::class, 'Indicators_Id', 'Id_Indicators');
     }
 }

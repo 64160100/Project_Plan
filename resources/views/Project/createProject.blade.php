@@ -457,17 +457,17 @@
                 <div class="content-box">
                     <div class="section-header">
                         <h4>
-                            14. ขั้นตอนและแผนการดำเนินงาน
+                            14. ขั้นตอนและแผนการดำเนินงาน (PDCA)
                             <i class='bx bx-chevron-up' id="toggleIconPlan" style="cursor: pointer; font-size: 1.5em;"
                                 onclick="togglePlanDetails()"></i>
                         </h4>
                     </div>
                     <div id="planDetails" style="display: none;">
                         <div class="form-group-radio mb-4">
-                            <input type="radio" name="planType" value="1" id="shortTermProject" checked>
+                            <input type="radio" name="Project_Type" value="S" id="shortTermProject" checked>
                             <label for="shortTermProject">โครงการระยะสั้น</label>
                             &nbsp;&nbsp;
-                            <input type="radio" name="planType" value="2" id="longTermProject">
+                            <input type="radio" name="Project_Type" value="L" id="longTermProject">
                             <label for="longTermProject">โครงการระยะยาว</label>
                         </div>
 
@@ -505,19 +505,16 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach(['Plan' => 'ขั้นวางแผนงาน',
-                                    'Do' => 'ขั้นดำเนินการ',
-                                    'Check' => 'ขั้นสรุปและประเมินผล',
-                                    'Act' => 'ขั้นปรับปรุงตามผลการประเมิน'] as $key => $step)
+                                    @foreach($pdcaStages as $stage)
                                     <tr>
                                         <td class="PDCA">
-                                            <div class="plan-text">{{ $step }}({{ $key }})</div>
+                                            <div class="plan-text">{{ $stage->Details_PDCA }}</div>
                                             <textarea class="plan-textarea auto-expand"
-                                                name="pdca_{{ strtolower($key) }}"
+                                                name="pdca[{{ $stage->Id_PDCA_Stages }}][detail]"
                                                 placeholder="เพิ่มรายละเอียด"></textarea>
                                         </td>
                                         @for($i = 1; $i <= 12; $i++) <td class="checkbox-container">
-                                            <input type="checkbox" name="pdca_{{ strtolower($key) }}_month[]"
+                                            <input type="checkbox" name="pdca[{{ $stage->Id_PDCA_Stages }}][months][]"
                                                 value="{{ $i }}">
                                             </td>
                                             @endfor
@@ -1245,6 +1242,20 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleIcon.classList.remove('bx-chevron-down');
             toggleIcon.classList.add('bx-chevron-up');
         }
+    };
+
+    const today = new Date().toISOString().split('T')[0];
+    const startDateInput = document.getElementById('First_Time');
+    const endDateInput = document.getElementById('End_Time');
+
+    startDateInput.setAttribute('min', today);
+
+    startDateInput.addEventListener('change', function() {
+        endDateInput.setAttribute('min', this.value);
+    });
+
+    if (startDateInput.value) {
+        endDateInput.setAttribute('min', startDateInput.value);
     }
 
     // ============ ขั้นตอนและแผนการดำเนินงาน ============

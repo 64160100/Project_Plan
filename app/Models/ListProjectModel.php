@@ -17,6 +17,7 @@ class ListProjectModel extends Model
         'Employee_Id',
         'Objective_Project',
         'Principles_Reasons',
+        'Project_Type',
         'First_Time',
         'End_Time',
         'Count_Steps',
@@ -83,4 +84,18 @@ class ListProjectModel extends Model
         return $this->hasMany(TargetModel::class, 'Project_Id', 'Id_Project');
     }
 
+    public function locations()
+    {
+        return $this->hasMany(LocationModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function projectHasIndicators()
+    {
+        return $this->hasMany(ProjectHasIndicatorsModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function pdca()
+    {
+        return $this->hasMany(PdcaDetailsModel::class, 'Project_Id', 'Id_Project');
+    }
 }

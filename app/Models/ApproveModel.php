@@ -18,7 +18,7 @@ class ApproveModel extends Model
 
     public function project()
     {
-        return $this->belongsTo(ProjectModel::class, 'Project_Id', 'Id_Project');
+        return $this->belongsTo(ListProjectModel::class, 'Project_Id', 'Id_Project');
     }
 
     public function recordHistory()

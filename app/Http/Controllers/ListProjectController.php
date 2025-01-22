@@ -22,6 +22,13 @@ use App\Models\ProjectHasSDGModel;
 use App\Models\ProjectHasIntegrationCategoryModel;
 use App\Models\TargetModel;
 use App\Models\TargetDetailsModel;
+use App\Models\LocationModel;
+use App\Models\IndicatorsModel;
+use App\Models\ProjectHasIndicatorsModel;
+use App\Models\MonthsModel;
+use App\Models\PdcaModel;
+use App\Models\PdcaDetailsModel;
+use App\Models\MonthlyPlansModel;
 use Carbon\Carbon;
 
 class ListProjectController extends Controller
@@ -43,16 +50,35 @@ class ListProjectController extends Controller
             'platforms.programs.kpis',
             'sdgs',
             'projectHasIntegrationCategories',
-            'targets.targetDetails'
+            'targets.targetDetails',
+            'locations',
+            'projectHasIndicators'
         ])->findOrFail($projectId);
 
         $strategics = StrategicModel::with(['strategies'])->findOrFail($project->Strategic_Id);
         $strategies = $strategics->strategies;
         $employees = EmployeeModel::all();
 
-        Log::info('Project data: ', $project->toArray());
+        $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
+        $pdcaStages = PdcaModel::all();
+        $pdcaDetails = PdcaDetailsModel::where('Project_Id', $projectId)->get();
+        $monthlyPlans = MonthlyPlansModel::where('Project_id', $projectId)->get();
 
-        return view('Project.viewProject', compact('project', 'strategics', 'strategies', 'employees'));
+        $formatDateToThai = function($date) use ($months) {
+            if (!$date) {
+                return '-';
+            }
+            $year = date('Y', strtotime($date)) + 543;
+            $monthKey = date('m', strtotime($date));
+            $month = $months[$monthKey] ?? null; // Use null coalescing operator to handle undefined keys
+            $day = date('d', strtotime($date));
+            return $month ? "วันที่ $day $month พ.ศ. $year" : "วันที่ $day พ.ศ. $year"; // Handle case where month is null
+        };
+        
+        $firstTime = $formatDateToThai($project->First_Time ?? null);
+        $endTime = $formatDateToThai($project->End_Time ?? null);
+
+        return view('Project.viewProject', compact('project', 'strategics', 'strategies', 'employees', 'firstTime', 'endTime', 'months', 'pdcaStages', 'pdcaDetails', 'monthlyPlans'));
     }
 
     public function showCreateForm($Strategic_Id)
@@ -64,16 +90,17 @@ class ListProjectController extends Controller
         $sdgs = SDGsModel::all();
         $nameStrategicPlan = $strategics->Name_Strategic_Plan;
         $integrationCategories = IntegrationModel::orderBy('Id_Integration_Category', 'asc')->get();
-        $months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+        $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
+        $pdcaStages = PdcaModel::all();
     
-        return view('Project.createProject', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months'));
+        return view('Project.createProject', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages'));
     }
 
     public function createProject(Request $request, $Strategic_Id)
     {
         $strategics = StrategicModel::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
         $strategies = $strategics->strategies;
-
+    
         $project = new ListProjectModel;
         $project->Strategic_Id = $Strategic_Id;
         $project->Name_Strategy = $request->Name_Strategy ?? null;
@@ -81,23 +108,24 @@ class ListProjectController extends Controller
         $project->Employee_Id = $request->employee_id ?? null;
         $project->Objective_Project = $request->Objective_Project ?? null;
         $project->Principles_Reasons = $request->Principles_Reasons ?? null;
+        $project->Project_type = $request->Project_Type ?? null;
         $project->First_Time = $request->First_Time ?? null;
         $project->End_Time = $request->End_Time ?? null;
         $project->save();
-        
+    
         if ($project->Id_Project) {
             $approval = new ApproveModel;
             $approval->Status = 'I';
             $approval->Project_Id = $project->Id_Project;
             $approval->save();
             Log::info('Approval record created for project ID: ' . $project->Id_Project);
-
+    
             $budget = new BudgetModel;
             $budget->Status_Budget = $request->Status_Budget ?? null;
             $budget->Project_Id = $project->Id_Project;
             $budget->save();
             Log::info('Budget record created for project ID: ' . $project->Id_Project);
-
+    
             if ($request->has('Name_Sup_Project')) {
                 foreach ($request->Name_Sup_Project as $supProjectName) {
                     $supProject = new SupProjectModel;
@@ -107,7 +135,7 @@ class ListProjectController extends Controller
                     Log::info('Sub-project created with name: ' . $supProjectName);
                 }
             }
-
+    
             if ($request->has('platforms')) {
                 foreach ($request->platforms as $platformData) {
                     if (!empty($platformData['name'])) {
@@ -116,14 +144,14 @@ class ListProjectController extends Controller
                         $platform->Project_Id = $project->Id_Project;
                         $platform->save();
                         Log::info('Platform created with name: ' . $platformData['name']);
-
+    
                         if (!empty($platformData['program'])) {
                             $program = new ProgramModel;
                             $program->Name_Program = $platformData['program'];
                             $program->Platform_Id = $platform->Id_Platform;
                             $program->save();
                             Log::info('Program created with name: ' . $platformData['program']);
-
+    
                             if (isset($platformData['kpis']) && is_array($platformData['kpis'])) {
                                 foreach ($platformData['kpis'] as $kpiName) {
                                     if (!empty($kpiName)) {
@@ -139,17 +167,17 @@ class ListProjectController extends Controller
                     }
                 }
             }
-
+    
             if ($request->has('sdgs')) {
                 foreach ($request->sdgs as $sdgId) {
                     $projectSdg = new ProjectHasSDGModel;
                     $projectSdg->Project_Id = $project->Id_Project;
-                    $projectSdg->SDGs_Id = $sdgId;    
+                    $projectSdg->SDGs_Id = $sdgId;
                     $projectSdg->save();
                     Log::info('Project SDG created with SDG ID: ' . $sdgId);
                 }
             }
-
+    
             if ($request->has('integrationCategories')) {
                 foreach ($request->integrationCategories as $categoryId => $categoryData) {
                     if (isset($categoryData['checked'])) {
@@ -163,11 +191,11 @@ class ListProjectController extends Controller
                     }
                 }
             }
-
+    
             if ($request->has('target_group')) {
                 log::info('Target group: ', $request->target_group);
                 $latestTargetId = null;
-            
+    
                 foreach ($request->target_group as $index => $targetGroupName) {
                     $target = new TargetModel;
                     $target->Name_Target = $targetGroupName;
@@ -176,22 +204,101 @@ class ListProjectController extends Controller
                     $target->Project_Id = $project->Id_Project;
                     $target->save();
                     Log::info('Target created with name: ' . $targetGroupName);
-            
+    
                     $latestTargetId = $target->Id_Target_Project;
                 }
-            
+    
                 if ($latestTargetId && $request->has('target_details')) {
                     $targetDetails = new TargetDetailsModel;
-                    $targetDetails->Details_Target = $request->target_details; 
+                    if (is_array($request->target_details)) {
+                        $targetDetails->Details_Target = implode(' ', $request->target_details);
+                    } else {
+                        $targetDetails->Details_Target = $request->target_details;
+                    }
                     $targetDetails->Target_Project_Id = $latestTargetId;
                     $targetDetails->save();
                     Log::info('Target details created for target ID: ' . $latestTargetId);
                 }
             }
+    
+            if ($request->has('location')) {
+                foreach ($request->location as $locationName) {
+                    if (!empty($locationName)) {
+                        $location = new LocationModel;
+                        $location->Name_Location = $locationName;
+                        $location->Project_Id = $project->Id_Project;
+                        $location->save();
+                        Log::info('Location created with name: ' . $locationName);
+                    }
+                }
+            }
+    
+            if ($request->has('goal')) {
+                foreach ($request->goal as $goalType) {
+                    if ($goalType == '1' && $request->has('quantitative')) {
+                        foreach ($request->quantitative as $quantitativeDetail) {
+                            $indicator = new IndicatorsModel;
+                            $indicator->Type_Indicators = 'Quantitative';
+                            $indicator->save();
+    
+                            $projectIndicator = new ProjectHasIndicatorsModel;
+                            $projectIndicator->Project_Id = $project->Id_Project;
+                            $projectIndicator->Indicators_Id = $indicator->Id_Indicators;
+                            $projectIndicator->Details_Indicators = $quantitativeDetail;
+                            $projectIndicator->save();
+                            Log::info('Quantitative indicator created with detail: ' . $quantitativeDetail);
+                        }
+                    }
+    
+                    if ($goalType == '2' && $request->has('qualitative')) {
+                        foreach ($request->qualitative as $qualitativeDetail) {
+                            $indicator = new IndicatorsModel;
+                            $indicator->Type_Indicators = 'Qualitative';
+                            $indicator->save();
+    
+                            $projectIndicator = new ProjectHasIndicatorsModel;
+                            $projectIndicator->Project_Id = $project->Id_Project;
+                            $projectIndicator->Indicators_Id = $indicator->Id_Indicators;
+                            $projectIndicator->Details_Indicators = $qualitativeDetail;
+                            $projectIndicator->save();
+                            Log::info('Qualitative indicator created with detail: ' . $qualitativeDetail);
+                        }
+                    }
+                }
+            }
+    
+            if ($request->has('pdca')) {
+                foreach ($request->pdca as $stageId => $details) {
+                    $pdcaDetail = new PdcaDetailsModel;
+                    $pdcaDetail->PDCA_Stages_Id = $stageId;
+                    $pdcaDetail->Details_PDCA = $details['detail'];
+                    $pdcaDetail->Project_Id = $project->Id_Project;
+                    $pdcaDetail->save();
+                    Log::info('PDCA stage created with ID: ' . $stageId);
+    
+                    if (isset($details['months']) && is_array($details['months'])) {
+                        foreach ($details['months'] as $month) {
+                            $monthlyPlan = new MonthlyPlansModel;
+                            $monthlyPlan->Project_id = $project->Id_Project;
+                            $monthlyPlan->Months_id = $month;
+                            $monthlyPlan->PDCA_Stages_Id = $stageId;
+    
+                            // Calculate the fiscal year based on the month
+                            $currentYear = date('Y');
+                            $fiscalYearStartMonth = 10; // Example: Fiscal year starts in October
+                            $fiscalYear = ($month >= $fiscalYearStartMonth) ? $currentYear + 1 : $currentYear;
+    
+                            $monthlyPlan->Fiscal_year = $fiscalYear;
+                            $monthlyPlan->save();
+                            Log::info('PDCA stage month saved: ' . $month . ' for fiscal year: ' . $fiscalYear);
+                        }
+                    }
+                }
+            }
         } else {
             Log::error('Failed to create project.');
         }
-
+    
         return redirect()->route('project', ['Strategic_Id' => $Strategic_Id])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
     }
     
@@ -466,20 +573,20 @@ class ListProjectController extends Controller
     public function submitForApproval(Request $request, $id)
     {
         $project = ListProjectModel::find($id);
-
+    
         if ($project) {
             $approval = ApproveModel::where('Project_Id', $project->Id_Project)->first();
-
+    
             if ($approval) {
                 $approval->Status = 'Y';
                 $approval->save();
-
+    
                 $employee = $request->session()->get('employee');
                 $permissions = $employee ? $employee->permissions : collect();
-
+    
                 $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
                 $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
-
+    
                 RecordHistory::create([
                     'Approve_Id' => $approval->Id_Approve,
                     'Approve_Project_Id' => $approval->Project_Id,
@@ -489,7 +596,7 @@ class ListProjectController extends Controller
                     'Name_Record' => $nameResponsible,
                     'Permission_Record' => $permissionName,
                 ]);
-
+    
                 if ($project->Count_Steps == 2) {
                     $budget = BudgetModel::where('Project_Id', $project->Id_Project)->first();
                     if ($budget && $budget->Status_Budget == 'N') {
@@ -539,20 +646,20 @@ class ListProjectController extends Controller
                             break;
                     }
                 }
-
+    
                 $project->save();
-
-                if ($project->Count_Steps <= 11) {
+    
+                if ($project->Count_Steps <= 9 || $project->Count_Steps == 11) {
                     $approval->Status = 'I';
                     $approval->save();
                 }
-
+    
                 return redirect()->route('proposeProject')->with('success', 'Project submitted for approval.');
             } else {
                 return redirect()->route('proposeProject')->with('error', 'Approval record not found.');
             }
         }
-
+    
         return redirect()->route('proposeProject')->with('error', 'Project not found.');
     }
 

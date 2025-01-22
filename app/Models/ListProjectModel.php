@@ -12,9 +12,14 @@ class ListProjectModel extends Model
     protected $keyType = 'int';
     protected $fillable = [
         'Strategic_Id',
+        'Name_Strategy',
         'Name_Project',
+        'Employee_Id',
+        'Objective_Project',
+        'Principles_Reasons',
+        'First_Time',
+        'End_Time',
         'Count_Steps',
-        'Employee_Id'
     ];
     public $timestamps = false;
 
@@ -33,7 +38,7 @@ class ListProjectModel extends Model
         return $this->hasMany(ApproveModel::class, 'Project_Id', 'Id_Project');
     }
 
-    public function supProjects()
+    public function subProjects()
     {
         return $this->hasMany(SupProjectModel::class, 'Project_Id', 'Id_Project');
     }
@@ -47,4 +52,35 @@ class ListProjectModel extends Model
     {
         return $this->hasMany(StorageFileModel::class, 'Project_Id', 'Id_Project');
     }
+
+    public function sdgs()
+    {
+        return $this->belongsToMany(SDGsModel::class, 'Project_has_SDGs', 'Project_Id', 'SDGs_Id');
+    }
+
+    public function indicators()
+    {
+        return $this->hasMany(IndicatorsModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function platforms()
+    {
+        return $this->hasMany(PlatformModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function projectHasSDGs()
+    {
+        return $this->hasMany(ProjectHasSDGModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function projectHasIntegrationCategories()
+    {
+        return $this->hasMany(ProjectHasIntegrationCategoryModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function targets()
+    {
+        return $this->hasMany(TargetModel::class, 'Project_Id', 'Id_Project');
+    }
+
 }

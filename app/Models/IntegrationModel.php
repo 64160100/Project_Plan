@@ -15,4 +15,9 @@ class IntegrationModel extends Model
     protected $fillable = [
         'Name_Integration_Category'
     ];
+
+    public function projectHasIntegrationCategories()
+    {
+        return $this->hasMany(ProjectHasIntegrationCategoryModel::class, 'Integration_Category_Id', 'Id_Integration_Category');
+    }
 }

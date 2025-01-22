@@ -27,8 +27,7 @@ Route::put('/editProject/{Id_Project}', [ListProjectController::class, 'updatePr
 Route::get('/project/{id}/edit', [ListProjectController::class, 'edit'])->name('projects.edit');
 Route::put('/project/{id}', [ListProjectController::class, 'update'])->name('projects.update');
 
-
-Route::get('/project/{id}/details', [ListProjectController::class, 'viewProjectDetails'])->name('project.details');
+Route::get('/project/{Id_Project}', [ProjectController::class, 'viewProject'])->name('viewProject');
 
 //แสดงหน้า Strategic
 Route::get('/viewProjectInStrategic/{Id_Strategic}', [ListProjectController::class, 'viewProjectInStrategic'])->name('viewProjectInStrategic');

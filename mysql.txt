@@ -40,9 +40,9 @@ INSERT INTO `Strategy` (`Id_Strategy`, `Strategic_Id`, `Name_Strategy`) VALUES
 (6, 2, 'กลยุทธ์ที่ 2.2 สนับสนุนและส่งเสริมการใช้ทรัพยากรสารสนเทศและนิเวศน์การเรียนรู้'),
 (7, 2, 'กลยุทธ์ที่ 2.3  พัฒนานิเวศการเรียนรู้สำหรับพลเมืองดิจิทัล');
 
-INSERT INTO `Project` (`Id_Project`, `Strategic_Id`, `Name_Strategy`, `Name_Project`, `Objective_Project`, `Indicators_Project`, `Target_Project`, `First_Time`, `End_Time`, `Count_Steps`, `Employee_Id`) VALUES
-(14, 1, NULL, 'ระบบป้องกัน', NULL, NULL, NULL, '2025-01-15', '2025-01-16', 4, 4),
-(15, 2, NULL, 'ระบบการเงิน', NULL, NULL, NULL, '2025-01-16', '2025-01-17', 0, NULL);
+INSERT INTO `Project` (`Id_Project`, `Strategic_Id`, `Name_Strategy`, `Name_Project`, `Objective_Project`, `First_Time`, `End_Time`, `Count_Steps`, `Employee_Id`) VALUES
+(14, 1, NULL, 'ระบบป้องกัน', NULL, '2025-01-15', '2025-01-16', 4, 4),
+(15, 2, NULL, 'ระบบการเงิน', NULL, '2025-01-16', '2025-01-17', 0, NULL);
 
 INSERT INTO `Approve` (`Id_Approve`, `Status`, `Project_Id`) VALUES
 (4, 'I', 14),
@@ -64,7 +64,7 @@ INSERT INTO `Storage_File` (`Id_Storage_File`, `Name_Storage_File`, `Path_Storag
 (7, '1736991819_project-table (1).pdf', 'uploads/project_15/1736991819_project-table (1).pdf', 'application/pdf', 1493973, 15),
 (8, '1736992353_Bunyakorn Kanpratoop - ร่างขอบเขตและวิเคราะห์ความเป็นไปได้.pdf', 'uploads/project_14/1736992353_Bunyakorn Kanpratoop - ร่างขอบเขตและวิเคราะห์ความเป็นไปได้.pdf', 'application/pdf', 102173, 14);
 
-INSERT INTO `Sustainable_Development_Goals` (`id_SDGs`, `Name_SDGs`) VALUES
+INSERT INTO `SDGs` (`id_SDGs`, `Name_SDGs`) VALUES
 (1, 'SDG1 ขจัดความยากจน'),
 (2, 'SDG2 ขจัดความหิวโหยและความอดอยาก'),
 (3, 'SDG3 มีคุณภาพและความเป็นอยู่ที่ดี'),
@@ -83,6 +83,11 @@ INSERT INTO `Sustainable_Development_Goals` (`id_SDGs`, `Name_SDGs`) VALUES
 (16, 'SDG16 สังคมสงบสุข ยุติธรรม ไม่แบ่งแยก'),
 (17, 'SDG17 ความร่วมมือเพื่อการพัฒนาที่ยั่งยืน');
 
+INSERT INTO `Integration_Category` (`Id_Integration_Category`, `Name_Integration_Category`) VALUES
+(1, 'การบริการสารสนเทศ'),
+(2, 'การวิจัย (ระบุโครงการวิจัย)'),
+(3, 'การบริการการวิชาการ (ระบุ โครงการบริการวิชาการ)'),
+(4, 'ทำนุบำรุงศิลปวัฒนธรรม (ระบุโครงการทำนุบำรุงศิลปวัฒนธรรม)');
 
 
 

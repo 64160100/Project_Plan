@@ -11,10 +11,17 @@ use App\Models\StrategyModel;
 use App\Models\ApproveModel;
 use App\Models\EmployeeModel;
 use App\Models\RecordHistory;
-use App\Models\SustainableDevelopmentGoalsModel;
+use App\Models\SDGsModel;
 use App\Models\BudgetModel;
 use App\Models\IntegrationModel;
 use App\Models\SupProjectModel;
+use App\Models\PlatformModel;
+use App\Models\ProgramModel;
+use App\Models\Kpi_ProgramModel;
+use App\Models\ProjectHasSDGModel;
+use App\Models\ProjectHasIntegrationCategoryModel;
+use App\Models\TargetModel;
+use App\Models\TargetDetailsModel;
 use Carbon\Carbon;
 
 class ListProjectController extends Controller
@@ -29,13 +36,32 @@ class ListProjectController extends Controller
         return view('Project.listProject', compact('strategics')); 
     }
 
+    public function viewProject($projectId)
+    {
+        $project = ListProjectModel::with([
+            'subProjects',
+            'platforms.programs.kpis',
+            'sdgs',
+            'projectHasIntegrationCategories',
+            'targets.targetDetails'
+        ])->findOrFail($projectId);
+
+        $strategics = StrategicModel::with(['strategies'])->findOrFail($project->Strategic_Id);
+        $strategies = $strategics->strategies;
+        $employees = EmployeeModel::all();
+
+        Log::info('Project data: ', $project->toArray());
+
+        return view('Project.viewProject', compact('project', 'strategics', 'strategies', 'employees'));
+    }
+
     public function showCreateForm($Strategic_Id)
     {
         $strategics = StrategicModel::with(['strategies', 'projects'])->find($Strategic_Id);
         $strategies = $strategics->strategies;
         $projects = $strategics->projects; 
         $employees = EmployeeModel::all();
-        $sdgs = SustainableDevelopmentGoalsModel::all();
+        $sdgs = SDGsModel::all();
         $nameStrategicPlan = $strategics->Name_Strategic_Plan;
         $integrationCategories = IntegrationModel::orderBy('Id_Integration_Category', 'asc')->get();
         $months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
@@ -47,32 +73,31 @@ class ListProjectController extends Controller
     {
         $strategics = StrategicModel::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
         $strategies = $strategics->strategies;
-    
+
         $project = new ListProjectModel;
         $project->Strategic_Id = $Strategic_Id;
+        $project->Name_Strategy = $request->Name_Strategy ?? null;
         $project->Name_Project = $request->Name_Project;
         $project->Employee_Id = $request->employee_id ?? null;
         $project->Objective_Project = $request->Objective_Project ?? null;
-        $project->Indicators_Project = $request->Indicators_Project ?? null;
-        $project->Target_Project = $request->Target_Project ?? null;
+        $project->Principles_Reasons = $request->Principles_Reasons ?? null;
         $project->First_Time = $request->First_Time ?? null;
         $project->End_Time = $request->End_Time ?? null;
         $project->save();
-    
+        
         if ($project->Id_Project) {
             $approval = new ApproveModel;
             $approval->Status = 'I';
             $approval->Project_Id = $project->Id_Project;
             $approval->save();
             Log::info('Approval record created for project ID: ' . $project->Id_Project);
-    
+
             $budget = new BudgetModel;
             $budget->Status_Budget = $request->Status_Budget ?? null;
             $budget->Project_Id = $project->Id_Project;
             $budget->save();
             Log::info('Budget record created for project ID: ' . $project->Id_Project);
-    
-            // Save sub-projects
+
             if ($request->has('Name_Sup_Project')) {
                 foreach ($request->Name_Sup_Project as $supProjectName) {
                     $supProject = new SupProjectModel;
@@ -82,10 +107,91 @@ class ListProjectController extends Controller
                     Log::info('Sub-project created with name: ' . $supProjectName);
                 }
             }
+
+            if ($request->has('platforms')) {
+                foreach ($request->platforms as $platformData) {
+                    if (!empty($platformData['name'])) {
+                        $platform = new PlatformModel;
+                        $platform->Name_Platform = $platformData['name'];
+                        $platform->Project_Id = $project->Id_Project;
+                        $platform->save();
+                        Log::info('Platform created with name: ' . $platformData['name']);
+
+                        if (!empty($platformData['program'])) {
+                            $program = new ProgramModel;
+                            $program->Name_Program = $platformData['program'];
+                            $program->Platform_Id = $platform->Id_Platform;
+                            $program->save();
+                            Log::info('Program created with name: ' . $platformData['program']);
+
+                            if (isset($platformData['kpis']) && is_array($platformData['kpis'])) {
+                                foreach ($platformData['kpis'] as $kpiName) {
+                                    if (!empty($kpiName)) {
+                                        $kpi = new Kpi_ProgramModel;
+                                        $kpi->Name_KPI = $kpiName;
+                                        $kpi->Program_Id = $program->Id_Program;
+                                        $kpi->save();
+                                        Log::info('KPI created with name: ' . $kpiName);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($request->has('sdgs')) {
+                foreach ($request->sdgs as $sdgId) {
+                    $projectSdg = new ProjectHasSDGModel;
+                    $projectSdg->Project_Id = $project->Id_Project;
+                    $projectSdg->SDGs_Id = $sdgId;    
+                    $projectSdg->save();
+                    Log::info('Project SDG created with SDG ID: ' . $sdgId);
+                }
+            }
+
+            if ($request->has('integrationCategories')) {
+                foreach ($request->integrationCategories as $categoryId => $categoryData) {
+                    if (isset($categoryData['checked'])) {
+                        $additionalInfo = $categoryData['details'] ?? null;
+                        $projectIntegration = new ProjectHasIntegrationCategoryModel;
+                        $projectIntegration->Project_Id = $project->Id_Project;
+                        $projectIntegration->Integration_Category_Id = $categoryId;
+                        $projectIntegration->Integration_Details = $additionalInfo;
+                        $projectIntegration->save();
+                        Log::info('Project Integration Category created with category ID: ' . $categoryId);
+                    }
+                }
+            }
+
+            if ($request->has('target_group')) {
+                log::info('Target group: ', $request->target_group);
+                $latestTargetId = null;
+            
+                foreach ($request->target_group as $index => $targetGroupName) {
+                    $target = new TargetModel;
+                    $target->Name_Target = $targetGroupName;
+                    $target->Quantity_Target = $request->target_count[$index];
+                    $target->Unit_Target = $request->target_unit[$index];
+                    $target->Project_Id = $project->Id_Project;
+                    $target->save();
+                    Log::info('Target created with name: ' . $targetGroupName);
+            
+                    $latestTargetId = $target->Id_Target_Project;
+                }
+            
+                if ($latestTargetId && $request->has('target_details')) {
+                    $targetDetails = new TargetDetailsModel;
+                    $targetDetails->Details_Target = $request->target_details; 
+                    $targetDetails->Target_Project_Id = $latestTargetId;
+                    $targetDetails->save();
+                    Log::info('Target details created for target ID: ' . $latestTargetId);
+                }
+            }
         } else {
             Log::error('Failed to create project.');
         }
-    
+
         return redirect()->route('project', ['Strategic_Id' => $Strategic_Id])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
     }
     

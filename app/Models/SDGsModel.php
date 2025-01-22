@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SustainableDevelopmentGoalsModel extends Model
+class SDGsModel extends Model
 {
     protected $connection = 'mydb';
-    protected $table = 'Sustainable_Development_Goals';
+    protected $table = 'SDGs';
     protected $primaryKey = 'id_SDGs';
-    // protected $keyType = 'int';
+    protected $keyType = 'int';
 
     protected $fillable = [
         'Name_SDGs',
@@ -18,6 +18,6 @@ class SustainableDevelopmentGoalsModel extends Model
 
     public function projects()
     {
-        return $this->belongsToMany(Project::class, 'Project_has_Sustainable_Development_Goals', 'SDGs_Id', 'Project_Id');
+        return $this->belongsToMany(ListProjectModel::class, 'Project_has_SDGs', 'SDGs_Id', 'Project_Id');
     }
 }

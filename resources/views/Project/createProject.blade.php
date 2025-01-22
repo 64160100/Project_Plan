@@ -1,385 +1,7 @@
 @extends('navbar.app')
 
 <hade>
-    @push('styles')
-    <style>
-    /* General Styles */
-    .content-box {
-        background-color: #fff;
-        border-radius: 0.5rem;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .section-header {
-        margin-bottom: 1.5rem;
-    }
-
-    .section-header h4 {
-        color: #2c3e50;
-        font-size: 1.25rem;
-        margin-bottom: 0.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #eee;
-    }
-
-    /* Form Elements */
-    .form-group {
-        margin-bottom: 1rem;
-    }
-
-    .form-control,
-    .form-select {
-        border: 1px solid #dce4ec;
-        border-radius: 0.375rem;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #3498db;
-        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-    }
-
-    /* Radio & Checkbox Styles */
-    .form-group-radio {
-        margin-bottom: 1rem;
-    }
-
-    .radio-group label {
-        margin-right: 1.5rem;
-    }
-
-    /* Dynamic Containers */
-    .dynamic-container {
-        margin-bottom: 1rem;
-    }
-
-    .dynamic-container .form-group {
-        position: relative;
-        padding-right: 3rem;
-    }
-
-    /* Buttons */
-    .btn-addlist {
-        color: #3498db;
-        background-color: transparent;
-        border: 1px solid #3498db;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        display: inline-flex;
-        align-items: center;
-        transition: all 0.2s;
-    }
-
-    .btn-addlist:hover {
-        color: #fff;
-        background-color: #3498db;
-    }
-
-    .btn-addlist i {
-        margin-right: 0.5rem;
-    }
-
-    .btn-remove {
-        color: #e74c3c;
-        background: transparent;
-        border: none;
-        padding: 0.25rem 0.5rem;
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-
-    /* Table Styles */
-    .table-PDCA {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 1rem;
-    }
-
-    .table-PDCA th,
-    .table-PDCA td {
-        border: 1px solid #dce4ec;
-        padding: 0.75rem;
-        text-align: center;
-    }
-
-    .table-PDCA th {
-        background-color: #f8f9fa;
-        font-weight: 500;
-    }
-
-    .PDCA {
-        text-align: left !important;
-    }
-
-    .plan-textarea {
-        width: 100%;
-        min-height: 60px;
-        resize: vertical;
-    }
-
-    .platform-card {
-        margin-bottom: 20px;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        background-color: #fff;
-    }
-
-    .card-header {
-        margin-bottom: 15px;
-    }
-
-    .card-title {
-        font-size: 1.25rem;
-        font-weight: bold;
-    }
-
-    .form-group {
-        margin-bottom: 15px;
-    }
-
-    .kpi-container {
-        margin-top: 15px;
-    }
-
-    .kpi-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .kpi-group {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .kpi-group .input-group {
-        display: flex;
-        align-items: center;
-        width: 100%;
-    }
-
-    .kpi-group .input-group input {
-        flex: 1;
-        margin-right: 10px;
-    }
-
-    .btn-add,
-    .btn-remove {
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 3px;
-        cursor: pointer;
-    }
-
-    .btn-add:hover,
-    .btn-remove:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-remove {
-        background-color: #dc3545;
-    }
-
-    .btn-remove:hover {
-        background-color: #c82333;
-    }
-
-    /* Add this CSS to your stylesheet */
-    .option-item {
-        padding: 10px;
-        display: flex;
-        align-items: center;
-        border-bottom: 1px solid #ddd;
-    }
-
-    .option-item:last-child {
-        border-bottom: none;
-    }
-
-    .option-item label {
-        display: flex;
-        align-items: center;
-        width: 100%;
-    }
-
-    .option-item input[type="checkbox"] {
-        margin-right: 10px;
-    }
-
-    .additional-info {
-        margin-top: 0;
-        border: 1px solidrgb(117, 117, 117);
-        border-radius: 5px;
-        padding: 5px 10px;
-        transition: border-color 0.3s;
-    }
-
-    /* Add this CSS to your stylesheet */
-    .section-header h4 {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    #toggleIcon {
-        cursor: pointer;
-        font-size: 1.5em;
-    }
-
-    #toggleIcon.bx-chevron-down {
-        transform: rotate(0deg);
-    }
-
-    .toggle-content {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.5s ease-out;
-    }
-
-    .toggle-content.show {
-        max-height: 1000px;
-    }
-
-    /* Add this CSS to your stylesheet */
-    #targetAreaDetails .form-group {
-        margin-bottom: 15px;
-    }
-
-    #targetAreaDetails .form-group label {
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    #targetAreaDetails .form-control {
-        border: 1px solidrgb(255, 255, 255);
-        border-radius: 5px;
-        padding: 10px;
-        transition: border-color 0.3s;
-    }
-
-    #targetAreaDetails .form-control:focus {
-        border-color: #0056b3;
-        outline: none;
-    }
-
-    .form-row {
-        display: flex;
-        flex-wrap: wrap;
-        margin-right: -15px;
-        margin-left: -15px;
-    }
-
-    .form-group {
-        padding-right: 15px;
-        padding-left: 15px;
-    }
-
-    /* Add this CSS to your stylesheet */
-    #locationDetails {
-        margin-top: 20px;
-    }
-
-    #locationContainer .form-group {
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-
-    #locationContainer .form-group textarea {
-        flex: 1;
-        border: 1px solid #007bff;
-        border-radius: 5px;
-        padding: 10px;
-        transition: border-color 0.3s;
-    }
-
-    #locationContainer .form-group textarea:focus {
-        border-color: #0056b3;
-        outline: none;
-    }
-
-    #locationContainer .form-group .btn-danger {
-        margin-left: 10px;
-        display: inline-block;
-    }
-
-    /* Add this CSS to your stylesheet */
-    .small-input {
-        width: 50%;
-        border: 1px solid #007bff;
-        border-radius: 5px;
-        padding: 5px;
-        transition: border-color 0.3s;
-    }
-
-    .small-input:focus {
-        border-color: #0056b3;
-        outline: none;
-    }
-
-    .btn-addlist {
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
-
-    .btn-addlist:hover {
-        background-color: #0056b3;
-    }
-
-    /* Add this CSS to your stylesheet */
-    .form-group-radio {
-        margin-bottom: 20px;
-    }
-
-    .radio-group {
-        display: flex;
-        align-items: center;
-    }
-
-    .radio-group input[type="checkbox"] {
-        margin-right: 10px;
-    }
-
-    .goal-inputs {
-        margin-top: 20px;
-    }
-
-    .goal-inputs h6 {
-        margin-bottom: 10px;
-    }
-
-    /* ขั้นตอน */
-    .hidden {
-        display: none;
-    }
-
-
-    /* Responsive Adjustments */
-    @media (max-width: 768px) {
-        .col-md-6 {
-            margin-bottom: 1rem;
-        }
-
-        .table-PDCA {
-            display: block;
-            overflow-x: auto;
-        }
-    }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/createProject.css') }}">
 </hade>
 
 @section('content')
@@ -478,7 +100,6 @@
                 </div>
 
                 <!-- ความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย -->
-                <!-- filepath: /home/aries/Project/Project_Plan/resources/views/Project/createProject.blade.php -->
                 <div class="content-box">
                     <div class="section-header">
                         <h4>
@@ -611,12 +232,15 @@
                                 @foreach ($integrationCategories as $category)
                                 <div class="option-item">
                                     <label>
-                                        <input type="checkbox" onchange="toggleSelectTextbox(this)">
+                                        <input type="checkbox"
+                                            name="integrationCategories[{{ $category->Id_Integration_Category }}][checked]"
+                                            onchange="toggleSelectTextbox(this)">
                                         {{ $category->Name_Integration_Category }}
                                     </label>
                                     @if ($category->Name_Integration_Category !== 'การบริการสารสนเทศ')
-                                    <input type="text" class="additional-info" placeholder="ระบุข้อมูลเพิ่มเติม"
-                                        disabled style="width: 100%;">
+                                    <input type="text" class="additional-info"
+                                        name="integrationCategories[{{ $category->Id_Integration_Category }}][details]"
+                                        placeholder="ระบุข้อมูลเพิ่มเติม" disabled style="width: 100%;">
                                     @endif
                                 </div>
                                 @endforeach
@@ -636,8 +260,11 @@
                     </div>
                     <div id="rationaleDetails" style="display: none;">
                         <div class="form-group">
-                            <textarea class="form-control" rows="15" name="rationale"
-                                placeholder="กรอกข้อมูล"></textarea>
+                            <textarea class="form-control @error('Principles_Reasons') is-invalid @enderror" rows="15"
+                                name="Principles_Reasons" placeholder="กรอกข้อมูล"></textarea>
+                            @error('Principles_Reasons')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -682,7 +309,8 @@
                                             placeholder="กรอกกลุ่มเป้าหมาย" required>
                                         <input type="number" name="target_count[]" class="form-control"
                                             placeholder="จำนวน" required>
-                                        <span class="input-group-text">คน</span>
+                                        <input type="text" name="target_unit[]" class="form-control" placeholder="หน่วย"
+                                            required>
                                         <button type="button" class="btn btn-danger btn-sm remove-target-group"
                                             style="display: none;">
                                             <i class='bx bx-trash'></i>
@@ -694,6 +322,7 @@
                         <button type="button" id="addTargetGroupBtn" class="btn-addlist">
                             <i class='bx bx-plus-circle'></i>เพิ่มกลุ่มเป้าหมาย
                         </button>
+
                         <div class="form-group mt-3">
                             <label>พื้นที่/ชุมชนเป้าหมาย (ถ้ามี ระบุ)</label>
                             <div class="form-check">
@@ -703,35 +332,10 @@
                                     for="targetAreaCheckbox">เลือกพื้นที่/ชุมชนเป้าหมาย</label>
                             </div>
                             <div id="targetAreaDetails" style="display: none;">
-                                <div class="form-row">
-                                    <div class="form-group col-md-6 mt-3">
-                                        <label>ชุมชน</label>
-                                        <input type="text" class="form-control" name="community"
-                                            placeholder="ระบุชุมชน">
-                                    </div>
-                                    <div class="form-group col-md-6 mt-3">
-                                        <label>หมู่บ้าน</label>
-                                        <input type="text" class="form-control" name="village"
-                                            placeholder="ระบุหมู่บ้าน">
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-6 mt-3">
-                                        <label>ตำบล</label>
-                                        <input type="text" class="form-control" name="subdistrict"
-                                            placeholder="ระบุตำบล">
-                                    </div>
-                                    <div class="form-group col-md-6 mt-3">
-                                        <label>อำเภอ</label>
-                                        <input type="text" class="form-control" name="district" placeholder="ระบุอำเภอ">
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-12 mt-3">
-                                        <label>จังหวัด</label>
-                                        <input type="text" class="form-control" name="province"
-                                            placeholder="ระบุจังหวัด">
-                                    </div>
+                                <div class="form-group mt-3">
+                                    <label>รายละเอียดกลุ่มเป้าหมาย</label>
+                                    <textarea class="form-control" name="target_details"
+                                        placeholder="กรอกรายละเอียด"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -1384,6 +988,8 @@ document.addEventListener('DOMContentLoaded', function() {
             textbox.disabled = !checkbox.checked;
             if (!textbox.disabled) {
                 textbox.focus();
+            } else {
+                textbox.value = '';
             }
         }
     }
@@ -1433,7 +1039,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="input-group">
                         <input type="text" class="form-control" name="target_group[]" placeholder="กรอกกลุ่มเป้าหมาย" required>
                         <input type="number" class="form-control" name="target_count[]" placeholder="จำนวน" required>
-                        <span class="input-group-text">คน</span>
+                        <input type="text" class="form-control" name="target_unit[]" placeholder="หน่วย" required>
                         <button type="button" class="btn btn-danger btn-sm remove-target-group">
                             <i class='bx bx-trash'></i>
                         </button>
@@ -1463,8 +1069,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const targetGroupDetails = document.getElementById('targetGroupDetails');
         const toggleIcon = document.getElementById('toggleIconTargetGroup');
 
-        if (targetGroupDetails.style.display === 'none' || targetGroupDetails.style.display ===
-            '') {
+        if (targetGroupDetails.style.display === 'none' || targetGroupDetails.style.display === '') {
             targetGroupDetails.style.display = 'block';
             toggleIcon.classList.remove('bx-chevron-up');
             toggleIcon.classList.add('bx-chevron-down');

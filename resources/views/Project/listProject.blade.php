@@ -8,7 +8,6 @@
     <title>Index</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{{ asset('css/listproject.css') }}">
-    </style>
 </head>
 
 <body>
@@ -18,11 +17,10 @@
         <h3 class="head-project">
             <b>รายการโครงการ ปีงบประมาณ พ.ศ. 2567</b>
         </h3>
-
     </div>
     <br>
 
-    @foreach ( $strategics as $Strategic )
+    @foreach ($strategics as $Strategic)
     <details class="accordion" id="{{ $Strategic->Id_Strategic }}">
         <summary class="accordion-btn">
             <b><a href="{{ route('viewProjectInStrategic', ['Id_Strategic' => $Strategic->Id_Strategic]) }}">
@@ -38,14 +36,19 @@
             <p>ไม่มีโครงการที่เกี่ยวข้อง</p>
             @else
             @foreach ($Strategic->projects as $Project)
-            <li><strong>{{ $Project->Name_Project }}</strong></li>
+            <li>
+                <strong>
+                    <a href="{{ route('viewProject', ['Id_Project' => $Project->Id_Project]) }}">
+                        {{ $Project->Name_Project }}
+                    </a>
+                </strong>
+            </li>
             @endforeach
             @endif
         </div>
     </details>
     @endforeach
     @endsection
-
 
 </body>
 

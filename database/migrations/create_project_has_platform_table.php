@@ -16,7 +16,7 @@ return new class extends Migration
             $table->primary(['Project_Id', 'Platform_Id']);
             
             // สร้าง Foreign Key
-            $table->foreign('Project_Id')->references('Id_Project')->on('Project')->onDelete('cascade');
+            $table->foreign('Project_Id')->references('Id_Project')->on('ListProjectModel')->onDelete('cascade');
             $table->foreign('Platform_Id')->references('Id_Platform')->on('Platform')->onDelete('cascade');
             
             $table->timestamps();

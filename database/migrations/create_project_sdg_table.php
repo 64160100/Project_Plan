@@ -16,7 +16,7 @@ return new class extends Migration
              $table->primary(['Project_Id', 'SDGs_Id']);
  
              // สร้าง Foreign Key
-             $table->foreign('Project_Id')->references('Id_Project')->on('Project')->onDelete('cascade');
+             $table->foreign('Project_Id')->references('Id_Project')->on('ListProjectModel')->onDelete('cascade');
              $table->foreign('SDGs_Id')->references('id_SDGs')->on('Sustainable_Development_Goals')->onDelete('cascade');
  
              $table->timestamps();

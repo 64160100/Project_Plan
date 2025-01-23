@@ -15,15 +15,16 @@
         <div class="content-box">
             <h4>โครงการล่าสุด</h4>
             <!-- link -->
-            <a href="#" class="project-status">
+            @foreach($lastestProject as $lastestproject)
+            <a href="{{ route('editProject', $lastestproject->Id_Project) }}" class="project-status mt-2">
                 <div class="project-group">
                     <div class="project-info">
                         <div class="status-icon">
                             <i class='bx bxs-circle'></i>
                         </div>
                         <div>
-                            <b>โครงการพัฒนาระบบติดตามแผนงาน</b>
-                            <div>ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้</div>
+                            <b>{{$lastestproject->Name_Project}}</b>
+                            <div>{{ $lastestproject->employee->department->Name_Department }}</div>
                         </div>
                     </div>
         
@@ -35,32 +36,49 @@
                     </div>
                 </div>
             </a>
+            @endforeach
             <br>
         </div>
         <br>
 
+        
         <div class="content-box">
             <h4>ผลการดำเนินงานแยกตามฝ่าย</h4>
-            <a href="#" class="progress-container">
+            @foreach($department as $Department)
+            <a href="{{ route('showProjectDepartment',$Department->Id_Department) }}" class="progress-container mt-2">
                 <div class="progress-group">
                     <div class="progress-info">
-                        <div>ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้</div>
+                        <div>{{ $Department->Name_Department }}</div>
                     </div>
                     <div class="progress-stats" >
-                        <div id="total">โครงการ : 12</div>
-                        <div id="done">เสร็จสิ้น : 8</div>
+                        <div id="total">โครงการ : {{ $Department->projects_count }} </div>
+                        <div id="done">เสร็จสิ้น : 0</div>
                     </div>
                 </div>
             </a>
+            @endforeach
         </div>
+        
     </div>
 
     <div class="menu-footer">
-        <div>แสดง 1 ถึง 5 จาก 5 รายการ</div>
+        <div>แสดง {{ $lastestProject->firstItem() }} ถึง {{ $lastestProject->lastItem() }} จาก {{ $lastestProject->total() }} รายการ</div>
         <div class="pagination">
-            <button class="pagination-btn" id="prevBtn">ก่อนหน้า</button>
-            <span class="page-number"><span id="currentPage">1</span></span>
-            <button class="pagination-btn" id="nextBtn">ถัดไป</button>
+            @if ($lastestProject->onFirstPage())
+                <button class="pagination-btn" disabled>ก่อนหน้า</button>
+            @else
+                <a href="{{ $lastestProject->previousPageUrl() }}" class="pagination-btn">ก่อนหน้า</a>
+            @endif
+    
+            <span class="page-number">
+                <span id="currentPage">{{ $lastestProject->currentPage() }}</span>
+            </span>
+    
+            @if ($lastestProject->hasMorePages())
+                <a href="{{ $lastestProject->nextPageUrl() }}" class="pagination-btn">ถัดไป</a>
+            @else
+                <button class="pagination-btn" disabled>ถัดไป</button>
+            @endif
         </div>
     </div>
 

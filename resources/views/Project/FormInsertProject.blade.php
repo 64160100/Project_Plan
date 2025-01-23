@@ -16,7 +16,7 @@
 <body>
     @section('content')
     <h3 class="card-header">กรอกข้อมูลโครงการใหม่</h3><br>
-    <form action="{{ route('createProject', ['Strategic_Id' => $strategics->Id_Strategic]) }}" method="POST">
+    <form action="{{ route('createProject', ['Strategic_Id' => $strategics->Id_Strategic, 'Employee_Id' => $employees->first()->Id_Employee]) }}" method="POST">
             @csrf 
                 <div class="content-box"><b>ชื่อโครงการ</b>
                 <hr>
@@ -25,11 +25,12 @@
                 
                 <!-- ผู้รับผิดชอบโครงการ  -->
                 <div class="content-box"><b>ผู้รับผิดชอบโครงการ</b>
+                    @include('Project.App.ProjectManager')
                 </div><br>
 
                 <!-- ลักษณะโครงการ  -->
                 <div class="content-box"><b>ลักษณะโครงการ</b>
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         <div class="form-group-radio">
                             <label>
                                 <input type="radio" name="projectType" value="1" onchange="toggleTextbox(this, 'textbox-projectType-')">
@@ -45,12 +46,12 @@
                         <div class="form-group">
                             <input type="text" id="textbox-projectType-2" class="hidden" data-group="projectType" placeholder="กรอกชื่อโครงการเดิม">
                         </div>
-                    </div>
+                    </div> -->
                 </div><br>
 
                 <!-- ความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย  -->
                 <div class="content-box"><b>ความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย</b>
-                    @include('Project.App.UniStrategic')
+                    <!-- include('Project.App.UniStrategic') -->
                 </div><br>
             
             
@@ -77,11 +78,11 @@
                 </div><br>
 
                 <!-- สถานที่   -->
-                <div class="content-box"><b>สถานที่ดำเนินงาน</b>
+                <!-- <div class="content-box"><b>สถานที่ดำเนินงาน</b>
                     <div class="form-group">
                         <textarea class="form-control" rows="2" id="comment" placeholder="เพิ่มข้อความ"></textarea>
                     </div>
-                </div><br>
+                </div><br> -->
                 
                 <!-- ตัวชี้วัด   -->
                 <div class="content-box"><b>ตัวชี้วัด</b>
@@ -102,31 +103,31 @@
                 </div><br>
 
                 <div class="content-box"><b>หลักการและเหตุผล</b>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <textarea class="form-control" rows="15" id="comment" placeholder="เพิ่มข้อความ"></textarea>
-                    </div>
+                    </div> -->
                 </div><br>
 
                 <!-- บูรณาการ   -->
                 <div class="content-box"><b>การบูรณาการงานโครงการ/กิจกรรม</b>
-                    <div class="mb-3 col-md-6">
+                    <!-- <div class="mb-3 col-md-6">
                         <div class="dropdown-container">
                             <div class="dropdown-button" onclick="toggleDropdown()">เลือกรายการโครงการ/กิจกรรม</div>
-                            @include('Project.App.ProjectIntegration')
+                            include('Project.App.ProjectIntegration')
                         </div>
-                    </div>
+                    </div> -->
                 </div><br>
 
 
                 <div class="content-box"><b>ขั้นตอนและแผนการดำเนินงาน</b>
                     <div class="mb-3">
-                        @include('Project.App.PlanProject')
+                        <!-- include('Project.App.PlanProject') -->
                     </div>
                 </div><br>
 
             <!-- Output   -->
                 <div class="content-box"><b>เป้าหมายเชิงผลผลิต (Output)</b>
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <form id="outputForm">
                                 <div id="outputContainer">
                                     
@@ -135,11 +136,11 @@
                                     <button type="button" class="btn-addlist" onclick="addField('outputContainer', 'output[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
                                 </div>
                             </form>
-                        </div>
+                        </div> -->
                 </div><br>
 
                 <div class="content-box"><b>เป้าหมายเชิงผลลัพธ์ (Outcome)</b>
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <form id="outcomeForm">
                                 <div id="outcomeContainer">
                                     
@@ -148,11 +149,11 @@
                                     <button type="button" class="btn-addlist" onclick="addField('outcomeContainer', 'outcome[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
                                 </div>
                             </form>
-                        </div>
+                        </div> -->
                 </div><br>
 
                 <div class="content-box"><b>ผลที่คาดว่าจะได้รับ</b>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <form id="resultForm">
                         <div id="resultContainer">
                             
@@ -161,21 +162,21 @@
                             <button type="button" class="btn-addlist" onclick="addField('resultContainer', 'result[]')"><i class='bx bx-plus-circle'></i>เพิ่มรายการ</button>
                         </div>
                     </form>
-                </div>
+                </div> -->
                 </div><br>
 
                 <div class="content-box"><b>เอกสารเพิ่มเติม</b>
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         <form action="/action_page.php">
                             <input type="file" id="myFile" name="filename">
                         </form>
-                    </div>    
+                    </div>     -->
                 </div><br>
 
                 <!-- save -->
-        <div class="container">
-            <button type="submit" class="btn-submit">บันทึก</button>
-        </div>
+                <div class="container">
+                    <button type="submit" class="btn-submit">บันทึก</button>
+                </div>
     
     </form> 
     @endsection

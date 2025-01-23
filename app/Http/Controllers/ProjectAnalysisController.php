@@ -3,58 +3,64 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\ListProjectModel;
+use App\Models\DepartmentModel;
 
 class ProjectAnalysisController extends Controller
 {
     
-    public function report()
-    {
-        return view('ProjectAnalysis.report');
+    public function report(){
+        $lastestProject = ListProjectModel::with(['employee.department', 'employee.position'])
+                        ->orderBy('Id_Project', 'DESC')
+                        ->paginate(5);
+        // $department = DepartmentModel::orderBy('Id_Department', 'ASC');
+        $department = DepartmentModel::all();
+
+        foreach ($department as $departments) {
+            $departments->projects_count = ListProjectModel::join('Employee', 'Project.Employee_Id', '=', 'Employee.Id_Employee')
+                ->where('Employee.Department_Id', $departments->Id_Department)
+                ->count();
+        }
+        
+    
+        $data = [      
+            'lastestProject' => $lastestProject,
+            'department' => $department
+        ]; 
+        
+        return view('ProjectAnalysis.report', $data);
     }
 
-    public function checkBudget()
-    {
-        return view('ProjectAnalysis.checkBudget');
+    public function checkBudget(){
+        $budgetProject = ListProjectModel::orderBy('Id_Project', 'DESC')->paginate(5);
+        return view('ProjectAnalysis.checkBudget', compact('budgetProject'));
     }
 
-    public function allProject()
-    {
-        return view('ProjectAnalysis.allProject');
+    public function editBudget(){
+        $budgetProject = ListProjectModel::all();
+        return view('ProjectAnalysis.editBudget',compact('budgetProject'));
     }
 
-   
+    public function allProject(){
+        // $allProject = ListProjectModel::orderBy('Id_Project', 'DESC')->paginate(5);
 
-
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        $allProject = ListProjectModel::with(['employee.department', 'employee.position'])
+                        ->orderBy('Id_Project', 'DESC')
+                        ->paginate(5);
+        return view('ProjectAnalysis.allProject', compact('allProject'));        
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    public function showProjectDepartment($Id_Department){
+        $department = DepartmentModel::findOrFail($Id_Department);
+        $projects = ListProjectModel::join('Employee', 'Project.Employee_Id', '=', 'Employee.Id_Employee')
+                ->where('Employee.Department_Id', $Id_Department)
+                ->with(['employee.department', 'employee.position'])
+                ->get();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $data = [      
+            'projects' => $projects,
+            'department' => $department
+        ];
+        return view('ProjectAnalysis.showProjectDepartment', $data);
     }
 }

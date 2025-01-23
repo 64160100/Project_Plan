@@ -127,3 +127,7 @@
     margin: 0 5px;
     border-radius: 10px;
 }
+
+.pagination-btn:disabled {
+    opacity: .5;
+}

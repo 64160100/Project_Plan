@@ -3,7 +3,7 @@
     <br>
 
     <!-- ค่าเป้าหมาย -->
-    <b>กลุ่มเป้าหมาย</b>
+    <!-- <b>กลุ่มเป้าหมาย</b>
     <textarea class="form-control" id="Target_Project" name="Target_Project" rows="5" placeholder="เพิ่มข้อความ" required></textarea>
     <br>
 
@@ -26,7 +26,7 @@
         </div>
         <div id="qualitative-input" class="qualitative-input" style="display: none;">
             <textarea class="form-control" id="textbox-goal-2" rows="3" placeholder="เพิ่มข้อความ"></textarea>
-        </div>
+        </div> -->
 
 
 <script>

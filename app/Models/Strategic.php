@@ -22,7 +22,7 @@ class Strategic extends Model
     // Strategic มีหลายโปรเจค
     public function projects()
     {
-        return $this->hasMany(Project::class, 'Strategic_Id', 'Id_Strategic');
+        return $this->hasMany(ListProjectModel::class, 'Strategic_Id', 'Id_Strategic');
     }
 
     //หนึ่ง Strategic มีหลาย Strategy

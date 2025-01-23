@@ -1,4 +1,4 @@
-<div id="targetGroupContainer">
+<!-- <div id="targetGroupContainer">
     <div class="target-group-item">
         <div class="form-group">
             <input type="text" name="target_group[]" placeholder="กรอกกลุ่มเป้าหมาย" required>&nbsp;
@@ -9,11 +9,11 @@
     </div>
 </div>
 
-<button type="button" id="addTargetGroupBtn" class="btn-addlist"><i class='bx bx-plus-circle'></i>กลุ่มเป้าหมาย</button>
+<button type="button" id="addTargetGroupBtn" class="btn-addlist"><i class='bx bx-plus-circle'></i>กลุ่มเป้าหมาย</button> -->
 
 <div>
     <div>รายละเอียดกลุ่มเป้าหมาย</div>
-    <textarea class="form-control" rows="5" name="target_group_details" placeholder="เพิ่มข้อความ"></textarea>
+    <textarea class="form-control" rows="5" id="Target_Project" name="Target_Project" placeholder="เพิ่มข้อความ"></textarea>
 </div>
         
     <!-- <div>รายละเอียดกลุ่มเป้าหมาย</div>

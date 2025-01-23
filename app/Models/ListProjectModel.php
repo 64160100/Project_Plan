@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Project extends Model
+class ListProjectModel extends Model
 {
     protected $connection = 'mydb';
     protected $table = 'Project';
     protected $primaryKey = 'Id_Project';
-    // protected $keyType = 'int';
+    protected $keyType = 'int';
 
     protected $fillable = [
         'Strategic_Id',
@@ -22,13 +22,12 @@ class Project extends Model
         'Target_Project',
         'First_Time',
         'End_Time',
-        // 'Count_Steps',
+        'Count_Steps',
         'Employee_Id',
     ];
 
     public $timestamps = false;
 
-    // 1 Project มี 1 Strategic
     public function strategic()
     {
         return $this->belongsTo(Strategic::class, 'Strategic_Id', 'Id_Strategic');
@@ -44,12 +43,14 @@ class Project extends Model
         return $this->hasMany(Sup_Project::class, 'Project_Id_Project', 'Id_Project');
     }
 
-    
+    //new func
+    public function employee()
+    {
+        return $this->belongsTo(EmployeeModel::class, 'Employee_Id', 'Id_Employee');
+    }
 
-    
-    
-    // public function platforms()
-    // {
-    //     return $this->hasMany(Platform::class, 'Project_Id_Project', 'Id_Project');
-    // }
+    public function approvals()
+    {
+        return $this->hasMany(ApproveModel::class, 'Project_Id', 'Id_Project');
+    }
 }

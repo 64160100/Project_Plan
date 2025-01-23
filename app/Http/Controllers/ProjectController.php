@@ -1,16 +1,23 @@
 <?php
 
 namespace App\Http\Controllers;
+// use App\Http\Controllers\ListProjectController;
 
 use Illuminate\Http\Request;
-use App\Models\Project;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Models\ListProjectModel;
 use App\Models\Strategic;
 use App\Models\Strategy;
 use App\Models\Sdg;
 use App\Models\Platform;
 use App\Models\Sup_Project;
 use App\Models\EmployeeModel;
+use App\Models\RecordHistory;
+use App\Models\ApproveModel;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 
 class ProjectController extends Controller
 {
@@ -30,18 +37,19 @@ class ProjectController extends Controller
         $strategics = Strategic::with('projects')->find($Strategic_Id); // ดึงข้อมูล Strategic พร้อมกับ projects
         $strategies = $strategics->strategies; //ดึงข้อมูล strategics เพื่อเข้าถึงฟังก์ชัน strategies ในตาราง Strategic
         $sdgs = Sdg::all();
-        // $employee = EmployeeModel::all();
+        $employees = EmployeeModel::all();
 
-        return view('Project.FormInsertProject', compact('strategics', 'strategies','sdgs'));
+        return view('Project.FormInsertProject', compact('strategics', 'strategies','sdgs', 'employees'));
     }
 
     
-    public function createProject(Request $request, $Strategic_Id)
+    public function createProject(Request $request, $Strategic_Id, $Employee_Id )
     {
         $strategics = Strategic::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
         $strategies = $strategics->strategies;
+        $employees = EmployeeModel::findOrFail($Employee_Id);
 
-        $projects = new Project;
+        $projects = new ListProjectModel;
         $projects->Strategic_Id = $request->Strategic_Id;
         $projects->Name_Project = $request->Name_Project;
         $projects->Name_Strategy = $request->Name_Strategy;
@@ -50,21 +58,38 @@ class ProjectController extends Controller
         $projects->Target_Project = $request->Target_Project;
         $projects->First_Time = $request->First_Time;
         $projects->End_Time = $request->End_Time;
-
-        // $projects->Employee_Id = $request->Employee_Id;
-
-        $projects->save();
+        // $projects->Count_Steps = $request->Count_Steps;
+        $employees->projects()->save($projects);
 
         if ($request->has('sdgs')) {
-            $selectedSDGs = $request->sdgs; // รับค่าที่ส่งมาจากฟอร์ม (Array)
-            $projects->sdgs()->sync($selectedSDGs); // เชื่อมโยง SDGs กับ Project
+            $selectedSDGs = $request->sdgs; 
+            $projects->sdgs()->sync($selectedSDGs);
         }
 
         if ($request->has('Name_Sup_Project')) {
             $this->createSupProjects($projects->Id_Project, $request->Name_Sup_Project);
         }
+    
+        Log::info('Project created with ID: ' . $projects->Id_Project);
+        if ($projects->Id_Project) {
+            $approval = new ApproveModel;
+            $approval->Status = 'I';
+            $approval->Project_Id = $projects->Id_Project;
+            $approval->save();
+            Log::info('Approval record created for project ID: ' . $projects->Id_Project);  
+        } 
+
+        else {
+            Log::error('Failed to create project.');
+            return redirect()->back()->with('error', 'ไม่สามารถสร้างโครงการได้');
+        }
+
         
-        return redirect()->route('index', ['Strategic_Id' => $Strategic_Id])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
+        return redirect()->route('index', [
+            'Strategic_Id' => $Strategic_Id,
+            'Employee_Id' => $employees->Id_Employee
+        ])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
+  
     }
 
 
@@ -89,10 +114,11 @@ class ProjectController extends Controller
 
     public function editProject(Request $request, $Id_Project)
     {
-        $projects = Project::with('sdgs')->findOrFail($Id_Project);
+        $projects = ListProjectModel::with('sdgs')->findOrFail($Id_Project);
         $strategics = Strategic::with('strategies')->findOrFail($projects->Strategic_Id); //ดึงข้อมูล Strategic ที่มี Strategic_Id พร้อมฟังก์ชัน strategies
         $strategies = Strategy::all();
         $sdgs = Sdg::all();
+        $employees = EmployeeModel::all();
 
         if($request->isMethod('post')){
             $projects->Strategic_Id = $request->Strategic_Id;
@@ -104,7 +130,9 @@ class ProjectController extends Controller
             $projects->First_Time = $request->First_Time;
             $projects->End_Time = $request->End_Time;
 
-            $projects->save();
+            $employees->projects()->save($projects); 
+
+            // $projects->save();
 
             // sdgs
             if ($request->has('sdgs')) {
@@ -121,12 +149,12 @@ class ProjectController extends Controller
             return redirect()->route('index')->with('success', 'แก้ไขโครงการเรียบร้อยแล้ว');
         }
         
-        return view('Project.FormEditProject', compact('projects', 'strategies', 'sdgs', 'strategies'));
+        return view('Project.FormEditProject', compact('projects', 'strategies', 'sdgs', 'strategies', 'employees'));
     }
 
     public function updateProject(Request $request, $Id_Project)
     {
-        $projects = Project::with('sdgs')->findOrFail($Id_Project);
+        $projects = ListProjectModel::with('sdgs')->findOrFail($Id_Project);
         $strategics = Strategic::with('strategies')->findOrFail($projects->Strategic_Id);
         $strategies = $strategics->strategies;
         
@@ -219,7 +247,7 @@ class ProjectController extends Controller
 
     public function viewProject($Id_Project)  // รับพารามิเตอร์ id จาก URL
     {
-        $projects = Project::with('strategic')->findOrFail($Id_Project); // ดึงข้อมูลโครงการและยุทธศาสตร์ที่เกี่ยวข้อง
+        $projects = ListProjectModel::with('strategic')->findOrFail($Id_Project); // ดึงข้อมูลโครงการและยุทธศาสตร์ที่เกี่ยวข้อง
         
         return view('Project.ViewProject', [
             'projects' => $projects,

@@ -1,0 +1,61 @@
+.link-style {
+    text-decoration: none;
+    color: inherit;
+}
+
+.card-style {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transition: color 0.3s;
+}
+
+.icon-style {
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 20%;
+    margin-right: 10px;
+    background: linear-gradient(180deg, #8729DA 0%, #AC2BDD 100%);
+}
+
+.icon-style i {
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.container h1 {
+    font-size: 36px !important;
+    margin-bottom: 5px;
+    line-height: 1.2;
+}
+
+.container .text-style {
+    color: rgba(130, 0, 255, 0.35);
+    margin-top: 0;
+    margin-bottom: 20px;
+    line-height: 1.2;
+    font-size: 16px !important;
+}
+
+.container h2 {
+    font-size: 18px !important;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    transition: color 0.15s;
+}
+
+.card-style:hover h2 {
+    color: rgba(80, 80, 80, 0.447);
+}
+
+h2:hover {
+    color: inherit;
+}

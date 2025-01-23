@@ -39,6 +39,24 @@
 
                 </div><br>
             <!-- endชื่อโครงการ -->
+
+            <!-- ผู้รับผิดชอบโครงการ  -->
+            <div class="content-box"><b>ผู้รับผิดชอบโครงการ</b>
+                <div class="mb-3">
+                    <!-- <label for="employee_id" class="form-label">เลือกผู้รับผิดชอบ</label> -->
+                    <select class="form-control" id="employee_id" name="employee_id" required>
+                        <option value="">เลือกผู้รับผิดชอบ</option>
+                        @foreach($employees as $employee)
+                            <option value="{{ $employee->Id_Employee }}" 
+                                @if($projects->Employee_Id == $employee->Id_Employee) selected @endif>
+                                {{ $employee->Firstname_Employee }} {{ $employee->Lastname_Employee }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div><br>
+            <!-- end ผู้รับผิดชอบโครงการ  -->
+
             
             <!-- ความสอดคล้องส่วนงาน -->
             <div class="content-box"><b>ความสอดคล้องกับยุทธศาสตร์ส่วนงาน</b>

@@ -20,7 +20,7 @@ class Sdg extends Model
 
     public function projects()
     {
-        return $this->belongsToMany(Project::class, 'Project_has_Sustainable_Development_Goals', 'SDGs_Id', 'Project_Id');
+        return $this->belongsToMany(ListProjectModel::class, 'Project_has_Sustainable_Development_Goals', 'SDGs_Id', 'Project_Id');
     }
 
 }

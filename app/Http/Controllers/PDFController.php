@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Strategic;
 use App\Models\Strategy;
-use App\Models\Project;
+use App\Models\ListProjectModel;
 
 
 class PDFController extends Controller
@@ -34,7 +34,7 @@ class PDFController extends Controller
     
     public function ActionPlanPDF()
     {
-        $projects = Project::with(['strategic.strategies'])
+        $projects = ListProjectModel::with(['strategic.strategies'])
                     ->orderBy('Strategic_Id')
                     ->orderBy('Name_Strategy')
                     ->get();    
@@ -54,7 +54,7 @@ class PDFController extends Controller
 
     public function PDFStrategic($Id_Strategic)
     {
-        $projects = Project::with(['strategic.strategies'])
+        $projects = ListProjectModel::with(['strategic.strategies'])
                     ->where('Strategic_Id', $Id_Strategic)
                     ->orderBy('Name_Strategy')
                     ->get();   
@@ -70,7 +70,7 @@ class PDFController extends Controller
 
     public function PDFProject($Id_Project)
     {
-        $projects = Project::with(['strategic.strategies'])
+        $projects = ListProjectModel::with(['strategic.strategies'])
                     ->where('Id_Project', $Id_Project)
                     ->firstOrFail();    
     
@@ -86,7 +86,7 @@ class PDFController extends Controller
     // PDF ที่เรียกจากหน้าHTML
     public function ctrlpPDFStrategic($Id_Strategic)
     {
-        $projects = Project::with(['strategic.strategies'])
+        $projects = ListProjectModel::with(['strategic.strategies'])
                     ->where('Strategic_Id', $Id_Strategic)
                     ->orderBy('Name_Strategy')
                     ->get();   
@@ -103,7 +103,7 @@ class PDFController extends Controller
     
     public function ctrlpPDFProject($Id_Project)
     {
-        $projects = Project::with(['strategic.strategies'])
+        $projects = ListProjectModel::with(['strategic.strategies','employee.position'])
                     ->where('Id_Project', $Id_Project)
                     ->firstOrFail();    
     

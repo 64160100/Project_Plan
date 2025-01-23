@@ -149,6 +149,11 @@
     border-radius: 10px;
 }
 
+.pagination-btn:disabled {
+    opacity: .5;
+}
+
+
 
 
 

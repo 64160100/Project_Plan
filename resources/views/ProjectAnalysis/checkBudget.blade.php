@@ -12,9 +12,9 @@
 @section('content')
     <div class="header">
         <h1>ตรวจสอบงบประมาณ</h1>
-        <a href="#" class="btn-editBudget">
-            <i class='bx bx-edit'></i>ปรับแก้งบประมาณ
-        </a> 
+        <button type="button" class="btn-editBudget" data-bs-toggle="modal" data-bs-target="#editBudget">
+            <i class='bx bx-plus'></i>แก้งบประมาณ
+        </button>
     </div><br>
    
         <div class="content-box">
@@ -35,68 +35,47 @@
                         </tr>
                     </thead>
                     <tbody>
-
+                        @foreach($budgetProject as $budgetproject)
                         <tr>
-                            <td>โครงการพัฒนาระบบติดตามแผนงาน</td>
+                            <td>{{ $budgetproject->Name_Project }}</td>
                             <td><b>งบดำเนินงาน</b></td>
                             <td>฿80000</td>
                             <td>
-                            <a href="#" class="btn-editBudget">
-                                <i class='bx bx-edit'></i>แก้งบประมาณ
-                            </a>
+                                <a href="{{ route('editProject', $budgetproject->Id_Project) }}" class="btn-editBudget">
+                                    <i class='bx bx-edit'></i>ปรับแก้งบประมาณ
+                                </a> 
                             </td>
                         </tr>
-
+                        @endforeach
                     </tbody>
                 </table>
             </div>
         </div>
+
+        @include('ProjectAnalysis.editBudget')
         
-    <div class="menu-footer">
-    <div>แสดง 1 ถึง 5 จาก 5 รายการ</div>
-        <div class="pagination">
-            <button class="pagination-btn" id="prevBtn">ก่อนหน้า</button>
-            <span class="page-number"><span id="currentPage">1</span></span>
-            <button class="pagination-btn" id="nextBtn">ถัดไป</button>
+        <div class="menu-footer">
+            <div>แสดง {{ $budgetProject->firstItem() }} ถึง {{ $budgetProject->lastItem() }} จาก {{ $budgetProject->total() }} รายการ</div>
+            <div class="pagination">
+                @if ($budgetProject->onFirstPage())
+                    <button class="pagination-btn" disabled>ก่อนหน้า</button>
+                @else
+                    <a href="{{ $budgetProject->previousPageUrl() }}" class="pagination-btn">ก่อนหน้า</a>
+                @endif
+        
+                <span class="page-number">
+                    <span id="currentPage">{{ $budgetProject->currentPage() }}</span>
+                </span>
+        
+                @if ($budgetProject->hasMorePages())
+                    <a href="{{ $budgetProject->nextPageUrl() }}" class="pagination-btn">ถัดไป</a>
+                @else
+                    <button class="pagination-btn" disabled>ถัดไป</button>
+                @endif
+            </div>
         </div>
-    </div>
     
 
 @endsection
-
-<!-- <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const currentPageSpan = document.getElementById('currentPage');
-        const totalPagesSpan = document.getElementById('totalPages');
-
-        let currentPage = 1;
-        const totalPages = 5; // สมมติว่ามี 3 หน้า
-
-        updatePageDisplay();
-
-        prevBtn.addEventListener('click', function() {
-            if (currentPage > 1) {
-                currentPage--;
-                updatePageDisplay();
-            }
-        });
-
-        nextBtn.addEventListener('click', function() {
-            if (currentPage < totalPages) {
-                currentPage++;
-                updatePageDisplay();
-            }
-        });
-
-        function updatePageDisplay() {
-            currentPageSpan.textContent = currentPage;
-            totalPagesSpan.textContent = totalPages;
-            prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage === totalPages;
-        }
-    });
-</script> -->
 </body>
 </html>

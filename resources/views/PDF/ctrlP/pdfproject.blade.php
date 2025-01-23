@@ -179,7 +179,7 @@
                     </td>
                     <td style="text-align: center;">{{ number_format($projects->Budget, 2) }}</td>
                     
-                    <td>{{ $projects->Responsible_Person }}</td>
+                    <td>{{ $projects->employee->position->Name_Position ?? 'ยังไม่ระบุ' }}</td>
                 </tr>
             </tbody>
         </table>

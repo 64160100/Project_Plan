@@ -21,7 +21,7 @@ class Sup_Project extends Model
 
     public function project()
     {
-        return $this->belongsTo(Project::class, 'Project_Id_Project', 'Id_Project');
+        return $this->belongsTo(ListProjectModel::class, 'Project_Id_Project', 'Id_Project');
     }
 
 

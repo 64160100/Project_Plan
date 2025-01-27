@@ -361,6 +361,104 @@
     display: none;
 }
 
+.form-check-label {
+    align-items: center;
+    width: 100%;
+}
+
+.label-text {
+    min-width: 300px; /* Adjust this value as needed */
+}
+
+.form-control-sm {
+    max-width: 100px;
+}
+
+.d-flex.align-items-center {
+    display: flex;
+    align-items: center;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.form-control {
+    width: 100%;
+    min-width: 0;
+    flex: 1;
+}
+
+.input-group-text {
+    margin-left: 0.5rem;
+}
+
+.d-flex.align-items-center {
+    display: flex;
+    align-items: center;
+}
+
+.ml-3 {
+    margin-left: 1rem;
+}
+
+.budget-form {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+.budget-form .form-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.budget-form .form-label {
+    font-weight: bold;
+}
+
+.budget-form .input-group-text {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+}
+
+.budget-form .btn {
+    margin-top: 10px;
+}
+
+.budget-form .remove-form-btn {
+    float: right;
+    margin-top: -10px;
+}
+
+.budget-form .detail-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
+.budget-form .detail-item .form-label {
+    margin-bottom: 0;
+}
+
+.budget-form .detail-item .input-group {
+    flex: 1;
+    margin-left: 1rem;
+}
+
+.budget-form .detail-item .remove-btn {
+    margin-left: 1rem;
+    align-self: flex-end;
+}
+
+.budget-form .detail-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {

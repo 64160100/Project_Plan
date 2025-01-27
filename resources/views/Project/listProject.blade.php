@@ -40,6 +40,8 @@
                 <strong>
                     <a href="{{ route('viewProject', ['Id_Project' => $Project->Id_Project]) }}">
                         {{ $Project->Name_Project }}
+                        <a href="{{ route('PDF.Project', $Project->Id_Project) }}" class='bx bx-folder-open' style='color:#bd7ff9; font-size: 20px; padding-right: 5px;'></a>
+                        <a href="{{ route('PDF.projectCtrlP', $Project->Id_Project) }}" class='bx bx-folder-open' style='color:#000; font-size: 20px; padding-right: 5px;'></a>
                     </a>
                 </strong>
             </li>

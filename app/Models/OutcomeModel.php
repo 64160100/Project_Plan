@@ -4,16 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class BudgetModel extends Model
+class OutcomeModel extends Model
 {
     protected $connection = 'mydb';
-    protected $table = 'Budget';
-    protected $primaryKey = 'Id_Budget';
-    protected $keyType = 'int';
+    protected $table = 'Outcome';
+    protected $primaryKey = 'Id_Outcome';
     protected $fillable = [
-        'Status_Budget',
-        'Project_Id'
+        'Name_Outcome',
+        'Project_Id',
     ];
+
     public $timestamps = false;
 
     public function project()

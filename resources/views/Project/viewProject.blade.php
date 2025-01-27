@@ -2,6 +2,31 @@
 
 <hade>
     <link rel="stylesheet" href="{{ asset('css/viewProject.css') }}">
+
+    <style>
+    .budget-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .budget-item strong {
+        flex: 1;
+    }
+
+    .budget-item select,
+    .budget-item textarea,
+    .budget-item input {
+        flex: 2;
+    }
+
+    .budget-item .amount {
+        text-align: right;
+    }
+    </style>
 </hade>
 
 @section('content')
@@ -367,8 +392,7 @@
                 </div>
             </div>
 
-            <!-- filepath: /home/aries/Project/Project_Plan/resources/views/Project/viewProject.blade.php -->
-
+            <!-- ระยะเวลาดำเนินโครงการ -->
             <div class="content-box">
                 <div class="section-header">
                     <h4>
@@ -396,7 +420,7 @@
             </div>
 
 
-            <!--  -->
+            <!-- ขั้นตอนและแผนการดำเนินงาน -->
             <div class="content-box">
                 <div class="section-header">
                     <h4>
@@ -422,9 +446,10 @@
                         <div class="method-form">
                             <div class="form-label">วิธีการดำเนินงาน</div>
                             <div id="methodContainer" class="method-items">
-                                @foreach($project->methods as $method)
+                                @foreach($shortProjects as $shortProject)
                                 <div class="form-group mt-2">
-                                    <input type="text" class="form-control" value="{{ $method }}" readonly>
+                                    <input type="text" class="form-control"
+                                        value="{{ $shortProject->Details_Short_Project }}" readonly>
                                 </div>
                                 @endforeach
                             </div>
@@ -474,6 +499,218 @@
                 </div>
             </div>
 
+            <!-- แหล่งงบประมาณ -->
+            <div class="content-box">
+                <div class="section-header">
+                    <h4>
+                        15. แหล่งงบประมาณ
+                    </h4>
+                </div>
+                <div id="budgetDetails">
+                    <div class="form-group-radio">
+                        <label>ประเภทโครงการ</label>
+                        <div class="radio-group">
+                            <input type="radio" name="Status_Budget" value="N" id="non_income"
+                                {{ $project->Status_Budget == 'N' ? 'checked' : '' }} disabled>
+                            <label for="non_income">ไม่แสวงหารายได้</label>
+
+                            <input type="radio" name="Status_Budget" value="Y" id="income_seeking"
+                                {{ $project->Status_Budget == 'Y' ? 'checked' : '' }} disabled>
+                            <label for="income_seeking">แสวงหารายได้</label>
+                        </div>
+                    </div>
+
+                    <div id="incomeForm" class="income-form"
+                        style="{{ $project->Status_Budget == 'Y' ? 'display: block;' : 'display: none;' }}">
+                        <div class="form-group">
+                            <label>แหล่งงบประมาณ</label>
+                            <div class="mb-4">
+                                @foreach($projectBudgetSources as $projectBudgetSource)
+                                @php
+                                $source = $budgetSources->firstWhere('Id_Budget_Source',
+                                $projectBudgetSource->Budget_Source_Id);
+                                @endphp
+                                <div class="form-check mb-2 d-flex align-items-center">
+                                    <input type="radio" id="{{ $source->Id_Budget_Source }}" name="budget_source"
+                                        value="{{ $source->Id_Budget_Source }}" class="form-check-input"
+                                        data-id="{{ $source->Id_Budget_Source }}"
+                                        {{ $projectBudgetSource->Budget_Source_Id == $source->Id_Budget_Source ? 'checked' : '' }}
+                                        disabled>
+                                    <label class="form-check-label d-flex align-items-center w-100"
+                                        for="{{ $source->Id_Budget_Source }}">
+                                        <span class="label-text">{{ $source->Name_Budget_Source }}</span>
+                                        <input type="number" name="amount_{{ $source->Id_Budget_Source }}"
+                                            class="form-control form-control-sm w-25 ml-2" placeholder="จำนวนเงิน"
+                                            value="{{ $projectBudgetSource->Amount_Total }}" disabled>
+                                        <span class="ml-2">บาท</span>
+                                    </label>
+                                </div>
+                                @endforeach
+                            </div>
+
+                            <!-- รายละเอียดการเบิกจ่าย -->
+                            <div id="sourceDetailForm">
+                                <div class="mb-3">
+                                    <label class="form-label">รายละเอียดค่าใช้จ่าย</label>
+                                    <textarea name="source_detail" class="form-control"
+                                        placeholder="ระบุรายละเอียดค่าใช้จ่าย"
+                                        disabled>{{ $projectBudgetSources->first()->Details_Expense ?? '' }}</textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group-radio">
+                                <label>กรอกแบบฟอร์มงบประมาณ</label>
+                                <div class="radio-group">
+                                    <input type="radio" name="fill_budget_form" value="yes" id="fill_yes"
+                                        {{ $budgetForms->isNotEmpty() ? 'checked' : '' }} disabled>
+                                    <label for="fill_yes">กรอกแบบฟอร์มงบประมาณ</label>
+
+                                    <input type="radio" name="fill_budget_form" value="no" id="fill_no"
+                                        {{ $budgetForms->isEmpty() ? 'checked' : '' }} disabled>
+                                    <label for="fill_no">ไม่กรอกแบบฟอร์มงบประมาณ</label>
+                                </div>
+                            </div>
+
+                            <!-- แบบฟอร์มงบประมาณ -->
+                            <div id="budgetFormsContainer"
+                                style="{{ $budgetForms->isNotEmpty() ? 'display: block;' : 'display: none;' }}">
+                                <table class="min-w-full border-collapse">
+                                    <thead>
+                                        <tr>
+                                            <th class="border px-4 py-2 text-center">รายการ</th>
+                                            <th class="border px-4 py-2 text-center">จำนวนเงิน (บาท)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($budgetForms as $index => $budgetForm)
+                                        <tr>
+                                            <td class="border px-4 py-2">
+                                                <div class="budget-item">
+                                                    <strong>หัวข้อใหญ่:</strong> {{ $budgetForm->Big_Topic }}
+                                                </div>
+                                                <div class="budget-item">
+                                                    <strong>หัวข้อย่อย:</strong>
+                                                    <select name="subActivity[]" class="form-control" disabled>
+                                                        <option value="" disabled selected>เลือกหัวข้อย่อย</option>
+                                                        @foreach($subtopBudgets as $subtop)
+                                                        <option value="{{ $subtop->Id_Subtopic_Budget }}"
+                                                            {{ $subtopicBudgetForms->where('Subtopic_Budget_Id', $subtop->Id_Subtopic_Budget)->where('Budget_Form_Id', $budgetForm->Id_Budget_Form)->isNotEmpty() ? 'selected' : '' }}>
+                                                            {{ $subtop->Name_Subtopic_Budget }}
+                                                        </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                @foreach($subtopicBudgetForms->where('Budget_Form_Id',
+                                                $budgetForm->Id_Budget_Form) as $subtopicBudgetForm)
+                                                <div class="budget-item">
+                                                    <strong>รายละเอียด:</strong>
+                                                    <textarea name="description[]" class="form-control"
+                                                        placeholder="เช่น ค่าอาหารว่างสำหรับการจัดประชุมคณะกรรมการจัดการความรู้"
+                                                        disabled>{{ $subtopicBudgetForm->Details_Subtopic_Form }}</textarea>
+                                                </div>
+                                                @endforeach
+                                            </td>
+                                            <td class="border px-4 py-2 text-right">
+                                                <div class="budget-item">
+                                                    <strong>จำนวนเงินทั้งหมด:</strong>
+                                                    <span
+                                                        class="amount">{{ number_format($budgetForm->Amount_Big, 2) }}</span>
+                                                </div>
+                                                @foreach($subtopicBudgetForms->where('Budget_Form_Id',
+                                                $budgetForm->Id_Budget_Form) as $subtopicBudgetForm)
+                                                <div class="budget-item">
+                                                    <strong>จำนวนเงิน:</strong>
+                                                    <input type="number" name="amount[]" class="form-control amount"
+                                                        placeholder="880" value="{{ $subtopicBudgetForm->Amount_Sub }}"
+                                                        disabled>
+                                                </div>
+                                                @endforeach
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output -->
+            <div class="content-box">
+                <div class="section-header">
+                    <h4>
+                        16. เป้าหมายเชิงผลผลิต (Output)
+                    </h4>
+                </div>
+                <div id="outputDetails">
+                    <div id="outputContainer" class="dynamic-container">
+                        @if($outputs->isEmpty())
+                        <div class="form-group mt-2">
+                            <input type="text" class="form-control" value="-" readonly>
+                        </div>
+                        @else
+                        @foreach($outputs as $output)
+                        <div class="form-group mt-2">
+                            <input type="text" class="form-control" name="outputs[]" value="{{ $output->Name_Output }}"
+                                readonly>
+                        </div>
+                        @endforeach
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outcome -->
+            <div class="content-box">
+                <div class="section-header">
+                    <h4>
+                        17. เป้าหมายเชิงผลลัพธ์ (Outcome)
+                    </h4>
+                </div>
+                <div id="outcomeDetails">
+                    <div id="outcomeContainer" class="dynamic-container">
+                        @if($outcomes->isEmpty())
+                        <div class="form-group mt-2">
+                            <input type="text" class="form-control" value="-" readonly>
+                        </div>
+                        @else
+                        @foreach($outcomes as $outcome)
+                        <div class="form-group mt-2">
+                            <input type="text" class="form-control" name="outcomes[]"
+                                value="{{ $outcome->Name_Outcome }}" readonly>
+                        </div>
+                        @endforeach
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- ผลที่คาดว่าจะได้รับ -->
+            <div class="content-box">
+                <div class="section-header">
+                    <h4>
+                        18. ผลที่คาดว่าจะได้รับ
+                    </h4>
+                </div>
+                <div id="resultDetails">
+                    <div id="resultContainer" class="dynamic-container">
+                        @if($expectedResults->isEmpty())
+                        <div class="form-group mt-2">
+                            <input type="text" class="form-control" value="-" readonly>
+                        </div>
+                        @else
+                        @foreach($expectedResults as $expectedResult)
+                        <div class="form-group mt-2">
+                            <input type="text" class="form-control" name="expected_results[]"
+                                value="{{ $expectedResult->Name_Expected_Results }}" readonly>
+                        </div>
+                        @endforeach
+                        @endif
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>

@@ -12,7 +12,6 @@ use App\Models\ApproveModel;
 use App\Models\EmployeeModel;
 use App\Models\RecordHistory;
 use App\Models\SDGsModel;
-use App\Models\BudgetModel;
 use App\Models\IntegrationModel;
 use App\Models\SupProjectModel;
 use App\Models\PlatformModel;
@@ -29,6 +28,15 @@ use App\Models\MonthsModel;
 use App\Models\PdcaModel;
 use App\Models\PdcaDetailsModel;
 use App\Models\MonthlyPlansModel;
+use App\Models\ShortProjectModel;
+use App\Models\BudgetSourceModel;
+use App\Models\SubtopBudgetModel;
+use App\Models\ProjectHasBudgetSourceModel;
+use App\Models\BudgetFormModel;
+use App\Models\SubtopicBudgetHasBudgetFormModel;
+use App\Models\ExpectedResultsModel;
+use App\Models\OutcomeModel;
+use App\Models\OutputModel;
 use Carbon\Carbon;
 
 class ListProjectController extends Controller
@@ -54,31 +62,84 @@ class ListProjectController extends Controller
             'locations',
             'projectHasIndicators'
         ])->findOrFail($projectId);
-
+    
         $strategics = StrategicModel::with(['strategies'])->findOrFail($project->Strategic_Id);
         $strategies = $strategics->strategies;
         $employees = EmployeeModel::all();
-
+    
         $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
         $pdcaStages = PdcaModel::all();
         $pdcaDetails = PdcaDetailsModel::where('Project_Id', $projectId)->get();
         $monthlyPlans = MonthlyPlansModel::where('Project_id', $projectId)->get();
-
+        $shortProjects = ShortProjectModel::where('Project_Id', $projectId)->get();
+    
+        $budgetSources = BudgetSourceModel::all();
+        $subtopBudgets = SubtopBudgetModel::all();
+        $projectBudgetSources = ProjectHasBudgetSourceModel::where('Project_Id', $projectId)->get();
+        $budgetForms = BudgetFormModel::where('Project_Id', $projectId)->get();
+        $subtopicBudgetForms = SubtopicBudgetHasBudgetFormModel::whereIn('Budget_Form_Id', $budgetForms->pluck('Id_Budget_Form'))->get();
+    
+        $expectedResults = ExpectedResultsModel::where('Project_Id', $projectId)->get();
+        $outcomes = OutcomeModel::where('Project_Id', $projectId)->get();
+        $outputs = OutputModel::where('Project_Id', $projectId)->get();
+    
         $formatDateToThai = function($date) use ($months) {
             if (!$date) {
                 return '-';
             }
             $year = date('Y', strtotime($date)) + 543;
             $monthKey = date('m', strtotime($date));
-            $month = $months[$monthKey] ?? null; // Use null coalescing operator to handle undefined keys
+            $month = $months[$monthKey] ?? null;
             $day = date('d', strtotime($date));
-            return $month ? "วันที่ $day $month พ.ศ. $year" : "วันที่ $day พ.ศ. $year"; // Handle case where month is null
+            return $month ? "วันที่ $day $month พ.ศ. $year" : "วันที่ $day พ.ศ. $year";
         };
-        
+    
         $firstTime = $formatDateToThai($project->First_Time ?? null);
         $endTime = $formatDateToThai($project->End_Time ?? null);
+    
+        Log::info($project);
 
-        return view('Project.viewProject', compact('project', 'strategics', 'strategies', 'employees', 'firstTime', 'endTime', 'months', 'pdcaStages', 'pdcaDetails', 'monthlyPlans'));
+        return view('Project.viewProject', compact(
+            'project', 'strategics', 'strategies', 'employees', 'firstTime', 'endTime', 'months', 'pdcaStages', 'pdcaDetails', 'monthlyPlans', 'shortProjects', 'budgetSources', 'subtopBudgets', 'projectBudgetSources', 'budgetForms', 'subtopicBudgetForms', 'expectedResults', 'outcomes', 'outputs'
+        ));
+    }
+
+    public function showCreateFirstForm($Strategic_Id)
+    {
+        $strategics = StrategicModel::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
+        $strategies = $strategics->strategies;
+        $projects = $strategics->projects; 
+        $employees = EmployeeModel::all();
+        $sdgs = SDGsModel::all();
+        $nameStrategicPlan = $strategics->Name_Strategic_Plan;
+        $integrationCategories = IntegrationModel::orderBy('Id_Integration_Category', 'asc')->get();
+        $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
+        $pdcaStages = PdcaModel::all();
+        $budgetSources = BudgetSourceModel::all();
+        $subtopBudgets = SubtopBudgetModel::all();
+    
+        return view('Project.createFirstForm', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets'));
+    }
+
+    public function createFirstForm(Request $request, $Strategic_Id)
+    {
+        $strategics = StrategicModel::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
+        $strategies = $strategics->strategies;
+    
+        $project = new ListProjectModel;
+        $project->Strategic_Id = $Strategic_Id;
+        $project->Name_Strategy = $request->Name_Strategy ?? null;
+        $project->Name_Project = $request->Name_Project;
+        $project->Employee_Id = $request->employee_id ?? null;
+        $project->Objective_Project = $request->Objective_Project ?? null;
+        $project->Success_Indicators = $request->Success_Indicators ?? null;
+        $project->Value_Target = $request->Value_Target ?? null;
+        $project->First_Time = $request->First_Time ?? null;
+        $project->End_Time = $request->End_Time ?? null;
+        $project->Status_Budget = $request->Status_Budget ?? null;
+        $project->save();
+    
+        return redirect()->route('project', ['Strategic_Id' => $Strategic_Id])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
     }
 
     public function showCreateForm($Strategic_Id)
@@ -92,8 +153,10 @@ class ListProjectController extends Controller
         $integrationCategories = IntegrationModel::orderBy('Id_Integration_Category', 'asc')->get();
         $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
         $pdcaStages = PdcaModel::all();
+        $budgetSources = BudgetSourceModel::all();
+        $subtopBudgets = SubtopBudgetModel::all();
     
-        return view('Project.createProject', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages'));
+        return view('Project.createProject', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets'));
     }
 
     public function createProject(Request $request, $Strategic_Id)
@@ -108,7 +171,10 @@ class ListProjectController extends Controller
         $project->Employee_Id = $request->employee_id ?? null;
         $project->Objective_Project = $request->Objective_Project ?? null;
         $project->Principles_Reasons = $request->Principles_Reasons ?? null;
+        $project->Success_Indicators = $request->Success_Indicators ?? null;
+        $project->Value_Target = $request->Value_Target ?? null;
         $project->Project_type = $request->Project_Type ?? null;
+        $project->Status_Budget = $request->Status_Budget ?? null;
         $project->First_Time = $request->First_Time ?? null;
         $project->End_Time = $request->End_Time ?? null;
         $project->save();
@@ -119,12 +185,6 @@ class ListProjectController extends Controller
             $approval->Project_Id = $project->Id_Project;
             $approval->save();
             Log::info('Approval record created for project ID: ' . $project->Id_Project);
-    
-            $budget = new BudgetModel;
-            $budget->Status_Budget = $request->Status_Budget ?? null;
-            $budget->Project_Id = $project->Id_Project;
-            $budget->save();
-            Log::info('Budget record created for project ID: ' . $project->Id_Project);
     
             if ($request->has('Name_Sup_Project')) {
                 foreach ($request->Name_Sup_Project as $supProjectName) {
@@ -283,9 +343,8 @@ class ListProjectController extends Controller
                             $monthlyPlan->Months_id = $month;
                             $monthlyPlan->PDCA_Stages_Id = $stageId;
     
-                            // Calculate the fiscal year based on the month
                             $currentYear = date('Y');
-                            $fiscalYearStartMonth = 10; // Example: Fiscal year starts in October
+                            $fiscalYearStartMonth = 10;
                             $fiscalYear = ($month >= $fiscalYearStartMonth) ? $currentYear + 1 : $currentYear;
     
                             $monthlyPlan->Fiscal_year = $fiscalYear;
@@ -295,19 +354,131 @@ class ListProjectController extends Controller
                     }
                 }
             }
+    
+            if ($request->Project_Type == 'S') {
+                foreach ($request->Details_Short_Project as $detail) {
+                    $shortProject = new ShortProjectModel;
+                    $shortProject->Project_Id = $project->Id_Project;
+                    $shortProject->Details_Short_Project = $detail;
+                    $shortProject->save();
+                    Log::info('Short project created with detail: ' . $detail);
+                }
+            }
+    
+            if ($request->Status_Budget !== 'N') {
+                if ($request->has('budget_source')) {
+                    $projectBudgetSource = new ProjectHasBudgetSourceModel;
+                    $projectBudgetSource->Project_Id = $project->Id_Project;
+                    $projectBudgetSource->Budget_Source_Id = $request->budget_source;
+                    $projectBudgetSource->Amount_Total = $request->input('amount_' . $request->budget_source) ?? null;
+                    $projectBudgetSource->Details_Expense = $request->source_detail ?? null;
+                    $projectBudgetSource->save();
+                    Log::info('Project budget source created with ID: ' . $request->budget_source);
+                }
+            
+                if ($request->has('activity')) {
+                    foreach ($request->activity as $index => $activity) {
+                        $budgetForm = new BudgetFormModel;
+                        $budgetForm->Budget_Source_Id = $request->budget_source;
+                        $budgetForm->Project_Id = $project->Id_Project;
+                        $budgetForm->Big_Topic = $activity ?? null;
+                        $budgetForm->Amount_Big = $request->total_amount[$index] ?? null;
+                        $budgetForm->save();
+                        Log::info('Budget form created with big topic: ' . $activity);
+            
+                        if ($request->has('subActivity')) {
+                            foreach ($request->subActivity[$index] as $subIndex => $subActivity) {
+                                $subtopicBudgetForm = new SubtopicBudgetHasBudgetFormModel;
+                                $subtopicBudgetForm->Subtopic_Budget_Id = $subActivity ?? null;
+                                $subtopicBudgetForm->Budget_Form_Id = $budgetForm->Id_Budget_Form;
+                                $subtopicBudgetForm->Details_Subtopic_Form = $request->description[$index][$subIndex] ?? null;
+                                $subtopicBudgetForm->Amount_Sub = $request->amount[$index][$subIndex] ?? null;
+                                $subtopicBudgetForm->save();
+                                Log::info('Subtopic budget form created with subtopic ID: ' . $subActivity);
+                            }
+                        }
+                    }
+                }
+            }
+    
+            if ($request->has('expected_results')) {
+                foreach ($request->expected_results as $expectedResult) {
+                    $expectedResultModel = new ExpectedResultsModel;
+                    $expectedResultModel->Name_Expected_Results = $expectedResult;
+                    $expectedResultModel->Project_Id = $project->Id_Project;
+                    $expectedResultModel->save();
+                    Log::info('Expected result created with name: ' . $expectedResult);
+                }
+            }
+            
+            if ($request->has('outcomes')) {
+                foreach ($request->outcomes as $outcome) {
+                    $outcomeModel = new OutcomeModel;
+                    $outcomeModel->Name_Outcome = $outcome;
+                    $outcomeModel->Project_Id = $project->Id_Project;
+                    $outcomeModel->save();
+                    Log::info('Outcome created with name: ' . $outcome);
+                }
+            }
+            
+            if ($request->has('outputs')) {
+                foreach ($request->outputs as $output) {
+                    $outputModel = new OutputModel;
+                    $outputModel->Name_Output = $output;
+                    $outputModel->Project_Id = $project->Id_Project;
+                    $outputModel->save();
+                    Log::info('Output created with name: ' . $output);
+                }
+            }
+    
         } else {
             Log::error('Failed to create project.');
         }
     
         return redirect()->route('project', ['Strategic_Id' => $Strategic_Id])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
     }
-    
+        
     public function showAllApprovals(Request $request)
     {
         $approvals = collect();
+        $countApproved = 0;
     
         $employee = $request->session()->get('employee');
         $permissions = $request->session()->get('permissions');
+
+        $request->session()->forget('pendingApprovalsCount');
+        $pendingApprovals = collect();
+        if ($employee) {
+            if ($employee->IsAdmin === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereNotIn('Count_Steps', [0, 2, 6, 9]);
+                })->where('Status', 'I')->get();
+            } elseif ($employee->IsManager === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereIn('Count_Steps', [4, 7]);
+                })->where('Status', 'I')->get();
+            } elseif ($employee->IsDirector === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereIn('Count_Steps', [1, 5, 8]);
+                })->where('Status', 'I')->get();
+            } elseif ($employee->IsFinance === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereIn('Count_Steps', [3]);
+                })->where('Status', 'I')->get();
+            } else {
+                // ผู้รับผิดชอบโครงการ
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) use ($employee) {
+                    $query->whereIn('Count_Steps', [0, 2, 6, 9])
+                        ->where('Employee_Id', $employee->Id_Employee);
+                })->where('Status', 'I')->get();
+            }
+        }
+
+        $pendingApprovalsCount = $pendingApprovals->count();
+        $request->session()->put('pendingApprovalsCount', $pendingApprovalsCount);
+
+        $pendingProjectIds = $pendingApprovals->pluck('Project_Id');
+        $request->session()->put('pendingProjectIds', $pendingProjectIds);
     
         if ($employee) {
             if ($employee->IsAdmin === 'Y') {
@@ -337,6 +508,9 @@ class ListProjectController extends Controller
                             ->where('Employee_Id', $employee->Id_Employee);
                     })->get();
             }
+
+            $countApproved = $approvals->where('Status', 'I')->count();
+            $request->session()->put('countApproved', $countApproved);
     
             foreach ($approvals as $approval) {
                 $project = $approval->project;
@@ -502,7 +676,7 @@ class ListProjectController extends Controller
             $projects = $projectsQuery->whereHas('approvals', function($query) {
                     $query->whereIn('Status', ['I', 'N']);
                 })
-                ->with(['approvals.recordHistory', 'employee.department', 'employee', 'budgets'])
+                ->with(['approvals.recordHistory', 'employee.department', 'employee'])
                 ->get();
     
             foreach ($projects as $project) {
@@ -560,7 +734,6 @@ class ListProjectController extends Controller
                     $project->buttonText = 'สิ้นสุดโครงการ';
                 }
     
-                $project->budgetStatus = $project->budgets->first()->Status_Budget ?? 'N/A';
             }
 
     
@@ -598,11 +771,10 @@ class ListProjectController extends Controller
                 ]);
     
                 if ($project->Count_Steps == 2) {
-                    $budget = BudgetModel::where('Project_Id', $project->Id_Project)->first();
-                    if ($budget && $budget->Status_Budget == 'N') {
-                        $project->Count_Steps = 4; 
+                    if ($project->Status_Budget == 'N') {
+                        $project->Count_Steps = 4;
                     } else {
-                        $project->Count_Steps = 3; 
+                        $project->Count_Steps = 3;
                     }
                 } else {
                     switch ($project->Count_Steps) {

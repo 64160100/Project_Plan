@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\EmployeeModel;
+use App\Models\ApproveModel;
+use App\Models\RecordHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -36,11 +38,77 @@ class AuthController extends Controller
             }
     
             $employee->load('permissions', 'department');
+
+            $pendingApprovals = collect();
+            if ($employee) {
+                if ($employee->IsAdmin === 'Y') {
+                    $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                        $query->whereNotIn('Count_Steps', [0, 2, 6, 9]);
+                    })->where('Status', 'I')->get();
+                } elseif ($employee->IsManager === 'Y') {
+                    $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                        $query->whereIn('Count_Steps', [4, 7]);
+                    })->where('Status', 'I')->get();
+                } elseif ($employee->IsDirector === 'Y') {
+                    $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                        $query->whereIn('Count_Steps', [1, 5, 8]);
+                    })->where('Status', 'I')->get();
+                } elseif ($employee->IsFinance === 'Y') {
+                    $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                        $query->whereIn('Count_Steps', [3]);
+                    })->where('Status', 'I')->get();
+                } else {
+                    $pendingApprovals = ApproveModel::whereHas('project', function ($query) use ($employee) {
+                        $query->whereIn('Count_Steps', [0, 2, 6, 9])
+                            ->where('Employee_Id', $employee->Id_Employee);
+                    })->where('Status', 'I')->get();
+
+                    $pendingApprovalsCountForEmployee = $pendingApprovals->count();
+                }
+            }
+            $pendingApprovalsCount = $pendingApprovals->count();
+
+            if ($employee->IsAdmin === 'Y') {
+                $recordHistories = RecordHistory::with('approvals.project')
+                    ->whereHas('approvals', function ($query) {
+                        $query->where('Status', '!=', 'Y');
+                    })
+                    ->orderBy('Id_Record_History', 'desc')
+                    ->get();
+            
+                $statusNCount = RecordHistory::whereHas('approvals', function ($query) {
+                        $query->where('Status', 'N');
+                    })
+                    ->count();
+            } else {
+                $recordHistories = RecordHistory::whereHas('approvals', function ($query) {
+                        $query->where('Status', '!=', 'Y');
+                    })
+                    ->whereHas('approvals.project', function ($query) use ($employee) {
+                        $query->where('Employee_Id', $employee->Id_Employee);
+                    })
+                    ->with('approvals.project')
+                    ->orderBy('Id_Record_History', 'desc')
+                    ->get();
+            
+                $statusNCount = RecordHistory::whereHas('approvals', function ($query) {
+                        $query->where('Status', 'N');
+                    })
+                    ->whereHas('approvals.project', function ($query) use ($employee) {
+                        $query->where('Employee_Id', $employee->Id_Employee);
+                    })
+                    ->count();
+            }
     
             session([
                 'employee' => $employee,
                 'permissions' => $employee->permissions,
-                'department' => $employee->department
+                'department' => $employee->department,
+                // แจ้งเตือนการอนุมัติ
+                'pendingApprovalsCountForEmployee' => $pendingApprovalsCountForEmployee ?? 0,  
+                'pendingApprovalsCount' => $pendingApprovalsCount,
+                'recordHistories' => $recordHistories,  
+                'statusNCount' => $statusNCount,
             ]);
     
             return redirect()->route('dashboard')->with('token', $token);

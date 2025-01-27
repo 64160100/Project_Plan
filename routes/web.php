@@ -4,7 +4,8 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ListProjectController;
 use App\Http\Controllers\StorageFileController;
 use App\Http\Controllers\StatusController;
-use App\Http\Controllers\PdfController;
+use App\Http\Controllers\PlanDLCController;
+use App\Http\Controllers\PDFController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -15,6 +16,9 @@ require __DIR__.'/strategic.php';
 Route::get('/setting', [SettingController::class, 'settings'])->name('setting');
 
 Route::get('/listProject', [ListProjectController::class, 'project'])->name('project');
+
+Route::get('/createFirstForm/{Strategic_Id}', [ListProjectController::class, 'showCreateFirstForm'])->name('showCreateFirstForm');
+Route::post('/createFirstForm/{Strategic_Id}', [ListProjectController::class, 'createFirstForm'])->name('createFirstForm');
 
 Route::get('/createProject/{Strategic_Id}', [ListProjectController::class, 'showCreateForm'])->name('showCreateProject');
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
@@ -58,8 +62,15 @@ Route::get('/project/{Id_Project}', [StatusController::class, 'showDetails'])->n
 Route::get('generate-pdf/{id}', [PDFController::class, 'generatePDF']);
 Route::get('actionplan-pdf', [PDFController::class, 'ActionPlanPDF']);
 Route::get('strategic-pdf/{Id_Strategic}', [PDFController::class, 'PDFStrategic'])->name('PDF.strategic');
-Route::get('project-pdf/{Id_Project}', [PDFController::class, 'PDFProject'])->name('PDF.Project');
 
 Route::get('pdfStrategic/{Id_Project}', [PDFController::class, 'ctrlpPDFStrategic'])->name('pdf.strategicCtrlP');
+
+Route::get('project-pdf/{Id_Project}', [PDFController::class, 'PDFProject'])->name('PDF.Project');
 Route::get('pdfproject/{Id_Project}', [PDFController::class, 'ctrlpPDFProject'])->name('PDF.projectCtrlP');
 
+//PlanDLC
+Route::get('/report', [PlanDLCController::class, 'report'])->name('PlanDLC.report');
+Route::get('/checkBudget', [PlanDLCController::class, 'checkBudget'])->name('PlanDLC.checkBudget');
+Route::get('/allProject', [PlanDLCController::class, 'allProject'])->name('PlanDLC.allProject');
+Route::get('/editBudget', [PlanDLCController::class, 'editBudget'])->name('PlanDLC.editBudget');
+Route::get('/showProjectDepartment/{Id_Department}', [PlanDLCController::class, 'showProjectDepartment'])->name('showProjectDepartment');

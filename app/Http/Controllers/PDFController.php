@@ -3,10 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
+use PDF;
 use App\Models\StrategicModel;
 use App\Models\StrategyModel;
-use App\Models\ProjectModel;
+use App\Models\ListProjectModel;
+use App\Models\SupProjectModel;
+use App\Models\ProjectHasBudgetSourceModel;
+use App\Models\TargetModel;
+use App\Models\TargetDetailsModel;
+
+
 
 
 class PDFController extends Controller
@@ -18,10 +25,12 @@ class PDFController extends Controller
      */
     public function generatePDF()
     {
+        // $strategic = StrategicModel::find(5);
         $strategy = StrategyModel::find(11);
         $data = [
             'title' => 'Welcome to ItSolutionStuff.com',
             'date' => date('m/d/Y'),
+            // 'strategic' => $strategic,
             'strategy' => $strategy,
         ]; 
            
@@ -32,13 +41,14 @@ class PDFController extends Controller
     
     public function ActionPlanPDF()
     {
-        $projects = ProjectModel::with(['strategic.strategies'])
+        $projects = ListProjectModel::with(['strategic.strategies'])
                     ->orderBy('Strategic_Id')
                     ->orderBy('Name_Strategy')
                     ->get();    
 
         $strategyCounts = $projects->groupBy('Name_Strategy')->map->count();
         $data = [
+            // 'title' => '',
             'projects' => $projects,
             'strategyCounts' => $strategyCounts,
         ]; 
@@ -51,7 +61,7 @@ class PDFController extends Controller
 
     public function PDFStrategic($Id_Strategic)
     {
-        $projects = ProjectModel::with(['strategic.strategies'])
+        $projects = ListProjectModel::with(['strategic.strategies'])
                     ->where('Strategic_Id', $Id_Strategic)
                     ->orderBy('Name_Strategy')
                     ->get();   
@@ -67,7 +77,7 @@ class PDFController extends Controller
 
     public function PDFProject($Id_Project)
     {
-        $projects = ProjectModel::with(['strategic.strategies'])
+        $projects = ListProjectModel::with(['strategic.strategies'])
                     ->where('Id_Project', $Id_Project)
                     ->firstOrFail();    
     
@@ -79,9 +89,11 @@ class PDFController extends Controller
         return $pdf->stream($projects->Name_Project .'.pdf');  
     }
 
-        public function ctrlpPDFStrategic($Id_Strategic)
+    
+    // PDF ที่เรียกจากหน้าHTML
+    public function ctrlpPDFStrategic($Id_Strategic)
     {
-        $projects = ProjectModel::with(['strategic.strategies'])
+        $projects = ListProjectModel::with(['strategic.strategies'])
                     ->where('Strategic_Id', $Id_Strategic)
                     ->orderBy('Name_Strategy')
                     ->get();   
@@ -96,16 +108,20 @@ class PDFController extends Controller
     
     public function ctrlpPDFProject($Id_Project)
     {
-        $projects = ProjectModel::with(['strategic.strategies'])
-                    ->where('Id_Project', $Id_Project)
-                    ->firstOrFail();    
+        $project = ListProjectModel::with([
+            'subProjects',
+            'projectHasIntegrationCategories',
+            'targets.targetDetails',
+        ])->where('Id_Project', $Id_Project)->firstOrFail();
     
-        $data = [      
-            'title' => $projects->Name_Project,
-            'projects' => $projects,
-        ]; 
-        return view('PDF.ctrlP.pdfproject', $data);
+        $strategics = StrategicModel::with(['strategies'])->findOrFail($project->Strategic_Id);
+        $strategies = $strategics->strategies;
+    
+        $projectBudgetSources = ProjectHasBudgetSourceModel::where('Project_Id', $Id_Project)->get();
+            
+        log::info($project);
 
+        return view('PDF.ctrlP.pdfproject', compact('project', 'strategies', 'projectBudgetSources'));
     }
 
 }

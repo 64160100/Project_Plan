@@ -25,4 +25,10 @@ class RecordHistory extends Model
     {
         return $this->belongsTo(ApproveModel::class, 'Approve_Id', "Approve_Project_Id");
     }
+
+    public function approvals()
+    {
+        return $this->belongsTo(ApproveModel::class, 'Approve_Id', 'Id_Approve');
+    }
+
 }

@@ -17,7 +17,10 @@ class ListProjectModel extends Model
         'Employee_Id',
         'Objective_Project',
         'Principles_Reasons',
+        'Success_Indicators',
+        'Value_Target',
         'Project_Type',
+        'Status_Budget',
         'First_Time',
         'End_Time',
         'Count_Steps',
@@ -42,11 +45,6 @@ class ListProjectModel extends Model
     public function subProjects()
     {
         return $this->hasMany(SupProjectModel::class, 'Project_Id', 'Id_Project');
-    }
-
-    public function budgets()
-    {
-        return $this->hasMany(BudgetModel::class, 'Project_Id', 'Id_Project');
     }
 
     public function storageFiles()

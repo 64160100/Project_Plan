@@ -48,10 +48,6 @@ INSERT INTO `Approve` (`Id_Approve`, `Status`, `Project_Id`) VALUES
 (4, 'I', 14),
 (5, 'I', 15);
 
-INSERT INTO `Budget` (`Id_Budget`, `Status_Budget`, `Project_Id`) VALUES
-(3, 'N', 14),
-(4, 'Y', 15);
-
 INSERT INTO `Record_History` (`Id_Record_History`, `comment`, `Name_Record`, `Permission_Record`, `Status_Record`, `Approve_Id`, `Approve_Project_Id`, `Time_Record`) VALUES
 (4, 'เสนอโครงการเพื่อขออนุมัติ', 'สมศักดิ์ น้ำเงิน', 'ผู้รับผิดชอบโครงการ', 'Y', 4, 14, '2025-01-15 14:08:46'),
 (5, 'เห็นชอบการดำเนินโครงการในขั้นต้น', 'สมหญิง เขียว', 'ผู้บริหาร', 'Y', 4, 14, '2025-01-15 14:18:39'),
@@ -104,6 +100,16 @@ INSERT INTO `Months` (`Id_Months`, `Name_Month`) VALUES
 ('12', 'ธันวาคม');
 
 INSERT INTO `PDCA_Stages` (`Id_PDCA_Stages`, `Name_PDCA`) VALUES ('1', 'ขั้นวางแผนงาน(Plan)'), ('2', 'ขั้นดำเนินการ(Do)'), ('3', 'ขั้นสรุปและประเมินผล(Check)'), ('4', 'ขั้นปรับปรุงตามผลการประเมิน(Act)');
+
+INSERT INTO `Budget_Source` (`Id_Budget_Source`, `Name_Budget_Source`) VALUES ('1', 'เงินอุดหนุนจากรัฐบาล'), ('2', 'เงินรายได้ของส่วนงาน'), ('3', 'ได้รับการสนับสนุนจากหน่วยงานภายนอก');
+
+INSERT INTO `Subtopic_Budget` (`Id_Subtopic_Budget`, `Name_Subtopic_Budget`) VALUES ('1', 'ค่าตอบแทน'), ('2', 'ค่าใช้สอย'), ('3', 'ค่าวัสดุ');
+
+INSERT INTO `Project_has_Budget_Source` (`Id_Project_has_Budget_Source`, `Project_Id`, `Budget_Source_Id`, `Amount_Total`, `Details_Expense`) VALUES ('1', '14', '1', '126000', 'โครงการสัปดาห์ห้องสมุด ประจำปี ๒๕๖๗ The Next Library for Digital Citizenship: อีกก้าวของห้องสมุดสำหรับพลเมืองดิจิทัล  Open in new window\r\n');
+
+INSERT INTO `Budget_Form` (`Id_Budget_Form`, `Budget_Source_Id`, `Project_Id`, `Big_Topic`, `Amount_Big`) VALUES ('1', '1', '14', 'วันที่ 14 มกราคม 2567 โครงการสัปดาห์ห้องสมุด ประจำปี ๒๕๖๗ The Next Library for Digital Citizenship: อีกก้าวของห้องสมุดสำหรับพลเมืองดิจิทัล  Open in new window\r\n', '20000');
+
+INSERT INTO `Subtopic_Budget_has_Budget_Form` (`Id_Subtopic_Budget_has_Budget_Form`, `Subtopic_Budget_Id`, `Budget_Form_Id`, `Details_Subtopic_Form`, `Amount_Sub`) VALUES ('1', '1', '1', 'ค่าอาหาร', '2000'), ('2', '1', '1', 'ค่าขนม', '3000');
 
 <?php
 $password = '12345678';

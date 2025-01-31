@@ -21,9 +21,6 @@ F1 > "Set Log Level" >
 
 php artisan make:controller RegisterController
 php artisan make:model MyModel
-
-composer dump-autoload
-
 กรณีที่สร้างหน้า viwe ใช้ get
 add -> กรณีที่เพิ่มถึงอย่างใช้ add ตามด้วยชื่อไฟล์ ตย. addEmployee
 edit -> กรณีที่แก้ไขถึงอย่างใช้ edit ตามด้วยชื่อไฟล์ ตย. editEmployee
@@ -35,7 +32,5 @@ update -> กรณีที่อัพเดทถึงอย่างใช�
 
 suchapa.ch
 
-INSERT INTO `Employee` 
-(`Id_Employee`, `Firstname_Employee`, `Lastname_Employee`, `Email`, `Password`, `IsManager`, `IsDirector`, `Department_Id`, `Position_Id`) 
-VALUES 
-(1, 'สมชาย', 'แดง', '54160100@go.buu.ac.th', MD5('12345678'), 'N', 'Y', 1, 1);
+เปิดที่อยู่ไฟล์บน wsl
+explorer.exe .

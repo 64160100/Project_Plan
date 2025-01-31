@@ -37,6 +37,10 @@ use App\Models\SubtopicBudgetHasBudgetFormModel;
 use App\Models\ExpectedResultsModel;
 use App\Models\OutcomeModel;
 use App\Models\OutputModel;
+use App\Models\StrategicObjectivesModel;
+use App\Models\KpiModel;
+use App\Models\ProjectBatchHasProjectModel;
+use App\Models\BatchProjectModel;
 use Carbon\Carbon;
 
 class ListProjectController extends Controller
@@ -49,6 +53,22 @@ class ListProjectController extends Controller
         });
 
         return view('Project.listProject', compact('strategics')); 
+    }
+
+    public function editProject($Id_Project)
+    {
+        $project = ListProjectModel::findOrFail($Id_Project);
+        $strategics = StrategicModel::all();
+        $strategies = StrategyModel::where('Strategic_Id', $project->Strategic_Id)->get();
+        $employees = EmployeeModel::all();
+        $budgetSources = BudgetSourceModel::all();
+        $subtopBudgets = SubtopBudgetModel::all();
+        $strategicObjectives = StrategicObjectivesModel::all();
+        $kpis = KpiModel::all();
+        
+        Log::info($strategies);
+
+        return view('Project.editProject', compact('project', 'strategics', 'strategies', 'employees', 'budgetSources', 'subtopBudgets', 'strategicObjectives', 'kpis'));
     }
 
     public function viewProject($projectId)
@@ -106,56 +126,37 @@ class ListProjectController extends Controller
 
     public function showCreateFirstForm($Strategic_Id)
     {
-        $strategics = StrategicModel::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
+        $strategics = StrategicModel::with(['strategies.kpis', 'strategies.strategicObjectives', 'projects'])->findOrFail($Strategic_Id);
         $strategies = $strategics->strategies;
         $projects = $strategics->projects; 
         $employees = EmployeeModel::all();
-        $sdgs = SDGsModel::all();
+        $sdgs = SDGsModel::all(); 
         $nameStrategicPlan = $strategics->Name_Strategic_Plan;
         $integrationCategories = IntegrationModel::orderBy('Id_Integration_Category', 'asc')->get();
         $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
         $pdcaStages = PdcaModel::all();
         $budgetSources = BudgetSourceModel::all();
         $subtopBudgets = SubtopBudgetModel::all();
-    
-        return view('Project.createFirstForm', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets'));
-    }
+        $kpis = KpiModel::all();
+        $strategicObjectives = StrategicObjectivesModel::all();
 
-    public function createFirstForm(Request $request, $Strategic_Id)
-    {
-        $strategics = StrategicModel::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
-        $strategies = $strategics->strategies;
-    
-        $project = new ListProjectModel;
-        $project->Strategic_Id = $Strategic_Id;
-        $project->Name_Strategy = $request->Name_Strategy ?? null;
-        $project->Name_Project = $request->Name_Project;
-        $project->Employee_Id = $request->employee_id ?? null;
-        $project->Objective_Project = $request->Objective_Project ?? null;
-        $project->Success_Indicators = $request->Success_Indicators ?? null;
-        $project->Value_Target = $request->Value_Target ?? null;
-        $project->First_Time = $request->First_Time ?? null;
-        $project->End_Time = $request->End_Time ?? null;
-        $project->Status_Budget = $request->Status_Budget ?? null;
-        $project->save();
-    
-        return redirect()->route('project', ['Strategic_Id' => $Strategic_Id])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
+        return view('Project.createFirstForm', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets', 'kpis', 'strategicObjectives'));
     }
 
     public function showCreateForm($Strategic_Id)
     {
-        $strategics = StrategicModel::with(['strategies', 'projects'])->find($Strategic_Id);
+        $strategics = StrategicModel::with(['strategies.kpis', 'strategies.strategicObjectives', 'projects'])->findOrFail($Strategic_Id);
         $strategies = $strategics->strategies;
         $projects = $strategics->projects; 
         $employees = EmployeeModel::all();
-        $sdgs = SDGsModel::all();
+        $sdgs = SDGsModel::all(); 
         $nameStrategicPlan = $strategics->Name_Strategic_Plan;
         $integrationCategories = IntegrationModel::orderBy('Id_Integration_Category', 'asc')->get();
         $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
         $pdcaStages = PdcaModel::all();
         $budgetSources = BudgetSourceModel::all();
         $subtopBudgets = SubtopBudgetModel::all();
-    
+
         return view('Project.createProject', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets'));
     }
 
@@ -164,9 +165,17 @@ class ListProjectController extends Controller
         $strategics = StrategicModel::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
         $strategies = $strategics->strategies;
     
+        $request->validate([
+            'Name_Strategy' => 'required',
+        ]);
+
+        $strategy = StrategyModel::find($request->input('Name_Strategy'));
+
+        $nameStrategy = $strategy ? $strategy->Name_Strategy : null;
+
         $project = new ListProjectModel;
-        $project->Strategic_Id = $Strategic_Id;
-        $project->Name_Strategy = $request->Name_Strategy ?? null;
+        $project->Strategic_Id = $request->Strategic_Id;
+        $project->Name_Strategy = $nameStrategy;
         $project->Name_Project = $request->Name_Project;
         $project->Employee_Id = $request->employee_id ?? null;
         $project->Objective_Project = $request->Objective_Project ?? null;
@@ -178,6 +187,7 @@ class ListProjectController extends Controller
         $project->First_Time = $request->First_Time ?? null;
         $project->End_Time = $request->End_Time ?? null;
         $project->save();
+
     
         if ($project->Id_Project) {
             $approval = new ApproveModel;
@@ -442,36 +452,25 @@ class ListProjectController extends Controller
     {
         $approvals = collect();
         $countApproved = 0;
-    
+        $batchProjects = null;
+        $projects = collect();
+        $batches = collect();
+        $projectBatchRelations = collect();
+        $filteredProjects = collect();
         $employee = $request->session()->get('employee');
         $permissions = $request->session()->get('permissions');
 
+        if (!$employee) {
+            Log::warning('No employee data found in session.');
+            return redirect()->route('home')->with('error', 'No employee data found in session.');
+        }
+
         $request->session()->forget('pendingApprovalsCount');
         $pendingApprovals = collect();
-        if ($employee) {
-            if ($employee->IsAdmin === 'Y') {
-                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
-                    $query->whereNotIn('Count_Steps', [0, 2, 6, 9]);
-                })->where('Status', 'I')->get();
-            } elseif ($employee->IsManager === 'Y') {
-                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
-                    $query->whereIn('Count_Steps', [4, 7]);
-                })->where('Status', 'I')->get();
-            } elseif ($employee->IsDirector === 'Y') {
-                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
-                    $query->whereIn('Count_Steps', [1, 5, 8]);
-                })->where('Status', 'I')->get();
-            } elseif ($employee->IsFinance === 'Y') {
-                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
-                    $query->whereIn('Count_Steps', [3]);
-                })->where('Status', 'I')->get();
-            } else {
-                // ผู้รับผิดชอบโครงการ
-                $pendingApprovals = ApproveModel::whereHas('project', function ($query) use ($employee) {
-                    $query->whereIn('Count_Steps', [0, 2, 6, 9])
-                        ->where('Employee_Id', $employee->Id_Employee);
-                })->where('Status', 'I')->get();
-            }
+        if ($employee->IsDirector === 'Y') {
+            $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                $query->whereIn('Count_Steps', [1, 5, 8]);
+            })->where('Status', 'I')->get();
         }
 
         $pendingApprovalsCount = $pendingApprovals->count();
@@ -479,39 +478,16 @@ class ListProjectController extends Controller
 
         $pendingProjectIds = $pendingApprovals->pluck('Project_Id');
         $request->session()->put('pendingProjectIds', $pendingProjectIds);
-    
-        if ($employee) {
-            if ($employee->IsAdmin === 'Y') {
-                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
-                    ->whereHas('project', function ($query) {
-                        $query->whereNotIn('Count_Steps', [0, 2, 6, 9]);
-                    })->get();
-            } elseif ($employee->IsManager === 'Y') {
-                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
-                    ->whereHas('project', function ($query) {
-                        $query->whereIn('Count_Steps', [4, 7]);
-                    })->get();
-            } elseif ($employee->IsDirector === 'Y') {
-                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
-                    ->whereHas('project', function ($query) {
-                        $query->whereIn('Count_Steps', [1, 5, 8, 11]);
-                    })->get();
-            } elseif ($employee->IsFinance === 'Y') {
-                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
-                    ->whereHas('project', function ($query) {
-                        $query->whereIn('Count_Steps', [3]);
-                    })->get();
-            } else {
-                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
-                    ->whereHas('project', function ($query) use ($employee) {
-                        $query->whereIn('Count_Steps', [0, 2, 6, 9])
-                            ->where('Employee_Id', $employee->Id_Employee);
-                    })->get();
-            }
+
+        if ($employee->IsDirector === 'Y') {
+            $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
+                ->whereHas('project', function ($query) {
+                    $query->whereIn('Count_Steps', [1, 5, 8, 11]);
+                })->get();
 
             $countApproved = $approvals->where('Status', 'I')->count();
             $request->session()->put('countApproved', $countApproved);
-    
+
             foreach ($approvals as $approval) {
                 $project = $approval->project;
                 if ($project && $project->First_Time) {
@@ -526,25 +502,48 @@ class ListProjectController extends Controller
                     $year = $firstTime->year + 543;
                     $project->formattedFirstTime = "วันที่ $day $month พ.ศ $year";
                 }
-    
+
                 foreach ($approval->recordHistory as $history) {
                     $timeRecord = $history->Time_Record;
                     $date = \Carbon\Carbon::parse($timeRecord);
                     $currentDate = \Carbon\Carbon::now()->setTimezone('Asia/Bangkok');
                     $history->daysSinceTimeRecord = max(ceil($date->diffInDays($currentDate, false)), 0);
-    
+
                     if ($history->daysSinceTimeRecord == -0) {
                         $history->daysSinceTimeRecord = 0;
                     }
                 }
+
+                $projects = ListProjectModel::with([
+                    'employee.department'
+                ])->get();
+            
+                $batches = BatchProjectModel::all();
+            
+                $projectBatchRelations = ProjectBatchHasProjectModel::with([
+                    'batch:Id_Project_Batch,Name_Batch',
+                    'project:Id_Project,Name_Project',
+                    'batch:Count_Steps_Batch'
+                ])
+                ->select('Project_Batch_Id', 'Project_Id', 'Count_Steps_Batch')
+                ->orderBy('Project_Batch_Id')
+                ->get();
+            
+                $project->batchProjects = null;
+                $project->batchName = null;
+                $project->batchId = null;
+                $namebatch = null;
+                $batches = null;
+                $filteredProjects = null;
+                $projects = null;
             }
         } else {
             Log::warning('No employee data found in session.');
         }
-    
-        return view('requestApproval', compact('approvals'));
+        
+        return view('requestApproval', compact('approvals', 'employee', 'batchProjects', 'projects', 'batches', 'projectBatchRelations', 'filteredProjects'));
     }
-    
+
     public function updateApprovalStatus(Request $request, $id, $status)
     {
         $approval = ApproveModel::find($id);
@@ -679,6 +678,8 @@ class ListProjectController extends Controller
                 ->with(['approvals.recordHistory', 'employee.department', 'employee'])
                 ->get();
     
+            $countStepsZero = 0;
+    
             foreach ($projects as $project) {
                 $employeeData = $project->employee;
                 $project->employeeName = $employeeData ? $employeeData->Firstname_Employee . ' ' . $employeeData->Lastname_Employee : '-';
@@ -729,119 +730,123 @@ class ListProjectController extends Controller
                     }
                 }
     
+                if ($project->Count_Steps === 0) {
+                    $countStepsZero++;
+                }
+    
                 if ($project->Count_Steps === 9) {
                     $project->status = 'สิ้นสุด';
                     $project->buttonText = 'สิ้นสุดโครงการ';
                 }
-    
             }
-
     
-            return view('proposeProject', compact('projects'));
+            return view('proposeProject', compact('projects', 'countStepsZero'));
         } else {
             return redirect()->back()->with('error', 'You are not authorized to view these projects.');
         }
     }
     
-    public function submitForApproval(Request $request, $id)
+    public function submitForApproval(Request $request, $id = null)
     {
-        $project = ListProjectModel::find($id);
-    
-        if ($project) {
-            $approval = ApproveModel::where('Project_Id', $project->Id_Project)->first();
-    
-            if ($approval) {
-                $approval->Status = 'Y';
-                $approval->save();
-    
-                $employee = $request->session()->get('employee');
-                $permissions = $employee ? $employee->permissions : collect();
-    
-                $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
-                $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
-    
-                RecordHistory::create([
-                    'Approve_Id' => $approval->Id_Approve,
-                    'Approve_Project_Id' => $approval->Project_Id,
-                    'Comment' => 'เสนอโครงการเพื่อขออนุมัติ',
-                    'Time_Record' => Carbon::now('Asia/Bangkok'),
-                    'Status_Record' => $approval->Status,
-                    'Name_Record' => $nameResponsible,
-                    'Permission_Record' => $permissionName,
-                ]);
-    
-                if ($project->Count_Steps == 2) {
-                    if ($project->Status_Budget == 'N') {
-                        $project->Count_Steps = 4;
-                    } else {
-                        $project->Count_Steps = 3;
-                    }
-                } else {
-                    switch ($project->Count_Steps) {
-                        case 0:
-                            $project->Count_Steps = 1;
-                            break;
-                        case 1:
-                            $project->Count_Steps = 2;
-                            break;
-                        case 3:
-                            $project->Count_Steps = 4;
-                            break;
-                        case 4:
-                            $project->Count_Steps = 5;
-                            break;
-                        case 5:
-                            $project->Count_Steps = 6;
-                            break;
-                        case 6:
-                            if (\Carbon\Carbon::now()->gt(\Carbon\Carbon::parse($project->End_Time))) {
-                                $project->Count_Steps = 11; 
-                            } else {
-                                $project->Count_Steps = 7;
-                            }
-                            break;
-                        case 7:
-                            $project->Count_Steps = 8;
-                            break;
-                        case 8:
-                            $project->Count_Steps = 9;
-                            break;
-                        case 9:
-                            $project->Count_Steps = 10;
-                            $approval->Status = 'Y';
-                            $approval->save();
-                            break;
-                        case 11:
-                            $project->Count_Steps = 2;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-    
-                $project->save();
-    
-                if ($project->Count_Steps <= 9 || $project->Count_Steps == 11) {
-                    $approval->Status = 'I';
+        $projectIds = $request->input('project_ids', []);
+
+        foreach ($projectIds as $id) {
+            $project = ListProjectModel::find($id);
+
+            if ($project) {
+                $approval = ApproveModel::where('Project_Id', $project->Id_Project)->first();
+
+                if ($approval) {
+                    $approval->Status = 'Y';
                     $approval->save();
+
+                    $employee = $request->session()->get('employee');
+                    $permissions = $employee ? $employee->permissions : collect();
+
+                    $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
+                    $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
+
+                    RecordHistory::create([
+                        'Approve_Id' => $approval->Id_Approve,
+                        'Approve_Project_Id' => $approval->Project_Id,
+                        'Comment' => 'เสนอโครงการเพื่อขออนุมัติ',
+                        'Time_Record' => Carbon::now('Asia/Bangkok'),
+                        'Status_Record' => $approval->Status,
+                        'Name_Record' => $nameResponsible,
+                        'Permission_Record' => $permissionName,
+                    ]);
+
+                    if ($project->Count_Steps == 0) {
+                        $project->Count_Steps = 1;
+
+                        ProjectBatchHasProjectModel::where('Project_Id', $project->Id_Project)
+                            ->update(['Count_Steps_Batch' => 1]);
+                    } else if ($project->Count_Steps == 2) {
+                        if ($project->Status_Budget == 'N') {
+                            $project->Count_Steps = 4;
+                        } else {
+                            $project->Count_Steps = 3;
+                        }
+                    } else {
+                        switch ($project->Count_Steps) {
+                            case 1:
+                                $project->Count_Steps = 2;
+                                break;
+                            case 3:
+                                $project->Count_Steps = 4;
+                                break;
+                            case 4:
+                                $project->Count_Steps = 5;
+                                break;
+                            case 5:
+                                $project->Count_Steps = 6;
+                                break;
+                            case 6:
+                                if (\Carbon\Carbon::now()->gt(\Carbon\Carbon::parse($project->End_Time))) {
+                                    $project->Count_Steps = 11; 
+                                } else {
+                                    $project->Count_Steps = 7;
+                                }
+                                break;
+                            case 7:
+                                $project->Count_Steps = 8;
+                                break;
+                            case 8:
+                                $project->Count_Steps = 9;
+                                break;
+                            case 9:
+                                $project->Count_Steps = 10;
+                                $approval->Status = 'Y';
+                                $approval->save();
+                                break;
+                            case 11:
+                                $project->Count_Steps = 2;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    $project->save();
+
+                    if ($project->Count_Steps <= 9 || $project->Count_Steps == 11) {
+                        $approval->Status = 'I';
+                        $approval->save();
+                    }
                 }
-    
-                return redirect()->route('proposeProject')->with('success', 'Project submitted for approval.');
-            } else {
-                return redirect()->route('proposeProject')->with('error', 'Approval record not found.');
             }
         }
-    
-        return redirect()->route('proposeProject')->with('error', 'Project not found.');
+
+        return redirect()->route('proposeProject')->with('success', 'Projects submitted for approval.');
     }
 
-    public function edit($id, Request $request)
-    {
-        $project = ListProjectModel::with('supProjects')->findOrFail($id);
-        $strategies = StrategyModel::all();
-        $sdgs = SustainableDevelopmentGoalsModel::all();
-        return view('Project.editProject', compact('project', 'strategies', 'sdgs'));
-    }
+    // public function edit($id, Request $request)
+    // {
+    //     $project = ListProjectModel::with('supProjects')->findOrFail($id);
+    //     $strategies = StrategyModel::all();
+    //     $sdgs = SustainableDevelopmentGoalsModel::all();
+    //     return view('Project.editProject', compact('project', 'strategies', 'sdgs'));
+    // }
     
     public function update(Request $request, $id)
     {   

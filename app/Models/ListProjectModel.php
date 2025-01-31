@@ -96,4 +96,10 @@ class ListProjectModel extends Model
     {
         return $this->hasMany(PdcaDetailsModel::class, 'Project_Id', 'Id_Project');
     }
+
+    public function projectBatchHasProjects()
+    {
+        return $this->hasMany(ProjectBatchHasProjectModel::class, 'Project_Id', 'Id_Project');
+    }
+
 }

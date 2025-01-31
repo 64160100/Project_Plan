@@ -1,13 +1,16 @@
 @extends('navbar.app')
 
-@section('content')
-<link rel="stylesheet" href="{{ asset('css/requestApproval.css') }}">
+<hade>
+    <link rel="stylesheet" href="{{ asset('css/requestApproval.css') }}">
+</hade>
 
+@section('content')
 
 <div class="container">
     <h1>การอนุมัติทั้งหมด</h1>
     @foreach($approvals as $approval)
     @if($approval->Status !== 'Y' && $approval->Status !== 'N')
+    @if($approval->project->Count_Steps != 1)
     <div class="outer-container">
         <div class="container">
             <div class="header">
@@ -107,16 +110,15 @@
                                         <i class='bx bx-like'></i> อนุมัติ
                                     </button>
                                 </form>
-                                <form style="display:inline;">
-                                    <button type="button" class="status-button not-approved" data-bs-toggle="modal"
-                                        data-bs-target="#commentModal-{{ $approval->Id_Approve }}">
-                                        <i class='bx bx-dislike'></i> ไม่อนุมัติ
-                                    </button>
-                                </form>
+                                <button type="button" class="status-button not-approved" data-bs-toggle="modal"
+                                    data-bs-target="#commentModal-{{ $approval->Id_Approve }}">
+                                    <i class='bx bx-dislike'></i> ไม่อนุมัติ
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
         <!-- Modal -->
@@ -145,6 +147,129 @@
         </div>
     </div>
     @endif
+    @endif
     @endforeach
+
+
+    @if($employee->IsDirector === 'Y')
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">ชุดโครงการที่สร้างแล้ว</h5>
+        </div>
+        <div class="card-body">
+            <div class="batches-list">
+                @foreach($projectBatchRelations->groupBy('batch.Name_Batch') as $batchName => $relations)
+                @php
+                // Filter out relations with Count_Steps_Batch set to 1
+                $filteredRelations = $relations->filter(function ($relation) {
+                return $relation->Count_Steps_Batch == 1;
+                });
+                @endphp
+                @if($filteredRelations->isNotEmpty())
+                <div class="batch-item">
+                    <div class="batch-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            {{ $batchName }}
+                            <small>({{ $filteredRelations->count() }} โครงการ)</small>
+                        </h5>
+                    </div>
+                    <div class="batch-projects">
+                        @foreach($filteredRelations as $index => $relation)
+                        <div class="batch-project-item d-flex justify-content-between align-items-center">
+                            <div class="project-name">
+                                {{ $index + 1 }}. {{ $relation->project->Name_Project }}
+                            </div>
+                            <div class="project-actions">
+                                <a href="{{ route('projects.showBatchesProject', ['id' => $relation->Project_Id]) }}"
+                                    class="btn btn-info btn-sm">
+                                    <i class='bx bx-show'></i> ดูข้อมูล
+                                </a>
+                                <form
+                                    action="{{ route('project-batches.removeProject', ['batch_id' => $relation->Project_Batch_Id, 'project_id' => $relation->Project_Id]) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบโครงการนี้ออกจากชุดโครงการ?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class='bx bx-trash'></i> ลบ
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    <div class="button-container mt-3">
+                        <div class="status-section">
+                            <div class="status-header">การดำเนินการ</div>
+                            <div class="status-card">
+                                <div class="status-left">
+                                    <div class="status-text">
+                                        รออนุมัติ:
+                                        {{ floor($approval->recordHistory->last()->daysSinceTimeRecord ?? 0) }} วัน
+                                    </div>
+                                </div>
+                                <div class="status-right">
+                                    <div class="action-buttons">
+                                        <form
+                                            action="{{ route('approvals.updateStatus', ['id' => $approval->Id_Approve, 'status' => 'Y']) }}"
+                                            method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="status-button approved">
+                                                <i class='bx bx-like'></i> อนุมัติ
+                                            </button>
+                                        </form>
+                                        <button type="button" class="status-button not-approved" data-bs-toggle="modal"
+                                            data-bs-target="#commentModal-{{ $approval->Id_Approve }}">
+                                            <i class='bx bx-dislike'></i> ไม่อนุมัติ
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for not approving -->
+    @foreach($approvals->groupBy('project.Project_Batch_Id') as $batchId => $projects)
+    @php
+    $filteredProjects = $projects->filter(function ($approval) {
+    return $approval->project->Count_Steps == 1;
+    });
+    @endphp
+    @if($filteredProjects->isNotEmpty())
+    <div class="modal fade" id="commentModal-{{ $filteredProjects->first()->project->Id_Project }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">เพิ่มความคิดเห็น</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form
+                        action="{{ route('approvals.updateStatus', ['id' => $filteredProjects->first()->project->Id_Project, 'status' => 'N']) }}"
+                        method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">ความคิดเห็น:</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger">ยืนยันการไม่อนุมัติ</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+    @endforeach
+    @endif
+    
 </div>
+
 @endsection

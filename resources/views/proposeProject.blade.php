@@ -7,7 +7,13 @@
 @section('content')
 <div class="container">
     <h1>เสนอโครงการเพื่อพิจารณา</h1>
+    <div class="mb-3">
+        <a href="{{ route('createSetProject') }}" class="btn btn-primary">
+            <i class='bx bx-plus'></i> สร้างชุดโครงการ ({{ $countStepsZero }} โครงการ)
+        </a>
+    </div>
     @foreach($projects as $project)
+    @if($project->Count_Steps !== 0)
     <div class="outer-container">
         <div class="container">
             <div class="header">
@@ -313,6 +319,7 @@
 
         </div>
     </div>
+    @endif
     @endforeach
 </div>
 

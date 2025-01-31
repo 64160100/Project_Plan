@@ -50,12 +50,9 @@
                     <h5 class="modal-title" id="strategicAnalysisModalLabel">การวิเคราะห์บริบทเชิงกลยุทธ์</h5>
                     <p class="modal-subtitle">โอกาสเชิงกลยุทธ์ ความท้าทายเชิงกลยุทธ์ ความได้เปรียบเชิงกลยุทธ์</p>
                 </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#addStrategicOpportunityModal">
-                    เพิ่มโอกาสเชิงกลยุทธ์ใหม่
-                </button>
                 <div class="d-flex justify-content-end mb-3">
                 </div>
                 <table class="table table-bordered">
@@ -63,10 +60,8 @@
                         <tr>
                             <th style="width: 14%;">หัวข้อ</th>
                             <th style="width: 30%;">โอกาสเชิงกลยุทธ์<br><small>(Strategic Opportunity)</small></th>
-                            <th style="width: 30%;">ความท้าทายเชิงกลยุทธ์<br><small>(Strategic Challenges)</small>
-                            </th>
-                            <th style="width: 40%;">ความได้เปรียบเชิงกลยุทธ์<br><small>(Strategic
-                                    Advantages)</small>
+                            <th style="width: 30%;">ความท้าทายเชิงกลยุทธ์<br><small>(Strategic Challenges)</small></th>
+                            <th style="width: 40%;">ความได้เปรียบเชิงกลยุทธ์<br><small>(Strategic Advantages)</small>
                             </th>
                             <th style="width: 1%;">การจัดการ</th>
                         </tr>
@@ -74,17 +69,7 @@
                     <tbody>
                         @foreach($strategicOpportunities as $opportunity)
                         <tr>
-                            <td>
-                                {{ $opportunity->Name_Strategic_Opportunity }}
-                                <form
-                                    action="{{ route('StrategicOpportunity.destroyOpportunity', ['id' => $opportunity->Id_Strategic_Opportunity]) }}"
-                                    method="POST" class="delete-form d-none" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-link text-danger p-0 m-0"
-                                        onclick="return confirm('คุณแน่ใจหรือไม่ที่จะลบรายการนี้?')">&#x2715;</button>
-                                </form>
-                            </td>
+                            <td>{{ $opportunity->Name_Strategic_Opportunity }}</td>
                             <td>
                                 <ul class="delete-list" data-type="details">
                                     @foreach($opportunity->details as $detail)
@@ -183,7 +168,6 @@
     </div>
 </div>
 
-<!-- เพิ่มการวิเคราะห์เชิงกลยุทธ์ใหม่ -->
 @foreach($strategicOpportunities as $opportunity)
 <div class="modal fade" id="addStrategicAnalysisModal{{ $opportunity->Id_Strategic_Opportunity }}" tabindex="-1"
     aria-labelledby="addStrategicAnalysisModalLabel{{ $opportunity->Id_Strategic_Opportunity }}" aria-hidden="true">
@@ -240,49 +224,6 @@
     </div>
 </div>
 @endforeach
-
-<!-- Modal Structure -->
-<div class="modal fade" id="addStrategicOpportunityModal" tabindex="-1"
-    aria-labelledby="addStrategicOpportunityModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addStrategicOpportunityModalLabel">เพิ่มโอกาสเชิงกลยุทธ์ใหม่</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="{{ route('StrategicOpportunity.addOpportunity') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label for="Strategic_Id_Strategic" class="form-label">Strategic ID</label>
-                        <input type="number" class="form-control" id="Strategic_Id_Strategic"
-                            name="Strategic_Id_Strategic" readonly required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="Name_Strategic_Opportunity" class="form-label">ชื่อโอกาสเชิงกลยุทธ์</label>
-                        <input type="text" class="form-control" id="Name_Strategic_Opportunity"
-                            name="Name_Strategic_Opportunity" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">บันทึก</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Extract the strategic ID from the URL
-    const urlParts = window.location.pathname.split('/');
-    const strategicId = urlParts[urlParts.length - 1];
-
-    // Set the strategic ID in the modal input field
-    const strategicIdInput = document.getElementById('Strategic_Id_Strategic');
-    if (strategicIdInput) {
-        strategicIdInput.value = strategicId;
-    }
-});
-</script>
 
 <!-- Edit Strategic Analysis Modals -->
 @foreach($strategicOpportunities as $opportunity)
@@ -357,28 +298,28 @@ document.addEventListener('DOMContentLoaded', function() {
 @endforeach
 
 <script>
-function addTextarea(containerId, name) {
-    const container = document.getElementById(containerId);
-    const textareaDiv = document.createElement('div');
-    textareaDiv.classList.add('mb-2', 'd-flex', 'align-items-center');
+    function addTextarea(containerId, name) {
+        const container = document.getElementById(containerId);
+        const textareaDiv = document.createElement('div');
+        textareaDiv.classList.add('mb-2', 'd-flex', 'align-items-center');
 
-    const textarea = document.createElement('textarea');
-    textarea.classList.add('form-control', 'me-2');
-    textarea.name = name;
-    textarea.rows = 2;
+        const textarea = document.createElement('textarea');
+        textarea.classList.add('form-control', 'me-2');
+        textarea.name = name;
+        textarea.rows = 2;
 
-    const removeButton = document.createElement('button');
-    removeButton.type = 'button';
-    removeButton.classList.add('btn', 'btn-outline-danger', 'btn-sm');
-    removeButton.innerText = 'ลบ';
-    removeButton.onclick = function() {
-        container.removeChild(textareaDiv);
-    };
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.classList.add('btn', 'btn-outline-danger', 'btn-sm');
+        removeButton.innerText = 'ลบ';
+        removeButton.onclick = function() {
+            container.removeChild(textareaDiv);
+        };
 
-    textareaDiv.appendChild(textarea);
-    textareaDiv.appendChild(removeButton);
-    container.appendChild(textareaDiv);
-}
+        textareaDiv.appendChild(textarea);
+        textareaDiv.appendChild(removeButton);
+        container.appendChild(textareaDiv);
+    }
 </script>
 
 <script>
@@ -410,43 +351,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const toggleDeleteButtons = document.querySelectorAll('.toggle-delete-mode');
-    toggleDeleteButtons.forEach(button => {
+    const deleteButtons = document.querySelectorAll('.toggle-delete-mode');
+    deleteButtons.forEach(button => {
         button.addEventListener('click', function() {
             const row = this.closest('tr');
-            const deleteForms = row.querySelectorAll('.delete-list form, .delete-form');
+            const deleteForms = row.querySelectorAll('.delete-list form');
             const deleteText = this.querySelector('.delete-text');
 
             deleteForms.forEach(form => {
                 const deleteButton = form.querySelector('button');
-                const opportunityList = row.querySelector('ul[data-type="details"]');
-                const challengesList = row.querySelector('ul[data-type="challenges"]');
-                const advantagesList = row.querySelector('ul[data-type="advantages"]');
-
-                // Check if all lists are empty
-                if (!opportunityList.children.length && !challengesList.children.length && !advantagesList.children.length) {
-                    form.classList.toggle('d-none');
-                }
-
-                // Toggle delete button visibility
-                if (deleteButton.style.display === 'none' || deleteButton.style.display === '') {
+                if (deleteButton.style.display === 'none' || deleteButton.style
+                    .display === '') {
                     deleteButton.style.display = 'inline-block';
+                    deleteText.textContent = 'ยกเลิก';
                 } else {
                     deleteButton.style.display = 'none';
+                    deleteText.textContent = 'ลบ';
                 }
             });
-
-            // Toggle button text
-            if (deleteText.textContent === 'ลบ') {
-                deleteText.textContent = 'ยกเลิก';
-            } else {
-                deleteText.textContent = 'ลบ';
-            }
         });
     });
 
-    // Hide all delete buttons when the page loads
-    const allDeleteButtons = document.querySelectorAll('.delete-list form button, .delete-form button');
+    // ซ่อนปุ่มลบทั้งหมดเมื่อโหลดหน้า
+    const allDeleteButtons = document.querySelectorAll('.delete-list form button');
     allDeleteButtons.forEach(button => {
         button.style.display = 'none';
     });

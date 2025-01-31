@@ -1,0 +1,107 @@
+.card {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.project-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.project-item:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.project-info {
+    padding-left: 1rem;
+}
+
+.project-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.department-name {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.project-details {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+.project-details i {
+    margin-right: 0.25rem;
+}
+
+.selected-projects {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    min-height: 100px;
+    background-color: #f8fafc;
+}
+
+.batch-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.batch-item:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.batch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.batch-project-item {
+    border-left: 3px solid #3182ce;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    background-color: #f7fafc;
+    transition: all 0.3s ease;
+}
+
+.batch-project-item:hover {
+    background-color: #edf2f7;
+}
+
+.form-check-input {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.form-type-selector .btn-group {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.form-type-selector .btn {
+    flex: 1;
+    padding: 1rem;
+}
+
+.batch-form {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: #fff;
+}

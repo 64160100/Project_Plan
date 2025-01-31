@@ -84,11 +84,11 @@
                 <tr style="vertical-align: top;">
                     @if ( $strategic->Id_Strategic == $strategy->Strategic_Id )
                         <td>{{ $strategy->Name_Strategy }}</td>
-                            <td>
-                                @foreach ($strategy->strategicObjectives as $objective)
-                                    {{ $objective->Details_Strategic_Objectives }} <br><br>
-                                @endforeach
-                            </td>
+                        <td>
+                            @foreach ($strategy->strategicObjectives as $objective)
+                                {{ $objective->Details_Strategic_Objectives }} <br><br>
+                            @endforeach
+                        </td>
                         <td>
                             @foreach ($strategy->kpis as $kpi)
                                 {{ $kpi->Name_Kpi }} <br><br>
@@ -104,7 +104,7 @@
                             <form action="{{ route('strategy.destroy', $strategy->Id_Strategy) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('คุณยืนยันที่จะลบข้อมูลนี้หรือไม่');">ลบ</button>
+                                <button type="submit" class="btn-delete" onclick="return confirm('คุณยืนยันที่จะลบข้อมูลนี้หรือไม่');">ลบ</button>
 
                             </form>
                         </td>

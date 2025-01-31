@@ -104,19 +104,22 @@ class StrategyController extends Controller
         $strategy->update([
             'Name_Strategy' => $request->Name_Strategy,
         ]);
-
-        foreach ($request->kpis as $Id_Kpi => $kpiData) {
-            $kpi = KpiModel::findOrFail($Id_Kpi);
-            $kpi->update($kpiData);
+    
+        if ($request->has('kpis') && is_array($request->kpis)) {
+            foreach ($request->kpis as $Id_Kpi => $kpiData) {
+                $kpi = KpiModel::findOrFail($Id_Kpi);
+                $kpi->update($kpiData);
+            }
         }
-
-        if ($request->has('strategicObjectives')) {
+    
+        if ($request->has('strategicObjectives') && is_array($request->strategicObjectives)) {
             foreach ($request->strategicObjectives as $Id_Strategic_Objectives => $SOData) {
                 $so = StrategicObjectivesModel::findOrFail($Id_Strategic_Objectives);
                 $so->update($SOData);
             }
         }
-        if ($request->has('newStrategicObjectives')) {
+    
+        if ($request->has('newStrategicObjectives') && is_array($request->newStrategicObjectives)) {
             foreach ($request->newStrategicObjectives as $newObjective) {
                 StrategicObjectivesModel::create([
                     'Details_Strategic_Objectives' => $newObjective,
@@ -124,7 +127,8 @@ class StrategyController extends Controller
                 ]);
             }
         }
-        if ($request->has('newKpis')) {
+    
+        if ($request->has('newKpis') && is_array($request->newKpis)) {
             foreach ($request->newKpis as $newKpi) {
                 KpiModel::create([
                     'Name_Kpi' => $newKpi['Name_Kpi'],
@@ -133,7 +137,7 @@ class StrategyController extends Controller
                 ]);
             }
         }
-
+    
         return redirect()->route('strategy.index', ['Id_Strategic' => $strategy->Strategic_Id])
                         ->with('success', 'กลยุทธ์และตัวชี้วัดถูกอัปเดตเรียบร้อยแล้ว');
     }

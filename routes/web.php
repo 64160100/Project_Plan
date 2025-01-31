@@ -6,6 +6,7 @@ use App\Http\Controllers\StorageFileController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\PlanDLCController;
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\ProjectBatchController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -16,12 +17,26 @@ require __DIR__.'/strategic.php';
 Route::get('/setting', [SettingController::class, 'settings'])->name('setting');
 
 Route::get('/listProject', [ListProjectController::class, 'project'])->name('project');
+Route::get('/projects/{Id_Project}/edit', [ProjectController::class, 'editProject'])->name('editProject');
 
 Route::get('/createFirstForm/{Strategic_Id}', [ListProjectController::class, 'showCreateFirstForm'])->name('showCreateFirstForm');
-Route::post('/createFirstForm/{Strategic_Id}', [ListProjectController::class, 'createFirstForm'])->name('createFirstForm');
 
 Route::get('/createProject/{Strategic_Id}', [ListProjectController::class, 'showCreateForm'])->name('showCreateProject');
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
+
+// สร้างชุดโครงการ
+Route::get('/createSetProject', [ProjectBatchController::class, 'createSetProject'])->name('createSetProject');
+Route::post('/project-batches', [ProjectBatchController::class, 'storeProjectBatch'])->name('project-batches.store');
+Route::get('/project-batches/submit/{id}', [ProjectBatchController::class, 'submitProjectBatch'])->name('project-batches.submit');
+
+Route::delete('/project-batches/{batch_id}', [ProjectBatchController::class, 'removeBatch'])->name('project-batches.removeBatch');
+
+Route::delete('/project-batches/{batch_id}/projects/{project_id}', [ProjectBatchController::class, 'removeProjectFromBatch'])->name('project-batches.removeProject');
+
+Route::post('/project-batches/add-projects', [ProjectBatchController::class, 'addProjectsToBatch'])->name('project-batches.addProjects');
+
+Route::get('/projects/{id}', [ProjectBatchController::class, 'showBatchesProject'])->name('projects.showBatchesProject');
+
 
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
 Route::match(['get', 'post'],'/editProject/{Id_Project}', [ListProjectController::class, 'editProject'])->name('editProject');

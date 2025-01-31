@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\KpiModel;
-
 
 class StrategyModel extends Model
 {
@@ -34,5 +32,4 @@ class StrategyModel extends Model
     {
         return $this->belongsTo(StrategicModel::class, 'Strategic_Id', 'Id_Strategic');
     }
-
 }

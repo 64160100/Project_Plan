@@ -8,7 +8,7 @@
 <div class="container">
     <h1>เสนอโครงการเพื่อพิจารณา</h1>
     @foreach($projects as $project)
-    <div class="outer-container">
+    <div class="outer-container"  id="{{ $project->Id_Project }}">
         <div class="container">
             <div class="header">
                 <div class="project-title">{{ $project->Name_Project }}</div>

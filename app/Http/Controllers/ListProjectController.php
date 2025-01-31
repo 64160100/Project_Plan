@@ -305,44 +305,22 @@ class ListProjectController extends Controller
     public function showAllApprovals(Request $request)
     {
         $approvals = collect();
-        $countApproved = 0;
     
         $employee = $request->session()->get('employee');
         $permissions = $request->session()->get('permissions');
     
         $request->session()->forget('pendingApprovalsCount');
-        $pendingApprovals = collect();
-        if ($employee) {
-            if ($employee->IsAdmin === 'Y') {
-                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
-                    $query->whereNotIn('Count_Steps', [0, 2, 6, 9]);
-                })->where('Status', 'I')->get();
-            } elseif ($employee->IsManager === 'Y') {
-                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
-                    $query->whereIn('Count_Steps', [4, 7]);
-                })->where('Status', 'I')->get();
-            } elseif ($employee->IsDirector === 'Y') {
-                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
-                    $query->whereIn('Count_Steps', [1, 5, 8]);
-                })->where('Status', 'I')->get();
-            } elseif ($employee->IsFinance === 'Y') {
-                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
-                    $query->whereIn('Count_Steps', [3]);
-                })->where('Status', 'I')->get();
-            } else {
-                // ผู้รับผิดชอบโครงการ
-                $pendingApprovals = ApproveModel::whereHas('project', function ($query) use ($employee) {
-                    $query->whereIn('Count_Steps', [0, 2, 6, 9])
-                        ->where('Employee_Id', $employee->Id_Employee);
-                })->where('Status', 'I')->get();
-            }
-        }
+        $pendingApprovals = $this->getPendingApprovals($employee);  //เรียนใช้ private function getPendingApprovals()
         $pendingApprovalsCount = $pendingApprovals->count();
         $request->session()->put('pendingApprovalsCount', $pendingApprovalsCount);
+        $this->storeProjectIdsAndNamesInSession($request, $pendingApprovals);
 
-        $pendingProjectIds = $pendingApprovals->pluck('Project_Id');
-        $request->session()->put('pendingProjectIds', $pendingProjectIds);
+        //แจ้งเตือนจดหมาย
+        $results = $this->getRecordHistoriesAndStatusNCount($employee);
+        $recordHistories = $results['recordHistories'];
+        $statusNCount = $results['statusNCount'];
 
+        $countApproved = 0;
         if ($employee) {
             if ($employee->IsAdmin === 'Y') {
                 $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
@@ -403,6 +381,9 @@ class ListProjectController extends Controller
         } else {
             Log::warning('No employee data found in session.');
         }
+
+        $request->session()->put('recordHistories', $recordHistories ?? null);
+        $request->session()->put('statusNCount', $statusNCount);
     
         return view('requestApproval', compact('approvals'));
     }
@@ -527,7 +508,19 @@ class ListProjectController extends Controller
     {
         $employee = $request->session()->get('employee');
         $permissions = $request->session()->get('permissions');
-    
+
+        //แจ้งเตือนการอนุญาติ
+        $request->session()->forget('pendingApprovalsCount');
+        $pendingApprovals = $this->getPendingApprovals($employee); 
+        $pendingApprovalsCount = $pendingApprovals->count();
+        $request->session()->put('pendingApprovalsCount', $pendingApprovalsCount);
+        $this->storeProjectIdsAndNamesInSession($request, $pendingApprovals);
+
+        //แจ้งเตือนจดหมาย
+        $results = $this->getRecordHistoriesAndStatusNCount($employee);
+        $recordHistories = $results['recordHistories'];
+        $statusNCount = $results['statusNCount'];
+   
         if ($employee) {
             $projectsQuery = ListProjectModel::query();
     
@@ -541,8 +534,6 @@ class ListProjectController extends Controller
                 ->with(['approvals.recordHistory', 'employee.department', 'employee', 'budgets'])
                 ->get();
 
-            // $projectIds = $projects->pluck('Id_Project');
-    
             foreach ($projects as $project) {
                 $employeeData = $project->employee;
                 $project->employeeName = $employeeData ? $employeeData->Firstname_Employee . ' ' . $employeeData->Lastname_Employee : '-';
@@ -593,25 +584,6 @@ class ListProjectController extends Controller
                     }
                 }
 
-                if ($employee->IsAdmin === 'Y') {
-                    $recordHistories = RecordHistory::with('approvals.project')
-                        ->whereHas('approvals', function ($query) {
-                            $query->where('Status', '!=', 'Y');
-                        })
-                        ->orderBy('Id_Record_History', 'desc')
-                        ->get();
-                } else {
-                    $recordHistories = RecordHistory::whereHas('approvals', function ($query) {
-                            $query->where('Status', '!=', 'Y');
-                        })
-                        ->whereHas('approvals.project', function ($query) use ($employee) {
-                            $query->where('Employee_Id', $employee->Id_Employee);
-                        })
-                        ->with('approvals.project')
-                        ->orderBy('Id_Record_History', 'desc')
-                        ->get();
-                }
-    
                 if ($project->Count_Steps === 9) {
                     $project->status = 'สิ้นสุด';
                     $project->buttonText = 'สิ้นสุดโครงการ';
@@ -620,8 +592,10 @@ class ListProjectController extends Controller
                 $project->budgetStatus = $project->budgets->first()->Status_Budget ?? 'N/A';
             }
 
-            $request->session()->put('recordHistories', $recordHistories);
-    
+            //แจ้งเตือนจดหมาย
+            $request->session()->put('recordHistories', $recordHistories ?? null);
+            $request->session()->put('statusNCount', $statusNCount);
+
             return view('proposeProject', compact('projects'));
         } else {
             return redirect()->back()->with('error', 'You are not authorized to view these projects.');
@@ -768,6 +742,87 @@ class ListProjectController extends Controller
         Log::info('Project after update: ', $project->toArray());
     
         return redirect()->route('proposeProject')->with('success', 'Project updated successfully');
+    }
+
+    private function getPendingApprovals($employee)
+    {
+        $pendingApprovals = collect();
+    
+        if ($employee) {
+            if ($employee->IsAdmin === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereNotIn('Count_Steps', [0, 2, 6, 9]);
+                })->where('Status', 'I')->get();
+            } elseif ($employee->IsManager === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereIn('Count_Steps', [4, 7]);
+                })->where('Status', 'I')->get();
+            } elseif ($employee->IsDirector === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereIn('Count_Steps', [1, 5, 8]);
+                })->where('Status', 'I')->get();
+            } elseif ($employee->IsFinance === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereIn('Count_Steps', [3]);
+                })->where('Status', 'I')->get();
+            } else {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) use ($employee) {
+                    $query->whereIn('Count_Steps', [0, 2, 6, 9])
+                        ->where('Employee_Id', $employee->Id_Employee);
+                })->where('Status', 'I')->get();
+            }
+        }
+    
+        return $pendingApprovals;
+    }
+
+    private function storeProjectIdsAndNamesInSession($request, $pendingApprovals)
+    {
+        // id
+        $projectIds = $pendingApprovals->pluck('Project_Id');
+        $request->session()->put('projectIds', $projectIds);
+
+        // Project names
+        $projectNames = ListProjectModel::whereIn('Id_Project', $projectIds)->pluck('Name_Project');
+        $request->session()->put('projectNames', $projectNames);
+    }
+
+    private function getRecordHistoriesAndStatusNCount($employee)
+    {
+        if ($employee->IsAdmin === 'Y') {
+            $recordHistories = RecordHistory::with('approvals.project')
+                ->whereHas('approvals', function ($query) {
+                    $query->where('Status', '!=', 'Y');
+                })
+                ->orderBy('Id_Record_History', 'desc')
+                ->get();
+    
+            $statusNCount = RecordHistory::where('Status_Record', 'N')
+                ->whereHas('approvals', function ($query) {
+                    $query->where('Status', 'N');
+                })
+                ->count();
+        } else {
+            $recordHistories = RecordHistory::whereHas('approvals', function ($query) {
+                    $query->where('Status', '!=', 'Y');
+                })
+                ->whereHas('approvals.project', function ($query) use ($employee) {
+                    $query->where('Employee_Id', $employee->Id_Employee);
+                })
+                ->with('approvals.project')
+                ->orderBy('Id_Record_History', 'desc')
+                ->get();
+    
+            $statusNCount = RecordHistory::where('Status_Record', 'N')
+                ->whereHas('approvals', function ($query) {
+                    $query->where('Status', 'N');
+                })
+                ->whereHas('approvals.project', function ($query) use ($employee) {
+                    $query->where('Employee_Id', $employee->Id_Employee);
+                })
+                ->count();
+        }
+        return compact('recordHistories', 'statusNCount');
     }
 
 }

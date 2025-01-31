@@ -7,6 +7,7 @@
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
 
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('Bootslander/assets/vendor/bootstrap/css/custom.css') }}">
 
     <!-- Fonts and icons -->
     <script>
@@ -57,6 +58,31 @@
             white-space: normal;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
+        .noit-detail {
+            padding: 2px;
+            padding-left: 8px;
+            margin: 4px;
+            width: 293px;
+            font-size: 13px
+        }
+
+        [id] {
+        scroll-margin-top: 80px;
+        }
+
+        .link-project {
+            color: black;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .link-project:hover {
+            color: #8729DA;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
     </style>
 
 
@@ -341,11 +367,21 @@
 
                             <!-- แจ้งเตือน -->
                             @if(session('employee'))
-                                @if(session('employee')->IsAdmin === 'Y')
-                                <!-- แจ้งสถานะ(จดหมาย)แอดมิน -->
+                                @php
+                                    $isResponsibleOnly = session('employee')->IsManager === 'N' && 
+                                                        session('employee')->IsDirector === 'N' && 
+                                                        session('employee')->IsFinance === 'N' && 
+                                                        session('employee')->IsAdmin === 'N';
+                                @endphp
+                                @if(session('employee')->IsAdmin === 'Y' || $isResponsibleOnly)
+                                <!-- แจ้งสถานะ(จดหมาย) -->
                                     <li class="nav-item topbar-icon dropdown hidden-caret">
                                         <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class='bx bx-envelope'></i>
+                                            @php
+                                                $color = session('statusNCount') > 0 ? '#ff0000' : 'inherit';
+                                            @endphp
+                                            <i class='bx bx-envelope me-1' style='color: {{ $color }}'></i>
+                                            <span style='color: {{ $color }}'>{{ session('statusNCount') }}</span>
                                         </a>
                                         <ul class="dropdown-menu animated fadeIn" style="max-height: 500px; width: 300px; overflow-y: auto; overflow-x: hidden;">
                                             @php
@@ -360,11 +396,13 @@
                                                         {{ \Carbon\Carbon::parse($date)->addYears(543)->translatedFormat('d F พ.ศ. Y') }}
                                                     </li>
                                                     @foreach($histories as $history)
-                                                        <li class="noitAppove noitAppove-detail">
-                                                            <b style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
-                                                                {{ $history->approvals->project->Name_Project }}
-                                                            </b>
-                                                            {{ $history->comment }} <br>(โดย:{{ $history->Permission_Record }})
+                                                        <li class="noitAppove noitAppove-detail"  style="{{ $history->Status_Record === 'N' && $history->approvals->Status === 'N' ? 'background-color:#ffc4c4;' : '' }}">
+                                                            <a class="link-project" href="{{ route('proposeProject', ['recordHistoryId' => $history->Approve_Project_Id]) }}#{{ $history->Approve_Project_Id }}">
+                                                                <b style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; width: 260px;">
+                                                                    {{ $history->approvals->project->Name_Project }}
+                                                                </b>
+                                                                {{ $history->comment }} <br>(โดย:{{ $history->Permission_Record }})
+                                                            </a>
                                                         </li>
                                                     @endforeach
                                                 @endforeach
@@ -376,90 +414,38 @@
                                         </ul>
                                     </li>
                                 @endif
-                                
-                                <li class="nav-item topbar-icon dropdown hidden-caret">
-                                <!-- แจ้งสถานะทั่วไป -->
-                                <!-- @if(session('pendingApprovalsCountForEmployee', 0) > 0)
-                                    <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class='bx bx-envelope'></i>
-                                    </a>
-                                    <ul class="dropdown-menu animated fadeIn" style="max-height: 500px; width: 300px; overflow-y: auto; overflow-x: hidden; background-color: #f0f0f0;" >
-                                        @php
-                                            \Carbon\Carbon::setLocale('th');
-                                            $groupedHistories = collect(session('recordHistories', [])) ->groupBy(function($history) {
-                                                    return \Carbon\Carbon::parse($history->Time_Record)->format('Y-m-d');
-                                                }) ->sortKeysDesc();
-                                        @endphp
-                                        @if(count($groupedHistories) > 0)
-                                            @foreach($groupedHistories as $date => $histories)
-                                                <li class="noitAppove" style="font-weight: bold; background-color:#e6faff;" >
-                                                    {{ \Carbon\Carbon::parse($date)->addYears(543)->translatedFormat('d F พ.ศ. Y') }}
-                                                </li>
-                                                @foreach($histories as $history)
-                                                    <li class="noitAppove noitAppove-detail">
-                                                        <b style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
-                                                            {{ $history->approvals->project->Name_Project }}
-                                                        </b>
-                                                        {{ $history->comment }} <br>(โดย:{{ $history->Permission_Record }})
+
+                                @if(session('pendingApprovalsCount', 0) > 0 && !$isResponsibleOnly)
+                                <!-- "มี" รายการรออนุมัติ -->
+                                    <li class="nav-item topbar-icon dropdown hidden-caret">
+                                        <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class='bx bxs-bell-ring me-1' style='color:#ff0000'></i>
+                                            <span style='color:#ff0000'>{{ session('pendingApprovalsCount') }}</span>
+                                        </a>
+                                        <ul class="dropdown-menu animated fadeIn" style="max-height: 500px; width: 300px; overflow-y: auto; overflow-x: hidden;" >
+                                            <li class="noit-detail" style="white-space: normal; width: 300px;">
+                                                รายการโครงการรอการอนุมัติ ({{ session('pendingApprovalsCount') }})
+                                            </li>
+                                            <ul >
+                                                @foreach(session('projectIds', []) as $index => $projectId)
+                                                    <li >
+                                                        <a class="link-project" href="{{ route('requestApproval', ['projectId' => $projectId]) }}#{{ $projectId }}" 
+                                                            style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; width: 260px;" >
+                                                            {{ session('projectNames', [])[$index] ?? 'Unknown Project' }}
+                                                        </a>
                                                     </li>
                                                 @endforeach
-                                            @endforeach
-                                        @else
-                                            <li style="text-align: center;">
-                                                ไม่มีข้อมูล
-                                            </li>
-                                        @endif
-                                    </ul> 
-                                    @endif -->
-                                <!-- "มี" รายการรออนุมัติ -->
-                                @if(session('pendingApprovalsCount', 0) > 0)
-                                    <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class='bx bxs-bell-ring me-1' style='color:#ff0000'></i>
-                                        <span style='color:#ff0000'>{{ session('pendingApprovalsCount') }}</span>
-                                    </a>
-                                    <ul class="dropdown-menu animated fadeIn">
-                                        <li class="dropdown-item" style="white-space: normal; width: 300px;">
-                                            <a href="{{ route('requestApproval') }}" style="color:#000;">
-                                                รายการโครงการรอการอนุมัติ ({{ session('pendingApprovalsCount') }})
-                                            </a>
-                                        </li>
-                                    </ul>
+                                            </ul>
+                                        </ul>
+                                    </li>
                                 @else
                                 <!-- "ไม่มี" รายการรออนุมัติ -->
                                     <li class="nav-item topbar-icon dropdown hidden-caret">
                                         <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class='bx bx-envelope'></i>
+                                            <i class='bx bxs-bell-ring me-1'></i><span>0</span>
                                         </a>
-                                        <ul class="dropdown-menu animated fadeIn" style="max-height: 500px; width: 300px; overflow-y: auto; overflow-x: hidden;">
-                                            @php
-                                                \Carbon\Carbon::setLocale('th');
-                                                $groupedHistories = collect(session('recordHistories', [])) ->groupBy(function($history) {
-                                                        return \Carbon\Carbon::parse($history->Time_Record)->format('Y-m-d');
-                                                    }) ->sortKeysDesc();
-                                            @endphp
-                                            @if(count($groupedHistories) > 0)
-                                                @foreach($groupedHistories as $date => $histories)
-                                                    <li class="noitAppove" style="font-weight: bold; background-color:#e6faff;" >
-                                                        {{ \Carbon\Carbon::parse($date)->addYears(543)->translatedFormat('d F พ.ศ. Y') }}
-                                                    </li>
-                                                    @foreach($histories as $history)
-                                                        <li class="noitAppove noitAppove-detail">
-                                                            <b style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
-                                                                {{ $history->approvals->project->Name_Project }}
-                                                            </b>
-                                                            {{ $history->comment }} <br>(โดย:{{ $history->Permission_Record }})
-                                                        </li>
-                                                    @endforeach
-                                                @endforeach
-                                            @else
-                                                <li style="text-align: center;">
-                                                    ไม่มีข้อมูล
-                                                </li>
-                                            @endif
-                                        </ul>
                                     </li>
                                 @endif
-                                </li>
                             @endif
 
                             <!-- โปรไฟล์ -->

@@ -8,7 +8,7 @@
     <h1>การอนุมัติทั้งหมด</h1>
     @foreach($approvals as $approval)
     @if($approval->Status !== 'Y' && $approval->Status !== 'N')
-    <div class="outer-container">
+    <div class="outer-container" id="{{ $approval->project->Id_Project }}">
         <div class="container">
             <div class="header">
                 <div class="project-title">{{ $approval->project->Name_Project }}</div>

@@ -66,28 +66,14 @@ class AuthController extends Controller
                     // $pendingApprovalsCountForEmployee = $pendingApprovals->count();
 
                 }
+
+                $projectNames = $pendingApprovals->map(function ($approval) {
+                    return $approval->project->Name_Project;
+                });
+
             }
             $pendingApprovalsCount = $pendingApprovals->count();
-            // $projectIds = $pendingApprovals->pluck('Project_Id');
-
-            // if ($employee->IsAdmin === 'Y') {
-            //     $recordHistories = RecordHistory::with('approvals.project')
-            //         ->whereHas('approvals', function ($query) {
-            //             $query->where('Status', '!=', 'Y');
-            //         })
-            //         ->orderBy('Id_Record_History', 'desc')
-            //         ->get();
-            // } else {
-            //     $recordHistories = RecordHistory::whereHas('approvals', function ($query) {
-            //             $query->where('Status', '!=', 'Y');
-            //         })
-            //         ->whereHas('approvals.project', function ($query) use ($employee) {
-            //             $query->where('Employee_Id', $employee->Id_Employee);
-            //         })
-            //         ->with('approvals.project')
-            //         ->orderBy('Id_Record_History', 'desc')
-            //         ->get();
-            // }
+            $projectIds = $pendingApprovals->pluck('Project_Id');
 
             if ($employee->IsAdmin === 'Y') {
                 $recordHistories = RecordHistory::with('approvals.project')
@@ -97,7 +83,8 @@ class AuthController extends Controller
                     ->orderBy('Id_Record_History', 'desc')
                     ->get();
             
-                $statusNCount = RecordHistory::whereHas('approvals', function ($query) {
+                $statusNCount = RecordHistory::where('Status_Record', 'N')
+                    ->whereHas('approvals', function ($query) {
                         $query->where('Status', 'N');
                     })
                     ->count();
@@ -112,7 +99,8 @@ class AuthController extends Controller
                     ->orderBy('Id_Record_History', 'desc')
                     ->get();
             
-                $statusNCount = RecordHistory::whereHas('approvals', function ($query) {
+                $statusNCount = RecordHistory::where('Status_Record', 'N')
+                    ->whereHas('approvals', function ($query) {
                         $query->where('Status', 'N');
                     })
                     ->whereHas('approvals.project', function ($query) use ($employee) {
@@ -126,10 +114,11 @@ class AuthController extends Controller
                 'permissions' => $employee->permissions,
                 'department' => $employee->department,
                 'pendingApprovalsCount' => $pendingApprovalsCount,
-                // 'pendingApprovalsCountForEmployee' => $pendingApprovalsCountForEmployee ?? 0,  //รายการโครงการที่ผู้ใช้รับผิดชอบโครงการ
-                'recordHistories' => $recordHistories,  
+                // 'pendingApprovalsCountForEmployee' => $pendingApprovalsCountForEmployee ?? 0,
+                'recordHistories' => $recordHistories,
                 'statusNCount' => $statusNCount,
-
+                'projectIds' => $projectIds,
+                'projectNames' => $projectNames, 
             ]);
     
             return redirect()->route('dashboard')->with('token', $token);

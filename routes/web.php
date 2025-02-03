@@ -35,8 +35,11 @@ Route::delete('/project-batches/{batch_id}/projects/{project_id}', [ProjectBatch
 
 Route::post('/project-batches/add-projects', [ProjectBatchController::class, 'addProjectsToBatch'])->name('project-batches.addProjects');
 
+// แสดง PDF
 Route::get('/projects/{id}', [ProjectBatchController::class, 'showBatchesProject'])->name('projects.showBatchesProject');
+Route::get('/projects/batch/{batch_id}', [ProjectBatchController::class, 'showBatchAll'])->name('projects.showBatchAll');
 
+Route::put('/approvals/batch/{id}/status/{status}', [ProjectBatchController::class, 'updateBatchApprovalStatus'])->name('approvals.updateBatchStatus');
 
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
 Route::match(['get', 'post'],'/editProject/{Id_Project}', [ListProjectController::class, 'editProject'])->name('editProject');

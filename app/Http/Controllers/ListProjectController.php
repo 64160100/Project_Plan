@@ -529,19 +529,15 @@ class ListProjectController extends Controller
                 ->orderBy('Project_Batch_Id')
                 ->get();
             
-                $project->batchProjects = null;
-                $project->batchName = null;
-                $project->batchId = null;
-                $namebatch = null;
-                $batches = null;
                 $filteredProjects = null;
-                $projects = null;
             }
         } else {
             Log::warning('No employee data found in session.');
         }
+
+        log::info($projectBatchRelations);
         
-        return view('requestApproval', compact('approvals', 'employee', 'batchProjects', 'projects', 'batches', 'projectBatchRelations', 'filteredProjects'));
+        return view('requestApproval', compact('approvals', 'employee', 'projectBatchRelations'));
     }
 
     public function updateApprovalStatus(Request $request, $id, $status)

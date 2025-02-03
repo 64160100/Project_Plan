@@ -31,9 +31,9 @@
                 <i class='bx bx-plus'></i>เพิ่มโครงการ
             </a>
 
-            <a href="{{ route('showCreateProject', ['Strategic_Id' => $Strategic->Id_Strategic]) }}" class="btn-add">
+            <!-- <a href="{{ route('showCreateProject', ['Strategic_Id' => $Strategic->Id_Strategic]) }}" class="btn-add">
                 <i class='bx bx-plus'></i>เพิ่มโครงการใหญ่
-            </a>
+            </a> -->
         </summary>
         <div class="accordion-content">
             @if ($Strategic->projects->isEmpty())

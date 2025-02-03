@@ -172,6 +172,10 @@
                             {{ $batchName }}
                             <small>({{ $filteredRelations->count() }} โครงการ)</small>
                         </h5>
+                        <a href="{{ route('projects.showBatchAll', ['batch_id' => $filteredRelations->first()->Project_Batch_Id]) }}"
+                            class="btn btn-primary btn-sm">
+                            <i class='bx bx-show'></i> ดูข้อมูลทั้งหมด
+                        </a>
                     </div>
                     <div class="batch-projects">
                         @foreach($filteredRelations as $index => $relation)
@@ -211,17 +215,21 @@
                                 <div class="status-right">
                                     <div class="action-buttons">
                                         <form
-                                            action="{{ route('approvals.updateStatus', ['id' => $approval->Id_Approve, 'status' => 'Y']) }}"
+                                            action="{{ route('approvals.updateBatchStatus', ['id' => $filteredRelations->first()->Project_Batch_Id, 'status' => 'Y']) }}"
                                             method="POST" style="display:inline;">
                                             @csrf
                                             @method('PUT')
+                                            @foreach($filteredRelations as $relation)
+                                            <input type="hidden" name="project_ids[]"
+                                                value="{{ $relation->project->Id_Project }}">
+                                            @endforeach
                                             <button type="submit" class="status-button approved">
-                                                <i class='bx bx-like'></i> อนุมัติ
+                                                <i class='bx bx-like'></i> อนุมัติทั้งหมด
                                             </button>
                                         </form>
                                         <button type="button" class="status-button not-approved" data-bs-toggle="modal"
-                                            data-bs-target="#commentModal-{{ $approval->Id_Approve }}">
-                                            <i class='bx bx-dislike'></i> ไม่อนุมัติ
+                                            data-bs-target="#commentModal-{{ $filteredRelations->first()->Project_Batch_Id }}">
+                                            <i class='bx bx-dislike'></i> ไม่อนุมัติทั้งหมด
                                         </button>
                                     </div>
                                 </div>
@@ -243,7 +251,7 @@
     });
     @endphp
     @if($filteredProjects->isNotEmpty())
-    <div class="modal fade" id="commentModal-{{ $filteredProjects->first()->project->Id_Project }}" tabindex="-1">
+    <div class="modal fade" id="commentModal-{{ $batchId }}" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -251,17 +259,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form
-                        action="{{ route('approvals.updateStatus', ['id' => $filteredProjects->first()->project->Id_Project, 'status' => 'N']) }}"
-                        method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="mb-3">
-                            <label for="comment" class="form-label">ความคิดเห็น:</label>
-                            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-danger">ยืนยันการไม่อนุมัติ</button>
-                    </form>
+
                 </div>
             </div>
         </div>
@@ -269,7 +267,7 @@
     @endif
     @endforeach
     @endif
-    
+
 </div>
 
 @endsection

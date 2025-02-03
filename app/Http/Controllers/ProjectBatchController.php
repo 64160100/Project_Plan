@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\ProjectBatchHasProjectModel;
 use App\Models\BatchProjectModel;
 use App\Models\ListProjectModel;
+use App\Models\RecordHistory;
+use App\Models\ApproveModel;
+use Carbon\Carbon;
+
 use Illuminate\Support\Facades\Log;
 
 class ProjectBatchController extends Controller
@@ -125,9 +129,82 @@ class ProjectBatchController extends Controller
         return redirect()->route('createSetProject')->with('success', 'ลบโครงการออกจากชุดเรียบร้อยแล้ว');
     }
 
+
+    public function updateBatchApprovalStatus(Request $request, $id, $status)
+    {
+        $projectIds = $request->input('project_ids', []);
+        $employee = $request->session()->get('employee');
+        $permissions = $employee ? $employee->permissions : collect();
+        $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
+        $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
+    
+        Log::info($projectIds);
+    
+        foreach ($projectIds as $projectId) {
+            $approval = ApproveModel::where('Project_Id', $projectId)->first();
+            if ($approval) {
+                $approval->Status = $status;
+                $approval->save();
+    
+                $project = ListProjectModel::find($projectId);
+                if ($status === 'Y' && $project->Count_Steps == 1) {
+                    $comment = "เห็นชอบการดำเนินโครงการในขั้นต้น";
+                    $project->Count_Steps = 2;
+    
+                    $batchProject = ProjectBatchHasProjectModel::where('Project_Batch_Id', $id)
+                        ->where('Project_Id', $projectId)
+                        ->first();
+                    
+                    if ($batchProject) {
+                        $batchProject->Count_Steps_Batch = 2;
+                        $batchProject->save();
+                    }
+                } else {
+                    $comment = $request->input('comment');
+                    if (empty($comment)) {
+                        $comment = "ไม่อนุมัติโครงการ กรุณาแก้ไขตามคำแนะนำ";
+                    }
+                }
+    
+                RecordHistory::create([
+                    'Approve_Id' => $approval->Id_Approve,
+                    'Approve_Project_Id' => $approval->Project_Id,
+                    'Comment' => $comment,
+                    'Time_Record' => Carbon::now('Asia/Bangkok'),
+                    'Status_Record' => $approval->Status,
+                    'Name_Record' => $nameResponsible,
+                    'Permission_Record' => $permissionName,
+                ]);
+    
+                if ($status === 'Y' && $project->Count_Steps == 2) {
+                    $approval->Status = 'I';
+                    $approval->save();
+                }
+    
+                $project->save();
+            }
+        }
+    
+        return redirect()->route('requestApproval')->with('success', 'บันทึกการพิจารณาเรียบร้อยแล้ว');
+    }
+
     public function showBatchesProject($id)
     {
-        $project = ListProjectModel::findOrFail($id);
-        return view('Project.showBatchesProject', compact('project'));
+        $project = ListProjectModel::with([
+            'strategic',
+            'subProjects',
+            'employee',
+            'projectBudgetSources'
+        ])->findOrFail($id);
+        
+        $projectBudgetSources = $project->projectBudgetSources;
+        
+        return view('Project.showBatchesProject', compact('project', 'projectBudgetSources'));
+    }
+    
+    public function showBatchAll($batch_id)
+    {
+        $batchRelations = ProjectBatchHasProjectModel::where('Project_Batch_Id', $batch_id)->get();
+        return view('Project.showBatchAll', compact('batchRelations'));
     }
 }

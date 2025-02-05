@@ -73,7 +73,7 @@ class ListProjectController extends Controller
         $monthlyPlans = MonthlyPlansModel::where('Project_id', $projectId)->get();
         $shortProjects = ShortProjectModel::where('Project_Id', $projectId)->get();
     
-        $budgetSources = BudgetSourceModel::all();
+        // $budgetSources = BudgetSourceModel::all();
         $subtopBudgets = SubtopBudgetModel::all();
         $projectBudgetSources = ProjectHasBudgetSourceModel::where('Project_Id', $projectId)->get();
         $budgetForms = BudgetFormModel::where('Project_Id', $projectId)->get();
@@ -100,7 +100,9 @@ class ListProjectController extends Controller
         Log::info($project);
 
         return view('Project.viewProject', compact(
-            'project', 'strategics', 'strategies', 'employees', 'firstTime', 'endTime', 'months', 'pdcaStages', 'pdcaDetails', 'monthlyPlans', 'shortProjects', 'budgetSources', 'subtopBudgets', 'projectBudgetSources', 'budgetForms', 'subtopicBudgetForms', 'expectedResults', 'outcomes', 'outputs'
+            'project', 'strategics', 'strategies', 'employees', 'firstTime', 'endTime', 'months', 'pdcaStages', 'pdcaDetails', 'monthlyPlans', 'shortProjects', 
+            // 'budgetSources', 
+            'subtopBudgets', 'projectBudgetSources', 'budgetForms', 'subtopicBudgetForms', 'expectedResults', 'outcomes', 'outputs'
         ));
     }
 
@@ -115,10 +117,12 @@ class ListProjectController extends Controller
         $integrationCategories = IntegrationModel::orderBy('Id_Integration_Category', 'asc')->get();
         $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
         $pdcaStages = PdcaModel::all();
-        $budgetSources = BudgetSourceModel::all();
-        $subtopBudgets = SubtopBudgetModel::all();
+        // $budgetSources = BudgetSourceModel::all();
+        // $subtopBudgets = SubtopBudgetModel::all();
     
-        return view('Project.createFirstForm', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets'));
+        return view('Project.createFirstForm', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 
+        // 'budgetSources', 'subtopBudgets'
+    ));
     }
 
     public function createFirstForm(Request $request, $Strategic_Id)
@@ -153,10 +157,12 @@ class ListProjectController extends Controller
         $integrationCategories = IntegrationModel::orderBy('Id_Integration_Category', 'asc')->get();
         $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
         $pdcaStages = PdcaModel::all();
-        $budgetSources = BudgetSourceModel::all();
-        $subtopBudgets = SubtopBudgetModel::all();
+        // $budgetSources = BudgetSourceModel::all();
+        // $subtopBudgets = SubtopBudgetModel::all();
     
-        return view('Project.createProject', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets'));
+        return view('Project.createProject', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 
+        // 'budgetSources', 'subtopBudgets'
+    ));
     }
 
     public function createProject(Request $request, $Strategic_Id)

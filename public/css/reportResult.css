@@ -1,0 +1,65 @@
+.content-box {
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #BDBDBD;
+    border-radius: 10px;
+    padding: 15px 20px;
+    text-align: left;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+h5 {
+    color: #2c3e50;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+table, th, td {
+    border: 1px solid #000000;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 12px;
+    text-align: left;
+    word-wrap: break-word;
+}
+th {
+    background-color: #299200;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* .strategy-section {
+    background-color: #e8f5e9; 
+}
+.project-section {
+    background-color: #fff3e0; 
+} */
+
+input[type="text"], select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+.section {
+    margin-bottom: 30px;
+}
+.signature {
+    margin-top: 20px;
+}
+
+
+textarea {
+    width: 100%; 
+    min-height: 50px;
+    resize: none;
+    padding: 10px;
+    font-size: 16px; 
+    box-sizing: border-box;
+}
+

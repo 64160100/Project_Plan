@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>report</title>
     <link rel="stylesheet" href="{{ asset('css/report.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/reportResult.css') }}">
 
 </head>
 <body>
@@ -23,7 +24,7 @@
                             <i class='bx bxs-circle'></i>
                         </div>
                         <div>
-                            <b>{{$lastestproject->Name_Project}}</b>
+                            <b>{{$lastestproject->Name_Project}}</b> 
                         </div>
                     </div>
         

@@ -16,9 +16,9 @@ require __DIR__.'/strategic.php';
 Route::get('/setting', [SettingController::class, 'settings'])->name('setting');
 
 Route::get('/listProject', [ListProjectController::class, 'project'])->name('project');
+Route::get('/projects/{Id_Project}/edit', [ProjectController::class, 'editProject'])->name('editProject');
 
 Route::get('/createFirstForm/{Strategic_Id}', [ListProjectController::class, 'showCreateFirstForm'])->name('showCreateFirstForm');
-Route::post('/createFirstForm/{Strategic_Id}', [ListProjectController::class, 'createFirstForm'])->name('createFirstForm');
 
 Route::get('/createProject/{Strategic_Id}', [ListProjectController::class, 'showCreateForm'])->name('showCreateProject');
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');

@@ -5,16 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ListProjectModel;
 use App\Models\DepartmentModel;
+
 use App\Models\ProjectHasIndicatorsModel;
 use App\Models\StrategicObjectivesModel;
 use App\Models\KpiModel;
 use App\Models\StrategyModel;
 use App\Models\BudgetFormModel;
-// use App\Models\ProjectHasBudgetSourceModel;
+use App\Models\SubtopBudgetModel;
 use App\Models\SubtopicBudgetHasBudgetFormModel;
-
-
-
+use App\Models\ProjectHasBudgetSourceModel;
 
 use Illuminate\Support\Facades\Log;
 
@@ -89,8 +88,14 @@ class PlanDLCController extends Controller
 
         $budgetProject = BudgetFormModel::where('Project_Id', 14)->first();
 
-        $subBudgetProject = SubtopicBudgetHasBudgetFormModel::where('Subtopic_Budget_Id',1)
+        $subBudgetProject = SubtopicBudgetHasBudgetFormModel::with('subtopicBudget')
+                        ->where('Subtopic_Budget_Id',1)
                         ->where('Budget_Form_Id', 1)
+                        ->first();
+
+        $projectBudgetSource = ProjectHasBudgetSourceModel::with('budgetSource')
+                        ->where('Id_Project_has_Budget_Source',1)
+                        ->where('Budget_Source_Id', 1)
                         ->first();
 
         $data = [
@@ -99,9 +104,8 @@ class PlanDLCController extends Controller
             'projectIndicator' => $projectIndicator,
             'budgetProject' => $budgetProject,
             'subBudgetProject' => $subBudgetProject,
+            'projectBudgetSource' => $projectBudgetSource,
         ];
         return view('PlanDLC.reportResult', $data);
-    }
-
-    
+    }   
 }

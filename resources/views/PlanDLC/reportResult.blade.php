@@ -12,9 +12,6 @@
 
 <body>
 @section('content')
-<!-- <h1>รายงานผล</h1> -->
-
-
 <button type="button" class="btn-editBudget" data-bs-toggle="modal" data-bs-target="#reportResult">
     <i class='bx bx-plus'></i>รายงานผล
 </button>
@@ -27,21 +24,20 @@
                 @csrf
                     
                     <div class="modal-header">
-                        <h3 class="modal-title" id="reportResultLabel">สรุปผลการดำเนินงาน {{$report->Name_Project}}</h3>
+                        <h1 class="modal-title" id="reportResultLabel">สรุปผลการดำเนินงาน {{$report->Name_Project}}</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     
                     
                     <div class="modal-body">
                         <div class="mb-3">
-                            <h2>ส่วนที่ 1</h2>
-                            <textarea class="form-control" id="activity_summary" name="activity_summary" placeholder="กรอกรายละเอียดผลการดำเนินงาน" rows="20"></textarea>
+                            <h2>ส่วนที่ 1 ผลการดำเนินงาน</h2>
+                            <textarea class="form-control" placeholder="กรอกรายละเอียดผลการดำเนินงาน" rows="20"></textarea>
                         </div>
 
-                        <h2>ส่วนที่ 2</h2>
+                        <h2>ส่วนที่ 2 ผลสำเร็จตามตัวชี้วัดของโครงการ</h2>
                         <div class="mb-3">
                             <div class="content-box">
-                                <h5>ผลสำเร็จตามตัวชี้วัดของโครงการ</h5>
                                 <div>
                                     <label>กลยุทธ์</label>
                                     <select id="categoryDropdown" class="mb-2">
@@ -76,54 +72,63 @@
                             </div>
                         </div>
                             
-                        <h2>ส่วนที่ 3</h2>
+                        <h2>ส่วนที่ 3 การมีส่วนร่วมของหน่วยงานภายนอก/ชุมชน</h2>
                         <div class="mb-3">
-                            <div class="content-box">
-                                <label for="external_participation" class="col-form-label">การมีส่วนร่วมของหน่วยงานภายนอก/ชุมชน</label>
-                                <textarea class="form-control" id="external_participation" name="external_participation" rows="5" placeholder="กรอกข้อมูลเพิ่มเติม" require></textarea>
-                            </div>
+                            <textarea class="form-control" id="external_participation" name="external_participation" rows="5" placeholder="กรอกข้อมูลเพิ่มเติม" require></textarea>
                         </div>
 
 
-                        <h2>ส่วนที่ 4</h2>
-                        <div class="content-box">
+                        <h2>ส่วนที่ 4 งบประมาณ</h2>
                             <div class="mb-3">
-                                <h5>งบประมาณ</h5>
+                                <div class="content-box">
+                                    <!-- <h5>งบประมาณ</h5> -->
+                                    <label>แหล่งงบประมาณ</label>
+                                    <div class="content-box mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <p>{{ $projectBudgetSource->budgetSource->Name_Budget_Source }}
+                                                <span>{{ $projectBudgetSource->Amount_Total }}</span>&nbsp;&nbsp; บาท <br>
+                                                รายละเอียดค่าใช้จ่าย : {{ $projectBudgetSource->Details_Expense }}
+                                                </p>
+                                            </div>
+                                    </div>
 
                                     @if (!empty($budgetProject) && !empty($budgetProject->Amount_Big))
                                         <div class="content-box">
-                                            <div>หัวข้อใหญ่</div>
-                                            <textarea class="form-control" rows="4" readonly>{{ $budgetProject->Big_Topic }}</textarea>
-                                            
-                                            <label for="budget" class="d-flex col-form-label">ใช้งบประมาณทั้งสิ้น</label>
-                                            <div class="d-flex align-items-center gap-2">
-                                            <input type="text" class="form-control fw-bold" value="{{ $budgetProject->Amount_Big }}" readonly style="max-width: 200px;">
-                                            <span class="fw-bold text-muted">บาท</span>
+                                            <label>หัวข้อใหญ่</label>
+                                            <div class="content-box mb-3">
+                                                <p>{{ $budgetProject->Big_Topic }}</p>
                                             </div>
-
+                                            
+                                            
                                             @if (!empty($subBudgetProject) && !empty($subBudgetProject->Amount_Sub))
-                                                <label for="budget" class="d-flex col-form-label">รายละเอียดค่าใช้จ่ายโครงการ</label>
-                                                <div class="d-flex align-items-center">
-                                                    <input type="text" class="form-control me-2" value="{{ $subBudgetProject->Details_Subtopic_Form }}" readonly style="max-width: 500px;">
-                                                    <input type="text" class="form-control me-2" value="{{ $subBudgetProject->Amount_Sub }}" readonly style="max-width: 500px;">
-                                                    <span>บาท</span>
+                                                <label>รายละเอียดค่าใช้จ่ายโครงการ</label>
+                                                <div class="content-box">
+                                                    <!-- foreach ($subBudgetProject as $subBudgetProjects) -->
+                                                        <div>{{ $subBudgetProject->subtopicBudget->Name_Subtopic_Budget }}</div>
+                                                    <!-- endforeach -->
+                                                    <div class="d-flex align-items-center">
+                                                        <input type="text" class="form-control me-2" value="{{ $subBudgetProject->Details_Subtopic_Form }}" readonly style="max-width: 500px;">
+                                                        <input type="text" class="form-control me-2" value="{{ $subBudgetProject->Amount_Sub }}" readonly style="max-width: 500px;">
+                                                        <span>บาท</span>
+                                                    </div>
                                                 </div>
                                             @endif
                                         </div>
+                                        <h4 class="budget">
+                                            ใช้งบประมาณทั้งสิ้น&nbsp;<span><strong>{{ $budgetProject->Amount_Big }}</strong></span>&nbsp;บาท
+                                        </h4>
                                     @else
                                         <div class="text-danger"><b>ไม่มีงบประมาณ</b></div>
                                     @endif
                                 </div>
-                            </div><br>
-
-
-                        <h2>ส่วนที่ 5</h2>
-                        <div class="content-box">
-                            <div class="mb-3">
-                                <label for="suggestions" class="col-form-label">ข้อเสนอแนะ</label>
-                                <textarea class="form-control" id="suggestions" name="suggestions" placeholder="กรอกข้อเสนอแนะ" rows="3"></textarea>
                             </div>
-                        </div><br>
+
+
+                        <h2>ส่วนที่ 5 ข้อเสนอแนะ</h2>
+                        <div class="mb-3">
+                            <textarea class="form-control" placeholder="กรอกข้อเสนอแนะ" rows="8"></textarea>
+                        </div>
+
                     </div>
 
                 <div class="modal-footer">
@@ -173,14 +178,14 @@
                     checkbox.value = kpi.id;
                     checkbox.classList.add("me-2");
 
-                    const inputKpi = document.createElement("input");
+                    const inputKpi = document.createElement("textarea");
                     inputKpi.type = "text";
                     inputKpi.value = kpi.name;
                     inputKpi.readOnly = true;
                     inputKpi.classList.add("form-control", "me-2");
                     inputKpi.style.maxWidth = "auto";
 
-                    const inputTarget = document.createElement("input");
+                    const inputTarget = document.createElement("textarea");
                     inputTarget.type = "text";
                     inputTarget.value = kpi.target;
                     inputTarget.readOnly = true;

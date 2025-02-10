@@ -74,7 +74,7 @@ Route::get('/statusTracking', [StatusController::class, 'statusTracking'])->name
 Route::get('/project/{Id_Project}', [StatusController::class, 'showDetails'])->name('project.details');
 
 // การแสดง PDF
-Route::get('generate-pdf/{id}', [PDFController::class, 'generatePDF']);
+Route::get('generate-pdf/{id}', [PDFController::class, 'generatePDF'])->name('PDF.generate');
 Route::get('actionplan-pdf', [PDFController::class, 'ActionPlanPDF']);
 Route::get('strategic-pdf/{Id_Strategic}', [PDFController::class, 'PDFStrategic'])->name('PDF.strategic');
 

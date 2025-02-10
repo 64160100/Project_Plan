@@ -6,6 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>report</title>
     <link rel="stylesheet" href="{{ asset('css/report.css') }}">
+    <style>
+        .project-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* อนุญาตให้รายการย้ายลงบรรทัดใหม่ */
+    gap: 10px; /* เพิ่มช่องว่างระหว่างไอเท็ม */
+}
+
+.energy-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: auto; /* ค่าเริ่มต้น */
+}
+
+@media (max-width: 600px) {
+    .energy-container {
+        width: 100%; /* ให้ energy-container ยึดเต็มบรรทัด */
+        margin-top: 10px; /* เพิ่มระยะห่างเล็กน้อยด้านบน */
+    }
+}
+
+    </style>
 
 </head>
 <body>
@@ -27,12 +51,15 @@
                         </div>
                     </div>
         
-                    <div class="energy-container">
-                        <div class="energy-text" id="energy-text">70%</div>
-                        <div class="energy-bar-container">
-                            <div class="energy-bar" id="energy-bar"></div>
+                    <div class="project-info">
+                        <div class="energy-container">
+                            <div class="energy-text" id="energy-text">70%</div>
+                            <div class="energy-bar-container">
+                                <div class="energy-bar" id="energy-bar"></div>
+                            </div>
                         </div>
                     </div>
+                        
                 </div>
             </a>
             @endforeach

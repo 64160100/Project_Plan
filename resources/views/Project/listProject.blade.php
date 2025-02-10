@@ -8,6 +8,31 @@
     <title>Index</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{{ asset('css/listproject.css') }}">
+    
+    <style>
+        .accordion-btn {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+    
+        .button-container {
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+    
+        @media (max-width: 800px) {
+            .accordion-btn {
+                align-items: flex-start;
+            }
+    
+            .button-container {
+                width: 100%;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -27,13 +52,15 @@
                     {{ $Strategic->Name_Strategic_Plan }}</a><br>จำนวนโครงการ : {{ $Strategic->project_count }}
                 โครงการ</b>
 
-            <a href="{{ route('showCreateFirstForm', ['Strategic_Id' => $Strategic->Id_Strategic]) }}" class="btn-add">
-                <i class='bx bx-plus'></i>เพิ่มโครงการ
-            </a>
+            <div>
+                <a href="{{ route('showCreateFirstForm', ['Strategic_Id' => $Strategic->Id_Strategic]) }}" class="btn-add">
+                    <i class='bx bx-plus'></i>เพิ่มโครงการ
+                </a>
 
-            <a href="{{ route('showCreateProject', ['Strategic_Id' => $Strategic->Id_Strategic]) }}" class="btn-add">
-                <i class='bx bx-plus'></i>เพิ่มโครงการใหญ่
-            </a>
+                <a href="{{ route('showCreateProject', ['Strategic_Id' => $Strategic->Id_Strategic]) }}" class="btn-add">
+                    <i class='bx bx-plus'></i>เพิ่มโครงการใหญ่
+                </a>                
+            </div>
         </summary>
         <div class="accordion-content">
             @if ($Strategic->projects->isEmpty())
@@ -48,6 +75,9 @@
                             style='color:#bd7ff9; font-size: 20px; padding-right: 5px;'></a>
                         <a href="{{ route('PDF.projectCtrlP', $Project->Id_Project) }}" class='bx bx-folder-open'
                             style='color:#000; font-size: 20px; padding-right: 5px;'></a>
+                        <!-- Pdfยาว -->
+                        <a href="{{ route('PDF.generate', $Project->Id_Project) }}" class='bx bx-folder-open'
+                            style='color:#f00; font-size: 20px; padding-right: 5px;'></a>
                     </a>
                 </strong>
                 <a href="{{ route('editProject', ['Id_Project' => $Project->Id_Project]) }}" >

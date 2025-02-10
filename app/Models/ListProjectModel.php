@@ -102,4 +102,19 @@ class ListProjectModel extends Model
         return $this->hasMany(ProjectBatchHasProjectModel::class, 'Project_Id', 'Id_Project');
     }
 
+    public function outputs()
+    {
+        return $this->hasMany(OutputModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function outcomes()
+    {
+        return $this->hasMany(OutcomeModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function expectedResults()
+    {
+        return $this->hasMany(ExpectedResultsModel::class, 'Project_Id', 'Id_Project');
+    }
+
 }

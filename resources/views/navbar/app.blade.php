@@ -77,6 +77,7 @@
                         <img src="{{asset('images/logo_BUU_LIB.png')}}" alt="navbar brand" class="navbar-brand"
                             height="50" />
                     </a>
+                    <!-- navbar responsive -->
                     <div class="nav-toggle">
                         <button class="btn btn-toggle toggle-sidebar">
                             <i class="gg-menu-right"></i>
@@ -94,7 +95,7 @@
                 <!-- End Logo Header -->
             </div>
             <div class="sidebar-wrapper scrollbar scrollbar-inner">
-                <div class="sidebar-content">
+                <div class="sidebar-content" >
                     <!-- content in sidebar -->
                     <ul class="nav nav-secondary">
                         @php
@@ -326,7 +327,7 @@
                             <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
                                     aria-expanded="false" aria-haspopup="true">
-                                    <i class="fa fa-search"></i>
+                                    <i class='bx bx-search-alt-2'></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-search animated fadeIn">
                                     <form class="navbar-left navbar-form nav-search">
@@ -362,7 +363,7 @@
                                     @foreach($histories as $history)
                                     <!-- <li class="noitAppove noitAppove-detail"> -->
                                     <li class="noitAppove noitAppove-detail"
-                                        style="{{ $history->Status_Record === 'N' && $history->approvals->Status === 'N' ? 'background-color:ffc4c4;' : '' }}">
+                                        style="{{ $history->Status_Record === 'N' && $history->approvals->Status === 'N' ? 'background-color:ffc    c4;' : '' }}">
                                         <b
                                             style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
                                             {{ $history->approvals->project->Name_Project }}

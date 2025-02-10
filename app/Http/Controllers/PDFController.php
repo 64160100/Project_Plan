@@ -23,56 +23,18 @@ class PDFController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function generatePDF()
+    public function generatePDF($Id_Project)
     {
-        // $strategic = StrategicModel::find(5);
-        $strategy = StrategyModel::find(11);
+        $project = ListProjectModel::with(['strategic.strategies'])
+                    ->where('Id_Project', $Id_Project)
+                    ->firstOrFail();
         $data = [
-            'title' => 'Welcome to ItSolutionStuff.com',
+            'title' => $project->Name_Project,
             'date' => date('m/d/Y'),
-            // 'strategic' => $strategic,
-            'strategy' => $strategy,
-        ]; 
-           
+            'project' => $project,
+        ];
         $pdf = PDF::loadView('PDF.PDF', $data);
-    
         return $pdf->stream('itsolutionstuff.pdf');
-    }
-    
-    public function ActionPlanPDF()
-    {
-        $projects = ListProjectModel::with(['strategic.strategies'])
-                    ->orderBy('Strategic_Id')
-                    ->orderBy('Name_Strategy')
-                    ->get();    
-
-        $strategyCounts = $projects->groupBy('Name_Strategy')->map->count();
-        $data = [
-            // 'title' => '',
-            'projects' => $projects,
-            'strategyCounts' => $strategyCounts,
-        ]; 
-           
-        $pdf = PDF::loadView('PDF.PDFActionPlan', $data);
-    
-        return $pdf->stream('action_plan.pdf');
-    }
-
-
-    public function PDFStrategic($Id_Strategic)
-    {
-        $projects = ListProjectModel::with(['strategic.strategies'])
-                    ->where('Strategic_Id', $Id_Strategic)
-                    ->orderBy('Name_Strategy')
-                    ->get();   
-                    
-        $strategicName = $projects->first()->strategic->Name_Strategic_Plan ?? 'Default Title';
-        $data = [
-            'title' => $strategicName, 
-            'projects' => $projects,
-        ]; 
-        $pdf = PDF::loadView('PDF.PDFStrategic', $data);
-        return $pdf->stream($strategicName . '.pdf');  
     }
 
     public function PDFProject($Id_Project)
@@ -88,7 +50,6 @@ class PDFController extends Controller
         $pdf = PDF::loadView('PDF.PDFProject', $data);
         return $pdf->stream($projects->Name_Project .'.pdf');  
     }
-
     
     // PDF ที่เรียกจากหน้าHTML
     public function ctrlpPDFStrategic($Id_Strategic)

@@ -34,3 +34,23 @@ suchapa.ch
 
 เปิดที่อยู่ไฟล์บน wsl
 explorer.exe .
+
+เปลี่ยน remote ใหม่ให้ใช้
+
+วิธีที่ 1: เปลี่ยน URL ของ remote ที่มีอยู่
+git remote set-url origin https://github.com/64160100/Laravel_Project.git
+
+วิธีที่ 2: ลบ remote เดิมออกก่อน แล้วค่อยเพิ่มใหม่
+git remote remove origin
+git remote add origin https://github.com/64160100/Laravel_Project.git
+
+ตรวจสอบด้วย
+git remote -v
+
+ลบการตั้งค่า proxy ใน git
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+ตรวจสอบค่า
+git config --global -l
+

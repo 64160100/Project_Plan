@@ -19,7 +19,12 @@ Route::get('/setting', [SettingController::class, 'settings'])->name('setting');
 Route::get('/listProject', [ListProjectController::class, 'project'])->name('project');
 Route::get('/projects/{Id_Project}/edit', [ProjectController::class, 'editProject'])->name('editProject');
 
+// ฟอร์มเริ่มต้น [count-step-0,1]
+
 Route::get('/createFirstForm/{Strategic_Id}', [ListProjectController::class, 'showCreateFirstForm'])->name('showCreateFirstForm');
+
+Route::put('/disapprove-project/{id}', [ListProjectController::class, 'disapproveProject'])->name('disapproveProject');
+Route::put('/approvals/disapproveAll/{id}', [ListProjectController::class, 'disapproveAll'])->name('disapproveAll');
 
 Route::get('/createProject/{Strategic_Id}', [ListProjectController::class, 'showCreateForm'])->name('showCreateProject');
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
@@ -28,27 +33,25 @@ Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'cre
 Route::get('/createSetProject', [ProjectBatchController::class, 'createSetProject'])->name('createSetProject');
 Route::post('/project-batches', [ProjectBatchController::class, 'storeProjectBatch'])->name('project-batches.store');
 Route::get('/project-batches/submit/{id}', [ProjectBatchController::class, 'submitProjectBatch'])->name('project-batches.submit');
-
 Route::delete('/project-batches/{batch_id}', [ProjectBatchController::class, 'removeBatch'])->name('project-batches.removeBatch');
-
 Route::delete('/project-batches/{batch_id}/projects/{project_id}', [ProjectBatchController::class, 'removeProjectFromBatch'])->name('project-batches.removeProject');
-
 Route::post('/project-batches/add-projects', [ProjectBatchController::class, 'addProjectsToBatch'])->name('project-batches.addProjects');
+Route::put('/approvals/batch/{id}/status/{status}', [ProjectBatchController::class, 'updateBatchApprovalStatus'])->name('approvals.updateBatchStatus');
 
 // แสดง PDF
 Route::get('/projects/{id}', [ProjectBatchController::class, 'showBatchesProject'])->name('projects.showBatchesProject');
-Route::get('/projects/batch/{batch_id}', [ProjectBatchController::class, 'showBatchAll'])->name('projects.showBatchAll');
+Route::get('/projects/batch/{batch_id}/all', [ProjectBatchController::class, 'showBatchAll'])->name('projects.showBatchAll');
 
-Route::put('/approvals/batch/{id}/status/{status}', [ProjectBatchController::class, 'updateBatchApprovalStatus'])->name('approvals.updateBatchStatus');
-
+// แก้ไขโครงการ
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
 Route::match(['get', 'post'],'/editProject/{Id_Project}', [ListProjectController::class, 'editProject'])->name('editProject');
 Route::put('/editProject/{Id_Project}', [ListProjectController::class, 'updateProject'])->name('updateProject');
 
+Route::post('/projects/update-status/{id}', [ListProjectController::class, 'updateStatus'])->name('projects.updateStatus');
+
 // แก้ไขโครงการ
 Route::get('/project/{id}/edit', [ListProjectController::class, 'edit'])->name('projects.edit');
 Route::put('/project/{id}', [ListProjectController::class, 'update'])->name('projects.update');
-
 Route::get('/project/{Id_Project}', [ProjectController::class, 'viewProject'])->name('viewProject');
 
 //แสดงหน้า Strategic
@@ -59,10 +62,12 @@ Route::get('/viewProject/{Id_Project}', [ListProjectController::class, 'viewProj
 Route::get('/requestApproval', [ListProjectController::class, 'showAllApprovals'])->name('requestApproval');
 Route::put('/approvals/{id}/status/{status}', [ListProjectController::class, 'updateApprovalStatus'])->name('approvals.updateStatus');
 Route::get('/editForm', [ListProjectController::class, 'approveProject'])->name('approveProject');
+Route::post('/submit-for-all-approval', [ListProjectController::class, 'submitForAllApproval'])->name('projects.submitForAllApproval');
 
 // การเสนอโครงการ
 Route::get('/proposeProject', [ListProjectController::class, 'proposeProject'])->name('proposeProject');
-Route::post('/projects/{id}/submitForApproval', [ListProjectController::class, 'submitForApproval'])->name('projects.submitForApproval');
+Route::post('/projects/submit-for-approval/{id}', [ListProjectController::class, 'submitForApproval'])->name('projects.submitForApproval');
+Route::put('/approvals/updateAllStatus', [ListProjectController::class, 'updateAllStatus'])->name('approvals.updateAllStatus');
 
 // คลังไฟล์ PDF
 Route::get('/storage-files/{project_id?}', [StorageFileController::class, 'index'])->name('StorageFiles.index');

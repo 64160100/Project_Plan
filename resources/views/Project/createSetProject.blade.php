@@ -25,7 +25,7 @@
                         $isAssigned = $projectBatchRelations->contains('Project_Id', $project->Id_Project);
                         @endphp
 
-                        @if(!$isAssigned)
+                        @if(!$isAssigned && $project->Count_Steps == 0)
                         <div class="project-item">
                             <div class="form-check">
                                 <input class="form-check-input project-checkbox" type="checkbox"
@@ -39,11 +39,18 @@
                                         <div class="project-details">
                                             <span class="budget">
                                                 <i class='bx bx-wallet-alt'></i>
-                                                งบประมาณ: {{ $project->Status_Budget === 'Y' ? '500,000 บาท' : '-' }}
+                                                @if($project->Status_Budget === 'Y')
+                                                @php
+                                                $totalBudget = $project->projectBudgetSources->sum('Amount_Total');
+                                                @endphp
+                                                {{ number_format($totalBudget, 2) }} บาท
+                                                @else
+                                                -
+                                                @endif
                                             </span>
                                             <span class="start-date">
                                                 <i class='bx bxs-calendar-event'></i>
-                                                วันที่เริ่ม: {{ $project->First_Time }}
+                                                วันที่เริ่ม: {{ $project->First_Time ?? '-' }}
                                             </span>
                                         </div>
                                     </div>
@@ -155,16 +162,22 @@
                                     {{ $batchName }}
                                     <small>({{ $filteredRelations->count() }} โครงการ)</small>
                                 </h5>
-                                <form
-                                    action="{{ route('project-batches.removeBatch', ['batch_id' => $filteredRelations->first()->Project_Batch_Id]) }}"
-                                    method="POST"
-                                    onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบชุดโครงการนี้?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class='bx bx-trash'></i> ลบชุดโครงการ
-                                    </button>
-                                </form>
+                                <div class="d-flex">
+                                    <a href="{{ route('projects.showBatchAll', ['batch_id' => $filteredRelations->first()->Project_Batch_Id]) }}"
+                                        class="btn btn-info btn-sm me-2">
+                                        <i class='bx bx-show'></i> ดูข้อมูลทั้งหมด
+                                    </a>
+                                    <form
+                                        action="{{ route('project-batches.removeBatch', ['batch_id' => $filteredRelations->first()->Project_Batch_Id]) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบชุดโครงการนี้?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class='bx bx-trash'></i> ลบชุดโครงการ
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                             <div class="batch-projects">
                                 @foreach($filteredRelations as $index => $relation)
@@ -172,16 +185,26 @@
                                     <div class="project-name">
                                         {{ $index + 1 }}. {{ $relation->project->Name_Project }}
                                     </div>
-                                    <form
-                                        action="{{ route('project-batches.removeProject', ['batch_id' => $relation->Project_Batch_Id, 'project_id' => $relation->Project_Id]) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบโครงการนี้ออกจากชุดโครงการ?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">
-                                            <i class='bx bx-trash'></i> ลบ
-                                        </button>
-                                    </form>
+                                    <div class="project-actions d-flex">
+                                        <a href="{{ route('projects.showBatchesProject', ['id' => $relation->project->Id_Project]) }}"
+                                            class="btn btn-info btn-sm me-2">
+                                            <i class='bx bx-show'></i> ดูข้อมูล
+                                        </a>
+                                        <a href="{{ route('editProject', ['Id_Project' => $project->Id_Project]) }}"
+                                            class="btn btn-warning btn-sm me-2">
+                                            <i class='bx bx-edit'></i> แก้ไข
+                                        </a>
+                                        <form
+                                            action="{{ route('project-batches.removeProject', ['batch_id' => $relation->Project_Batch_Id, 'project_id' => $relation->Project_Id]) }}"
+                                            method="POST"
+                                            onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบโครงการนี้ออกจากชุดโครงการ?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class='bx bx-trash'></i> ลบ
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                                 @endforeach
                             </div>
@@ -205,7 +228,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </div>

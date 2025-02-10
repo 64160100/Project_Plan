@@ -35,7 +35,10 @@
                                     <option value="" selected disabled>เลือกกลยุทธ์</option>
                                     @if($strategies->isNotEmpty())
                                     @foreach($strategies as $strategy)
-                                    <option value="{{ $strategy->Id_Strategy }}">{{ $strategy->Name_Strategy }}</option>
+                                    <option value="{{ $strategy->Id_Strategy }}"
+                                        {{ isset($project) && $project->Name_Strategy == $strategy->Id_Strategy ? 'selected' : '' }}>
+                                        {{ $strategy->Name_Strategy }}
+                                    </option>
                                     @endforeach
                                     @else
                                     <option value="" disabled>ไม่มีกลยุทธ์ที่เกี่ยวข้อง</option>
@@ -49,7 +52,6 @@
                     </div>
                 </div>
 
-
                 <!-- ลักษณะโครงการ -->
                 <div class="content-box">
                     <div class="section-header">
@@ -59,12 +61,12 @@
                     </div>
                     <div class="form-group-radio">
                         <div class="radio-item">
-                            <input type="radio" name="projectType" value="1" id="newProject"
+                            <input type="radio" name="Description_Project" value="N" id="newProject"
                                 onchange="toggleTextbox(this, 'textbox-projectType-')" checked>
                             <label for="newProject">โครงการใหม่</label>
                         </div>
                         <div class="radio-item">
-                            <input type="radio" name="projectType" value="2" id="continuousProject"
+                            <input type="radio" name="Description_Project" value="C" id="continuousProject"
                                 onchange="toggleTextbox(this, 'textbox-projectType-')">
                             <label for="continuousProject">โครงการต่อเนื่อง</label>
                         </div>
@@ -112,15 +114,27 @@
                     </div>
                     <div id="objectiveDetails">
                         <div class="form-group">
-                            <select class="form-control @error('Objective_Project') is-invalid @enderror"
-                                id="Objective_Project" name="Objective_Project" required>
-                                <option value="" disabled selected>กรอกข้อมูลวัตถุประสงค์</option>
-                                @foreach($strategicObjectives as $objective)
-                                <option value="{{ $objective->Details_Strategic_Objectives }}"
-                                    data-strategy-id="{{ $objective->Strategy_Id_Strategy }}">
-                                    {{ $objective->Details_Strategic_Objectives }}</option>
-                                @endforeach
-                            </select>
+                            <div class="d-flex align-items-center">
+                                <select class="form-control @error('Objective_Project') is-invalid @enderror"
+                                    id="Objective_Project" name="Objective_Project" required>
+                                    <option value="" disabled selected>กรอกข้อมูลวัตถุประสงค์</option>
+                                    @foreach($strategicObjectives as $objective)
+                                    <option value="{{ $objective->Details_Strategic_Objectives }}"
+                                        data-strategy-id="{{ $objective->Strategy_Id_Strategy }}">
+                                        {{ $objective->Details_Strategic_Objectives }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="form-check ms-2 d-flex align-items-center">
+                                    <input class="form-check-input" type="checkbox"
+                                        id="Objective_Project_Other_Checkbox">
+                                    <label class="form-check-label ms-1" for="Objective_Project_Other_Checkbox">
+                                        อื่น ๆ
+                                    </label>
+                                </div>
+                            </div>
+                            <textarea class="form-control mt-2" id="Objective_Project_Other"
+                                name="Objective_Project_Other" placeholder="กรอกข้อมูลวัตถุประสงค์อื่น ๆ"
+                                style="display: none;"></textarea>
                             @error('Objective_Project')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -138,17 +152,28 @@
                     </div>
                     <div id="successIndicatorsDetails">
                         <div class="form-group">
-                            <label for="Success_Indicators"></label>
-                            <select class="form-control @error('Success_Indicators') is-invalid @enderror"
-                                id="Success_Indicators" name="Success_Indicators">
-                                <option value="" disabled selected>กรอกตัวชี้วัดความสำเร็จของโครงการ</option>
-                                @foreach($kpis as $kpi)
-                                <option value="{{ $kpi->Name_Kpi }}" data-strategy-id="{{ $kpi->Strategy_Id }}"
-                                    data-target-value="{{ $kpi->Target_Value }}">
-                                    {{ $kpi->Name_Kpi }}
-                                </option>
-                                @endforeach
-                            </select>
+                            <div class="d-flex align-items-center">
+                                <select class="form-control @error('Success_Indicators') is-invalid @enderror"
+                                    id="Success_Indicators" name="Success_Indicators">
+                                    <option value="" disabled selected>กรอกตัวชี้วัดความสำเร็จของโครงการ</option>
+                                    @foreach($kpis as $kpi)
+                                    <option value="{{ $kpi->Name_Kpi }}" data-strategy-id="{{ $kpi->Strategy_Id }}"
+                                        data-target-value="{{ $kpi->Target_Value }}">
+                                        {{ $kpi->Name_Kpi }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                <div class="form-check ms-2 d-flex align-items-center">
+                                    <input class="form-check-input" type="checkbox"
+                                        id="Success_Indicators_Other_Checkbox">
+                                    <label class="form-check-label ms-1" for="Success_Indicators_Other_Checkbox">
+                                        อื่น ๆ
+                                    </label>
+                                </div>
+                            </div>
+                            <textarea class="form-control mt-2" id="Success_Indicators_Other"
+                                name="Success_Indicators_Other" placeholder="กรอกตัวชี้วัดความสำเร็จอื่น ๆ"
+                                style="display: none;"></textarea>
                             @error('Success_Indicators')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -165,11 +190,21 @@
                     </div>
                     <div id="valueTargetDetails">
                         <div class="form-group">
-                            <label for="Value_Target"></label>
-                            <select class="form-control @error('Value_Target') is-invalid @enderror" id="Value_Target"
-                                name="Value_Target">
-                                <option value="" disabled selected>กรอกค่าเป้าหมาย</option>
-                            </select>
+                            <div class="d-flex align-items-center">
+                                <select class="form-control @error('Value_Target') is-invalid @enderror"
+                                    id="Value_Target" name="Value_Target">
+                                    <option value="" disabled selected>กรอกค่าเป้าหมาย</option>
+                                    <!-- Add options here if needed -->
+                                </select>
+                                <div class="form-check ms-2 d-flex align-items-center">
+                                    <input class="form-check-input" type="checkbox" id="Value_Target_Other_Checkbox">
+                                    <label class="form-check-label ms-1" for="Value_Target_Other_Checkbox">
+                                        อื่น ๆ
+                                    </label>
+                                </div>
+                            </div>
+                            <textarea class="form-control mt-2" id="Value_Target_Other" name="Value_Target_Other"
+                                placeholder="กรอกค่าเป้าหมายอื่น ๆ" style="display: none;"></textarea>
                             @error('Value_Target')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -328,7 +363,7 @@
                                                                             <div class="input-group">
                                                                                 <input type="number" name="amount[0][]"
                                                                                     class="form-control"
-                                                                                    placeholder="880">
+                                                                                    placeholder="จำนวนเงิน">
                                                                                 <span
                                                                                     class="input-group-text">บาท</span>
                                                                             </div>
@@ -472,12 +507,13 @@ document.addEventListener('DOMContentLoaded', function() {
             field.textContent = `1.${index + 1}`;
         });
     }
+
     // ====== ลักษณะโครงการ =======
     window.toggleTextbox = function(radio, prefix) {
         const textboxContainer = document.querySelector(`#${prefix}2`).closest('.form-group');
         const textbox = document.getElementById(`${prefix}2`);
 
-        if (radio.value === '2') {
+        if (radio.value === 'C') {
             textboxContainer.style.display = 'block';
             textbox.classList.remove('hidden');
             textbox.required = true;
@@ -491,10 +527,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.addEventListener('DOMContentLoaded', function() {
         const newProjectRadio = document.getElementById('newProject');
+        const continuousProjectRadio = document.getElementById('continuousProject');
         const textbox = document.getElementById('textbox-projectType-2');
+
         if (newProjectRadio.checked) {
             textbox.classList.add('hidden');
             textbox.closest('.form-group').style.display = 'none';
+        }
+
+        if (continuousProjectRadio.checked) {
+            textbox.classList.remove('hidden');
+            textbox.closest('.form-group').style.display = 'block';
+            textbox.required = true;
         }
 
         const projectTypeDetails = document.querySelector('.form-group-radio');
@@ -507,24 +551,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============ จัดการความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย============
 
     // ============ ความสอดคล้องกับยุทธศาสตร์ส่วนงาน ============
-
-    // ============ วัตถุประสงค์โครงการ ============
-    const form = document.querySelector('form'); // Adjust the selector to target your form
-    form.addEventListener('submit', function(event) {
-        const select = document.getElementById('Objective_Project');
-        const selectedOption = select.options[select.selectedIndex];
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'Details_Strategic_Objectives';
-        hiddenInput.value = selectedOption.value;
-        form.appendChild(hiddenInput);
-        select.disabled = true; // Disable the select to avoid sending its value
-    });
-
-    // ============ ตัวชี้วัดความสำเร็จของโครงการ ============
-
-
-    // ============ ค่าเป้าหมาย ============
 
     // ============ แหล่งงบประมาณ ============
     window.toggleIncomeForm = function(radio) {
@@ -782,6 +808,115 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     // ============ ผู้รับผิดชอบโครงการ============
 
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // ============ วัตถุประสงค์โครงการ ตัวชี้วัดความสำเร็จของโครงการ ค่าเป้าหมาย=================
+    const objectiveCheckbox = document.getElementById('Objective_Project_Other_Checkbox');
+    const objectiveSelect = document.getElementById('Objective_Project');
+    const objectiveOther = document.getElementById('Objective_Project_Other');
+    objectiveCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            objectiveOther.style.display = 'block';
+            objectiveOther.required = true;
+            objectiveSelect.disabled = true;
+        } else {
+            objectiveOther.style.display = 'none';
+            objectiveOther.required = false;
+            objectiveOther.value = '';
+            objectiveSelect.disabled = false;
+        }
+    });
+
+    const successIndicatorsCheckbox = document.getElementById('Success_Indicators_Other_Checkbox');
+    const successIndicatorsSelect = document.getElementById('Success_Indicators');
+    const successIndicatorsOther = document.getElementById('Success_Indicators_Other');
+    successIndicatorsCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            successIndicatorsOther.style.display = 'block';
+            successIndicatorsOther.required = true;
+            successIndicatorsSelect.disabled = true;
+        } else {
+            successIndicatorsOther.style.display = 'none';
+            successIndicatorsOther.required = false;
+            successIndicatorsOther.value = '';
+            successIndicatorsSelect.disabled = false;
+        }
+    });
+
+    const valueTargetCheckbox = document.getElementById('Value_Target_Other_Checkbox');
+    const valueTargetSelect = document.getElementById('Value_Target');
+    const valueTargetOther = document.getElementById('Value_Target_Other');
+    valueTargetCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            valueTargetOther.style.display = 'block';
+            valueTargetOther.required = true;
+            valueTargetSelect.disabled = true;
+        } else {
+            valueTargetOther.style.display = 'none';
+            valueTargetOther.required = false;
+            valueTargetOther.value = '';
+            valueTargetSelect.disabled = false;
+        }
+    });
+
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+        // ============ วัตถุประสงค์โครงการ ============
+        if (objectiveCheckbox.checked) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'Objective_Project';
+            hiddenInput.value = objectiveOther.value;
+            form.appendChild(hiddenInput);
+            objectiveOther.disabled = false;
+        } else {
+            const selectedOption = objectiveSelect.options[objectiveSelect.selectedIndex];
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'Objective_Project';
+            hiddenInput.value = selectedOption.value;
+            form.appendChild(hiddenInput);
+            objectiveSelect.disabled = true;
+        }
+
+        // ============ ตัวชี้วัดความสำเร็จของโครงการ ============
+        if (successIndicatorsCheckbox.checked) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'Success_Indicators';
+            hiddenInput.value = successIndicatorsOther.value;
+            form.appendChild(hiddenInput);
+            successIndicatorsOther.disabled = false;
+        } else {
+            const selectedOption = successIndicatorsSelect.options[successIndicatorsSelect
+                .selectedIndex];
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'Success_Indicators';
+            hiddenInput.value = selectedOption.value;
+            form.appendChild(hiddenInput);
+            successIndicatorsSelect.disabled = true;
+        }
+
+        // ============ ค่าเป้าหมาย ============
+        if (valueTargetCheckbox.checked) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'Value_Target';
+            hiddenInput.value = valueTargetOther.value;
+            form.appendChild(hiddenInput);
+            valueTargetOther.disabled = false;
+        } else {
+            const selectedOption = valueTargetSelect.options[valueTargetSelect.selectedIndex];
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'Value_Target';
+            hiddenInput.value = selectedOption.value;
+            form.appendChild(hiddenInput);
+            valueTargetSelect.disabled = true;
+        }
+    });
 });
 </script>
 @endsection

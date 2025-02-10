@@ -137,20 +137,20 @@ class ProjectBatchController extends Controller
         $permissions = $employee ? $employee->permissions : collect();
         $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
         $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
-    
+
         Log::info($projectIds);
-    
+
         foreach ($projectIds as $projectId) {
             $approval = ApproveModel::where('Project_Id', $projectId)->first();
             if ($approval) {
                 $approval->Status = $status;
                 $approval->save();
-    
+
                 $project = ListProjectModel::find($projectId);
                 if ($status === 'Y' && $project->Count_Steps == 1) {
                     $comment = "เห็นชอบการดำเนินโครงการในขั้นต้น";
                     $project->Count_Steps = 2;
-    
+
                     $batchProject = ProjectBatchHasProjectModel::where('Project_Batch_Id', $id)
                         ->where('Project_Id', $projectId)
                         ->first();
@@ -165,7 +165,7 @@ class ProjectBatchController extends Controller
                         $comment = "ไม่อนุมัติโครงการ กรุณาแก้ไขตามคำแนะนำ";
                     }
                 }
-    
+
                 RecordHistory::create([
                     'Approve_Id' => $approval->Id_Approve,
                     'Approve_Project_Id' => $approval->Project_Id,
@@ -175,36 +175,50 @@ class ProjectBatchController extends Controller
                     'Name_Record' => $nameResponsible,
                     'Permission_Record' => $permissionName,
                 ]);
-    
+
                 if ($status === 'Y' && $project->Count_Steps == 2) {
                     $approval->Status = 'I';
                     $approval->save();
                 }
-    
+
                 $project->save();
             }
         }
-    
+
+        $remainingProjects = ProjectBatchHasProjectModel::where('Project_Batch_Id', $id)
+            ->where('Count_Steps_Batch', '<>', 2)
+            ->count();
+
+        if ($remainingProjects === 0) {
+            ProjectBatchHasProjectModel::where('Project_Batch_Id', $id)->delete();
+            BatchProjectModel::where('Id_Project_Batch', $id)->delete();
+        }
+
         return redirect()->route('requestApproval')->with('success', 'บันทึกการพิจารณาเรียบร้อยแล้ว');
     }
 
     public function showBatchesProject($id)
     {
-        $project = ListProjectModel::with([
-            'strategic',
-            'subProjects',
-            'employee',
-            'projectBudgetSources'
-        ])->findOrFail($id);
-        
-        $projectBudgetSources = $project->projectBudgetSources;
-        
-        return view('Project.showBatchesProject', compact('project', 'projectBudgetSources'));
+        $project = ListProjectModel::with('projectBatchHasProjects', 'employee')->find($id);
+    
+        if (!$project) {
+            return redirect()->back()->with('error', 'Project not found.');
+        }
+    
+        $message = "Hello";
+
+
+        log::info($message);
+    
+        return view('Project.showBatchesProject', compact('project', 'message'));
     }
     
     public function showBatchAll($batch_id)
     {
-        $batchRelations = ProjectBatchHasProjectModel::where('Project_Batch_Id', $batch_id)->get();
+        $batchRelations = ProjectBatchHasProjectModel::with('project', 'project.employee', 'project.strategic', 'project.subProjects')
+            ->where('Project_Batch_Id', $batch_id)
+            ->get();
+
         return view('Project.showBatchAll', compact('batchRelations'));
     }
 }

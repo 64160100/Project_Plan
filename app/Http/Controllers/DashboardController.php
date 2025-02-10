@@ -10,7 +10,9 @@ class DashboardController extends Controller
     {
         $employee = $request->session()->get('employee');
         $permissions = $request->session()->get('permissions');
-
-        return view('dashboard', ['employee' => $employee, 'permissions' => $permissions]);
+    
+        $message = "Hello";
+    
+        return view('dashboard', ['employee' => $employee, 'permissions' => $permissions, 'message' => $message]);
     }
 }

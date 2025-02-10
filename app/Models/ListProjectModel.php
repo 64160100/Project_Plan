@@ -12,8 +12,10 @@ class ListProjectModel extends Model
     protected $keyType = 'int';
     protected $fillable = [
         'Strategic_Id',
+        'Strategy_Id',
         'Name_Strategy',
         'Name_Project',
+        'Description_Project',
         'Employee_Id',
         'Objective_Project',
         'Principles_Reasons',
@@ -21,6 +23,8 @@ class ListProjectModel extends Model
         'Value_Target',
         'Project_Type',
         'Status_Budget',
+        'Name_Creator',
+        'Role_Creator',
         'First_Time',
         'End_Time',
         'Count_Steps',
@@ -100,6 +104,11 @@ class ListProjectModel extends Model
     public function projectBatchHasProjects()
     {
         return $this->hasMany(ProjectBatchHasProjectModel::class, 'Project_Id', 'Id_Project');
+    }
+    
+    public function projectBudgetSources()
+    {
+        return $this->hasMany(ProjectHasBudgetSourceModel::class, 'Project_Id', 'Id_Project');
     }
 
 }

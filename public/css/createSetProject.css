@@ -105,3 +105,20 @@
     border-radius: 0.5rem;
     background-color: #fff;
 }
+
+.project-actions .btn {
+    height: 40px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+}
+
+.btn-sm {
+    height: 40px; 
+    width: 150px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center; 
+}

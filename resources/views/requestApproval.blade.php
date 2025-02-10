@@ -1,11 +1,85 @@
+@php
+use Carbon\Carbon;
+Carbon::setLocale('th');
+@endphp
+
 @extends('navbar.app')
 
 <hade>
     <link rel="stylesheet" href="{{ asset('css/requestApproval.css') }}">
+    <style>
+    @font-face {
+        font-family: 'THSarabunNew';
+        font-style: normal;
+        font-weight: normal;
+        src: url('{{ storage_path('fonts/THSarabunNew.ttf') }}') format('truetype');
+    }
+
+    @font-face {
+        font-family: 'THSarabunNew';
+        font-style: normal;
+        font-weight: bold;
+        src: url('{{ storage_path('fonts/THSarabunNew Bold.ttf') }}') format('truetype');
+    }
+
+    .page-container {
+        padding: 40px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        margin-bottom: 20px;
+    }
+
+    th,
+    td {
+        border: 1px solid #000;
+        padding: 10px;
+        font-size: 14px;
+        vertical-align: top;
+        word-wrap: break-word;
+        background-color: white;
+    }
+
+    th {
+        background-color: #c8e6c9 !important;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .button-container {
+        margin: 20px 0;
+        text-align: center;
+    }
+
+    .print-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .text-gray {
+        color: #a9a9a9;
+    }
+
+    @media print {
+        .button-container {
+            display: none;
+        }
+
+        @page {
+            size: A4 landscape;
+        }
+    }
+    </style>
 </hade>
 
 @section('content')
-
 <div class="container">
     <h1>การอนุมัติทั้งหมด</h1>
     @foreach($approvals as $approval)
@@ -150,108 +224,140 @@
     @endif
     @endforeach
 
-
+    <!-- การอนุมัติจากผู้อำนวยการช่วงแรก -->
     @if($employee->IsDirector === 'Y')
-    <div class="card">
-        <div class="card-header bg-white">
-            <h5 class="mb-0">ชุดโครงการที่สร้างแล้ว</h5>
-        </div>
+    @php
+    $hasProjectsToApprove = false;
+    foreach ($strategics as $Strategic) {
+    if ($Strategic->projects->contains(function($project) {
+    return $project->Count_Steps == 1;
+    })) {
+    $hasProjectsToApprove = true;
+    break;
+    }
+    }
+    @endphp
+
+    @if($hasProjectsToApprove)
+    <div class="card mb-3">
         <div class="card-body">
-            <div class="batches-list">
-                @foreach($projectBatchRelations->groupBy('batch.Name_Batch') as $batchName => $relations)
-                @php
-                // Filter out relations with Count_Steps_Batch set to 1
-                $filteredRelations = $relations->filter(function ($relation) {
-                return $relation->Count_Steps_Batch == 1;
-                });
-                @endphp
-                @if($filteredRelations->isNotEmpty())
-                <div class="batch-item">
-                    <div class="batch-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            {{ $batchName }}
-                            <small>({{ $filteredRelations->count() }} โครงการ)</small>
-                        </h5>
-                        <a href="{{ route('projects.showBatchAll', ['batch_id' => $filteredRelations->first()->Project_Batch_Id]) }}"
-                            class="btn btn-primary btn-sm">
-                            <i class='bx bx-show'></i> ดูข้อมูลทั้งหมด
-                        </a>
-                    </div>
-                    <div class="batch-projects">
-                        @foreach($filteredRelations as $index => $relation)
-                        <div class="batch-project-item d-flex justify-content-between align-items-center">
-                            <div class="project-name">
-                                {{ $index + 1 }}. {{ $relation->project->Name_Project }}
-                            </div>
-                            <div class="project-actions">
-                                <a href="{{ route('projects.showBatchesProject', ['id' => $relation->Project_Id]) }}"
-                                    class="btn btn-info btn-sm">
-                                    <i class='bx bx-show'></i> ดูข้อมูล
-                                </a>
-                                <form
-                                    action="{{ route('project-batches.removeProject', ['batch_id' => $relation->Project_Batch_Id, 'project_id' => $relation->Project_Id]) }}"
-                                    method="POST"
-                                    onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบโครงการนี้ออกจากชุดโครงการ?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class='bx bx-trash'></i> ลบ
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                    <div class="button-container mt-3">
-                        <div class="status-section">
-                            <div class="status-header">การดำเนินการ</div>
-                            <div class="status-card">
-                                <div class="status-left">
-                                    <div class="status-text">
-                                        รออนุมัติ:
-                                        {{ floor($approval->recordHistory->last()->daysSinceTimeRecord ?? 0) }} วัน
-                                    </div>
-                                </div>
-                                <div class="status-right">
-                                    <div class="action-buttons">
-                                        <form
-                                            action="{{ route('approvals.updateBatchStatus', ['id' => $filteredRelations->first()->Project_Batch_Id, 'status' => 'Y']) }}"
-                                            method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('PUT')
-                                            @foreach($filteredRelations as $relation)
-                                            <input type="hidden" name="project_ids[]"
-                                                value="{{ $relation->project->Id_Project }}">
-                                            @endforeach
-                                            <button type="submit" class="status-button approved">
-                                                <i class='bx bx-like'></i> อนุมัติทั้งหมด
-                                            </button>
-                                        </form>
-                                        <button type="button" class="status-button not-approved" data-bs-toggle="modal"
-                                            data-bs-target="#commentModal-{{ $filteredRelations->first()->Project_Batch_Id }}">
-                                            <i class='bx bx-dislike'></i> ไม่อนุมัติทั้งหมด
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+            <h5 class="card-title">การอนุมัติจากผู้อำนวยการ</h5>
+            @foreach ($strategics as $Strategic)
+            @php
+            $filteredProjects = $Strategic->projects->filter(function($project) {
+            return $project->Count_Steps == 1;
+            });
+            $filteredProjectCount = $filteredProjects->count();
+            @endphp
+            <details class="accordion" id="{{ $Strategic->Id_Strategic }}">
+                <summary class="accordion-btn">
+                    <b>{{ $Strategic->Name_Strategic_Plan }}</b><br>จำนวนโครงการ :
+                    {{ $filteredProjectCount }} โครงการ
+                </summary>
+                @if ($filteredProjectCount > 0)
+                <div class="accordion-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:10%">ยุทธศาสตร์ สำนักหอสมุด</th>
+                                <th style="width:10%">กลยุทธ์ สำนักหอสมุด</th>
+                                <th style="width:14%">โครงการ</th>
+                                <th style="width:14%">ตัวชี้วัดความสำเร็จ<br>ของโครงการ</th>
+                                <th style="width:12%">ค่าเป้าหมาย</th>
+                                <th style="width:10%">งบประมาณ (บาท)</th>
+                                <th style="width:12%">ผู้รับผิดชอบ</th>
+                                <th style="width:10%">การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($filteredProjects as $index => $Project)
+                            @php
+                            $isStatusN = $Project->approvals->contains('Status', 'N');
+                            @endphp
+                            <tr>
+                                @if ($index === 0)
+                                <td rowspan="{{ $filteredProjectCount }}">{{ $Strategic->Name_Strategic_Plan }}</td>
+                                @endif
+                                <td class="{{ $isStatusN ? 'text-gray' : '' }}">{{ $Project->Name_Strategy ?? '-' }}
+                                </td>
+                                <td class="{{ $isStatusN ? 'text-gray' : '' }}">
+                                    <b>{{ $Project->Name_Project }}</b><br>
+                                    @foreach($Project->subProjects as $subProject)
+                                    - {{ $subProject->Name_Sup_Project }}<br>
+                                    @endforeach
+                                </td>
+                                <td class="{{ $isStatusN ? 'text-gray' : '' }}">{!! $Project->Success_Indicators ?
+                                    nl2br(e($Project->Success_Indicators)) : '-' !!}</td>
+                                <td class="{{ $isStatusN ? 'text-gray' : '' }}">{!! $Project->Value_Target ?
+                                    nl2br(e($Project->Value_Target)) : '-' !!}</td>
+                                <td class="{{ $isStatusN ? 'text-gray' : '' }}" style="text-align: center;">
+                                    @php
+                                    $totalBudget = $Project->projectBatchHasProjects ?
+                                    $Project->projectBatchHasProjects->sum('Amount_Total') : 0;
+                                    @endphp
+                                    @if($totalBudget === 0)
+                                    ไม่ใช้งบประมาณ
+                                    @else
+                                    {{ number_format($totalBudget, 2) }}
+                                    @endif
+                                </td>
+                                <td class="{{ $isStatusN ? 'text-gray' : '' }}">
+                                    {{ $Project->employee->Firstname_Employee ?? '-' }}
+                                    {{ $Project->employee->Lastname_Employee ?? '' }}
+                                </td>
+                                <td class="{{ $isStatusN ? 'text-gray' : '' }}">
+                                    @if(!$isStatusN)
+                                    <button type="button" class="btn btn-danger btn-sm custom-disapprove-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#commentModal-{{ $Project->Id_Project }}">ไม่อนุมัติ</button>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @else
+                <div class="accordion-content">
+                    <p>ไม่มีโครงการที่เกี่ยวข้อง</p>
+                </div>
+                @endif
+            </details>
+            @endforeach
+            <div class="status-section mt-3">
+                <div class="status-header">การดำเนินการ</div>
+                <div class="status-card">
+                    <div class="status-right">
+                        <div class="action-buttons">
+                            @if(isset($approval))
+                            <form action="{{ route('approvals.updateAllStatus') }}" method="POST"
+                                style="display:inline;">
+                                @csrf
+                                @method('PUT')
+                                @foreach($approvals as $approval)
+                                <input type="hidden" name="approvals[{{ $approval->Id_Approve }}][id]"
+                                    value="{{ $approval->Id_Approve }}">
+                                <input type="hidden" name="approvals[{{ $approval->Id_Approve }}][status]" value="Y">
+                                @endforeach
+                                <button type="submit" class="status-button approved">
+                                    <i class='bx bx-like'></i> อนุมัติทั้งหมด
+                                </button>
+                            </form>
+                            <button type="button" class="status-button not-approved" data-bs-toggle="modal"
+                                data-bs-target="#commentModal-{{ $approval->Id_Approve }}">
+                                <i class='bx bx-dislike'></i> ไม่อนุมัติทั้งหมด
+                            </button>
+                            @endif
                         </div>
                     </div>
                 </div>
-                @endif
-                @endforeach
             </div>
         </div>
     </div>
 
-    <!-- Modal for not approving -->
-    @foreach($approvals->groupBy('project.Project_Batch_Id') as $batchId => $projects)
-    @php
-    $filteredProjects = $projects->filter(function ($approval) {
-    return $approval->project->Count_Steps == 1;
-    });
-    @endphp
-    @if($filteredProjects->isNotEmpty())
-    <div class="modal fade" id="commentModal-{{ $batchId }}" tabindex="-1">
+    <!-- Modal for not approving all projects -->
+    @foreach ($strategics as $Strategic)
+    <div class="modal fade" id="commentModal-{{ $Strategic->Id_Strategic }}" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -259,15 +365,53 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-
+                    <form action="{{ route('disapproveAll', ['id' => $Strategic->Id_Strategic]) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="Count_Steps" value="0">
+                        @foreach ($Strategic->projects as $Project)
+                        <input type="hidden" name="project_ids[]" value="{{ $Project->Id_Project }}">
+                        @endforeach
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">ความคิดเห็น:</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger">ยืนยันการไม่อนุมัติ</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-    @endif
     @endforeach
+
+    <!-- Modal for not approving individual projects -->
+    @foreach ($strategics as $Strategic)
+    @foreach ($Strategic->projects as $Project)
+    <div class="modal fade" id="commentModal-{{ $Project->Id_Project }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">เพิ่มความคิดเห็น</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('disapproveProject', ['id' => $Project->Id_Project]) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">ความคิดเห็น:</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger">ยืนยันการไม่อนุมัติ</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+    @endforeach
+    @endif
     @endif
 
 </div>
-
 @endsection

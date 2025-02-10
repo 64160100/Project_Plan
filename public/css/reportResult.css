@@ -92,4 +92,53 @@ textarea {
     font-size: 20px; 
 }
 
+#categoryDropdown {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: #ffffff;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#categoryDropdown:hover {
+    border-color: #0056b3;
+}
+
+#categoryDropdown:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.kpi-list div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #ffffff;
+    box-sizing: content-box;
+}
+
+.kpi-list input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.kpi-list textarea {
+    flex: 1;
+    min-height: 35px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+    box-sizing: content-box;
+}
+
+
+
 

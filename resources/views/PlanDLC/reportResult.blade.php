@@ -86,8 +86,8 @@
                                     <div class="content-box mb-3">
                                             <div class="d-flex align-items-center">
                                                 <p>{{ $projectBudgetSource->budgetSource->Name_Budget_Source }}
-                                                <span>{{ $projectBudgetSource->Amount_Total }}</span>&nbsp;&nbsp; บาท <br>
-                                                รายละเอียดค่าใช้จ่าย : {{ $projectBudgetSource->Details_Expense }}
+                                                <span><b>{{ $projectBudgetSource->Amount_Total }}</b></span>&nbsp;&nbsp; บาท <br>
+                                                รายละเอียดค่าใช้จ่าย : <b>{{ $projectBudgetSource->Details_Expense }}</b>
                                                 </p>
                                             </div>
                                     </div>

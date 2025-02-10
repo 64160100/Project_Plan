@@ -33,7 +33,7 @@
         </div>
     </a>
 
-    <a href="#" class="link-style">
+    <a href="{{ route('showSdg') }}" class="link-style">
         <div class="card-style">
             <div class="icon-style">
                 <i class='bx bx-leaf'></i> 

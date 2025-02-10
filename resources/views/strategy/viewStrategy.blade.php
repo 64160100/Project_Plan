@@ -48,6 +48,10 @@
         .header-bar a.bx-table:hover {
             transform: scale(1.2);
         }
+        
+        .text-table{
+            vertical-align: top;
+        }
 
     </style>
 
@@ -72,7 +76,7 @@
         </div>
 
         <div>
-            <table>
+        <table>
                 <tr style="text-align: center;">
                     <th style="width: 15%">กลยุทธ์</th>
                     <th style="width: 25%">วัตถุประสงค์เชิงกลยุทธ์ <br>(Strategic Objectives : SO)</th>
@@ -83,22 +87,28 @@
                 @foreach ( $strategy as $strategy )
                 <tr style="vertical-align: top;">
                     @if ( $strategic->Id_Strategic == $strategy->Strategic_Id )
+                        <!-- กลยุทธ์ -->
                         <td>{{ $strategy->Name_Strategy }}</td>
-                            <td>
-                                @foreach ($strategy->strategicObjectives as $objective)
-                                    {{ $objective->Details_Strategic_Objectives }} <br><br>
-                                @endforeach
-                            </td>
+                        <!-- SO -->
+                        <td>
+                            @foreach ($strategy->strategicObjectives as $objective)
+                                {{ $objective->Details_Strategic_Objectives }} <br><br>
+                            @endforeach
+                        </td>
+                        <!-- ชื่อ KPI -->
                         <td>
                             @foreach ($strategy->kpis as $kpi)
                                 {{ $kpi->Name_Kpi }} <br><br>
                             @endforeach
                         </td>
+                        <!-- ค่าเป้าหมาย -->
                         <td>
                             @foreach ($strategy->kpis as $kpi)
                                {{ $kpi->Target_Value }} <br><br>
                             @endforeach
                         </td>
+
+                        <!-- จัดการ -->
                         <td>
                             <a href="{{ route('strategy.edit', $strategy->Id_Strategy) }}" class="btn-edit"><i class='bx bx-edit'></i>แก้ไข</a>
                             <form action="{{ route('strategy.destroy', $strategy->Id_Strategy) }}" method="POST" style="display:inline;">
@@ -112,6 +122,9 @@
                 </tr>
                 @endforeach
             </table>
+
+
+
         </div>
     </div>
     @include('strategy.modelStrategy')

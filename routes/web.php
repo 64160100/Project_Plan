@@ -6,6 +6,8 @@ use App\Http\Controllers\StorageFileController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\PlanDLCController;
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\SustainableDevelopmentGoalsController;
+
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -76,4 +78,10 @@ Route::get('/editBudget', [PlanDLCController::class, 'editBudget'])->name('PlanD
 Route::get('/showProjectDepartment/{Id_Department}', [PlanDLCController::class, 'showProjectDepartment'])->name('showProjectDepartment');
 
 Route::get('/reportResult', [PlanDLCController::class, 'reportResult'])->name('reportResult');
+
+//Sdg
+Route::get('showSdg', [SustainableDevelopmentGoalsController::class, 'showSdg'])->name('showSdg');
+Route::post('/showSdg', [SustainableDevelopmentGoalsController::class, 'createSDG'])->name('createSDG');
+Route::put('/editSDG/{id_SDGs}', [SustainableDevelopmentGoalsController::class, 'editSDG'])->name('editSDG');
+Route::delete('/deleteSDG/{id_SDGs}', [SustainableDevelopmentGoalsController::class, 'deleteSDG'])->name('deleteSDG');
 

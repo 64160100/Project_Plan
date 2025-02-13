@@ -1,0 +1,212 @@
+/* .header-bar {
+    background-color: #7C3AED; 
+    color: white;
+    padding: 10px 15px 3;
+    font-weight: bold; 
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    width: fit-content;
+    margin: 0 auto;
+} */
+
+.header-bar {
+    background-color: #7C3AED; 
+    color: white;
+    padding: 10px 15px 3px;
+    font-weight: bold; 
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    width: fit-content;
+    margin: 0 auto;
+    font-size: 18px;
+}
+
+.text-box {
+    border: 1px solid #7C3AED;
+    border-radius: 15px;
+    background-color: white;
+    color: #7C3AED;
+    padding: 10px 15px;
+    font-size: 14px;
+    line-height: 1.5;
+    width: fit-content;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+}
+
+table {
+    width: 100%;
+    table-layout: auto;
+    margin-top: 7px;
+    border-collapse: collapse;
+    border: 1px solid #7C3AED;  
+    border-radius: 15px; 
+    overflow: hidden; 
+    background-color: #7C3AED; 
+  }
+  
+th, td {
+    padding: 8px; 
+    background-color: #ffffff; 
+    border-collapse: collapse;
+    border: 1px solid #7C3AED !important;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+th {
+    background: #7C3AED;
+    color: white;
+    text-align: center;
+}
+
+.strategy-start {
+    border-top: 2px solid #7C3AED !important;
+    border: 1px solid #7C3AED;
+    vertical-align: top;
+}
+
+.strategy-row {
+    border: 1px solid #7C3AED;
+    vertical-align: top;
+}
+
+.header-bar a.bx-table {
+    transition: transform 0.2s ease-in-out;
+}
+.header-bar a.bx-table:hover {
+    transform: scale(1.2);
+}
+
+
+/* button */
+.btn-add {
+    background-color: initial;
+    background-image: linear-gradient(#7C3AED, #472187 100%);
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+    width: auto; 
+    padding: 0 10px; 
+    line-height: 40px;
+    display: inline-flex; 
+    align-items: center;
+  }
+  .btn-add:hover {
+    color: black;
+    opacity: .8;
+  }
+
+  .btn-edit {
+    background-color: initial;
+    background-image: linear-gradient(#EEE605, #A78B02);
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+    width: auto; 
+    padding: 0 10px; 
+    line-height: 40px;
+    display: inline-flex; 
+    align-items: center;
+  }
+  .btn-edit:hover {
+    color: black;
+    opacity: .8;
+  }
+  
+  .btn-delete {
+    background-color: initial;
+    background-image: linear-gradient(#EF4444, #892727);
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 16px;
+    width: auto; 
+    padding: 0 10px; 
+    line-height: 40px;
+    display: inline-flex; 
+    align-items: center;
+  }
+  .btn-delete:hover {
+    color: black;
+    opacity: .8;
+  }
+
+
+  @media screen and (max-width: 768px) {
+    .header-bar {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+    
+    .header-bar h3 {
+        font-size: 16px;
+    }
+
+    .header-bar a {
+        font-size: 18px;
+    }
+
+    table {
+        width: 100%;
+        table-layout: fixed; 
+    }
+
+    th, td {
+        padding: 10px 8px;
+        font-size: 12px; 
+    }
+
+    th {
+        font-size: 14px; 
+    }
+
+    .btn-add {
+        font-size: 0; 
+        padding: 8px 12px;
+        line-height: 30px; 
+        border-radius: 50px;
+    }
+    
+    .btn-add i { 
+    font-size: 20px;
+    }
+
+    .btn-edit {
+        font-size: 0;
+        padding: 8px 12px; 
+        line-height: 30px;
+        border-radius: 50px;
+    }
+
+    .btn-edit i {
+        font-size: 20px;
+    }
+
+    .btn-delete {
+        font-size: 0; 
+        padding: 8px 12px; 
+        line-height: 30px; 
+        border-radius: 50px;
+    }
+
+    .btn-delete i {
+        font-size: 20px;
+    }
+}

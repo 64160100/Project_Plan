@@ -14,7 +14,7 @@
 @section('content')
     <div class="container">
         <h3 class="head-project">
-            <b>เป้าหมายการพัฒนาที่ยั่งยืน (SDGs)</b>
+            <b>เป้าหมายการพัฒนาที่ยั่งยืน (Sustainable Development Goals: SDGs)</b>
         </h3>
         <button type="button" class="btn-add" data-bs-toggle="modal" data-bs-target="#addSdg">
             <i class='bx bx-plus'></i>เพิ่มข้อมูล
@@ -53,33 +53,29 @@
     @include('SDG.editSDG')
 
     <table id="sdg">
-    <tr>
-        <th>ลำดับ</th>
-        <th>ชื่อเป้าหมาย</th>
-        <th>จัดการ</th>
-    </tr>
-    @foreach ( $sdg as $Sdg )
-    <tr>
-        <td>{{$Sdg->id_SDGs}}</td>
-        <td>{{$Sdg->Name_SDGs}}</td>
-        <td>
-        <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#editSdg{{$Sdg->id_SDGs}}" id="{{$Sdg->id_SDGs}}">
-            <i class='bx bx-edit'></i>แก้ไข
-        </button>
-        <!-- <button type="button" class="btn-delete"><i class='bx bx-trash'></i>ลบ</button> -->
-        <form action="{{ route('deleteSDG', $Sdg->id_SDGs) }}" method="POST" style="display: inline;">
-            @csrf
-            @method('DELETE') 
-            <button type="submit" class="btn-delete" onclick="return confirm('คุณต้องการลบเป้าหมายการพัฒนา(SDGs)นี้ใช่หรือไม่?')">
-                <i class='bx bx-trash'></i>ลบ
-            </button>
-        </form>
-        </td>
-    </tr>
-
-
-    @endforeach
-
+        <tr>
+            <th>ลำดับ</th>
+            <th>ชื่อเป้าหมาย</th>
+            <th>จัดการ</th>
+        </tr>
+        @foreach ( $sdg as $Sdg )
+            <tr>
+                <td>{{$Sdg->id_SDGs}}</td>
+                <td>{{$Sdg->Name_SDGs}}</td>
+                <td class="btn-manage">
+                    <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#editSdg{{$Sdg->id_SDGs}}" id="{{$Sdg->id_SDGs}}">
+                        <i class='bx bx-edit'></i>แก้ไข
+                    </button>
+                    <form action="{{ route('deleteSDG', $Sdg->id_SDGs) }}" method="POST" style="display: inline;">
+                        @csrf
+                        @method('DELETE') 
+                        <button type="submit" class="btn-delete" onclick="return confirm('คุณต้องการลบเป้าหมายการพัฒนา(SDGs)นี้ใช่หรือไม่?')">
+                            <i class='bx bx-trash'></i>ลบ
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        @endforeach
     </table>
 @endsection    
 </body>

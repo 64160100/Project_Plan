@@ -1,59 +1,7 @@
 @extends('navbar.app')
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="{{ asset('css/button.css') }}">
-
-    <style>
-        .header-bar {
-            background-color: #7C3AED; 
-            color: white;
-            padding: 10px 15px 3;
-            font-weight: bold; 
-            border-radius: 15px;
-            display: flex;
-            justify-content: space-between; 
-            align-items: center; 
-            width: fit-content;
-            margin: 0 auto;
-        }
-        .text-box {
-            border: 1px solid #7C3AED;
-            border-radius: 15px;
-            background-color: white;
-            color: #7C3AED;
-            padding: 10px 15px;
-            font-size: 14px;
-            line-height: 1.5;
-            width: fit-content;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin: 0 auto;
-        }
-
-        table {
-            width: 100%;
-            margin: 0 auto;
-            margin-top: 15px;
-            border-radius: 15px; 
-            overflow: hidden;
-        }
-
-        th,td {
-            border: 1px solid #7C3AED;
-            background: #fff;
-            padding: 15px;
-            color: #7C3AED;
-        }
-        .header-bar a.bx-table {
-            transition: transform 0.2s ease-in-out;
-        }
-        .header-bar a.bx-table:hover {
-            transform: scale(1.2);
-        }
-        
-        .text-table{
-            vertical-align: top;
-        }
-
-    </style>
+    <!-- <link rel="stylesheet" href="{{ asset('css/button.css') }}"> -->
+    <link rel="stylesheet" href="{{ asset('css/viewStrategy.css') }}">
 
 @section('content')
     <div class="container">
@@ -66,7 +14,7 @@
                 data-bs-target="#strategicAnalysisModal" title="แสดงการวิเคราะห์บริบทเชิงกลยุทธ์"></a>
             </div>
             <div>
-                <a href="#" class='btn-add' data-bs-toggle="modal" data-bs-target="#ModalAddStrategy">เพิ่มข้อมูล</a>
+                <a href="#" class='btn-add' data-bs-toggle="modal" data-bs-target="#ModalAddStrategy"><i class='bx bx-plus'></i>เพิ่มข้อมูล</a>
             </div>
         </div>
         <div class="collapse" id="collapseExample">
@@ -76,54 +24,76 @@
         </div>
 
         <div>
-        <table>
+            <table>
                 <tr style="text-align: center;">
-                    <th style="width: 15%">กลยุทธ์</th>
-                    <th style="width: 25%">วัตถุประสงค์เชิงกลยุทธ์ <br>(Strategic Objectives : SO)</th>
-                    <th style="width: 25%">ตัวชี้วัดกลยุทธ์</th>
-                    <th style="20">ค่าเป้าหมาย</th>
-                    <th style="15">จัดการ</th>
+                    <th>กลยุทธ์</th>
+                    <th>วัตถุประสงค์เชิงกลยุทธ์<br>(Strategic Objectives : SO)</th>
+                    <th>ตัวชี้วัดกลยุทธ์</th>
+                    <th>ค่าเป้าหมาย</th>
+                    <th>จัดการ</th>
                 </tr>
-                @foreach ( $strategy as $strategy )
-                <tr style="vertical-align: top;">
-                    @if ( $strategic->Id_Strategic == $strategy->Strategic_Id )
-                        <!-- กลยุทธ์ -->
-                        <td>{{ $strategy->Name_Strategy }}</td>
-                        <!-- SO -->
-                        <td>
-                            @foreach ($strategy->strategicObjectives as $objective)
-                                {{ $objective->Details_Strategic_Objectives }} <br><br>
-                            @endforeach
-                        </td>
-                        <!-- ชื่อ KPI -->
-                        <td>
-                            @foreach ($strategy->kpis as $kpi)
-                                {{ $kpi->Name_Kpi }} <br><br>
-                            @endforeach
-                        </td>
-                        <!-- ค่าเป้าหมาย -->
-                        <td>
-                            @foreach ($strategy->kpis as $kpi)
-                               {{ $kpi->Target_Value }} <br><br>
-                            @endforeach
-                        </td>
 
-                        <!-- จัดการ -->
-                        <td>
-                            <a href="{{ route('strategy.edit', $strategy->Id_Strategy) }}" class="btn-edit"><i class='bx bx-edit'></i>แก้ไข</a>
-                            <form action="{{ route('strategy.destroy', $strategy->Id_Strategy) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('คุณยืนยันที่จะลบข้อมูลนี้หรือไม่');">ลบ</button>
+                @foreach ($strategy as $strategy)
+                    @php 
+                        $rowspan = max(count($strategy->kpis ?? []), 1);  
+                    @endphp
 
-                            </form>
-                        </td>
+                    @if ($strategy->kpis->isNotEmpty())
+                        @foreach ($strategy->kpis as $index => $kpi)
+                        <tr class="{{ $index == 0 ? 'strategy-start' : 'strategy-row' }}">
+                                @if ($index == 0)
+                                    <td rowspan="{{ $rowspan }}">{{ $strategy->Name_Strategy }}</td>
+                                    <td rowspan="{{ $rowspan }}">
+                                        @foreach ($strategy->strategicObjectives as $objective)
+                                            {{ $objective->Details_Strategic_Objectives }} <br><br>
+                                        @endforeach
+                                    </td>
+                                @endif
+                                <td>{{ $kpi->Name_Kpi }}</td>
+                                <td>{{ $kpi->Target_Value }}</td>
+
+                                @if ($index == 0)
+                                    <td rowspan="{{ $rowspan }}">
+                                        <a href="{{ route('strategy.edit', $strategy->Id_Strategy) }}" class="btn-edit mb-2">
+                                            <i class='bx bx-edit'></i> แก้ไข
+                                        </a>
+                                        <form action="{{ route('strategy.destroy', $strategy->Id_Strategy) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-delete" onclick="return confirm('คุณยืนยันที่จะลบข้อมูลนี้หรือไม่');">
+                                            <i class='bx bx-trash'></i>ลบ
+                                            </button>
+                                        </form>
+                                    </td>
+                                @endif
+                            </tr>
+                        @endforeach
+                    @else
+                    <tr class="{{ $strategy->Name_Strategy ? 'strategy-start' : 'strategy-row' }}">
+                            <td rowspan="1">{{ $strategy->Name_Strategy }}</td>
+                            <td rowspan="1">
+                                @foreach ($strategy->strategicObjectives as $objective)
+                                    {{ $objective->Details_Strategic_Objectives }} <br><br>
+                                @endforeach
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <a href="{{ route('strategy.edit', $strategy->Id_Strategy) }}" class="btn-edit mb-2">
+                                    <i class='bx bx-edit'></i> แก้ไข
+                                </a>
+                                <form action="{{ route('strategy.destroy', $strategy->Id_Strategy) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-delete" onclick="return confirm('คุณยืนยันที่จะลบข้อมูลนี้หรือไม่');">
+                                    <i class='bx bx-trash'></i>ลบ
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
                     @endif
-                </tr>
                 @endforeach
             </table>
-
-
 
         </div>
     </div>

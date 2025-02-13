@@ -84,7 +84,7 @@ class StrategyController extends Controller
             foreach ($Details_Strategic_Objectives as $detail) {
                 StrategicObjectivesModel::create([
                     'Details_Strategic_Objectives' => $detail,
-                    'Strategy_Id_Strategy' => $Id_Strategy
+                    'Strategy_Id' => $Id_Strategy
                 ]);
             }
         }
@@ -123,7 +123,7 @@ class StrategyController extends Controller
             foreach ($request->newStrategicObjectives as $newObjective) {
                 StrategicObjectivesModel::create([
                     'Details_Strategic_Objectives' => $newObjective,
-                    'Strategy_Id_Strategy' => $Id_Strategy
+                    'Strategy_Id' => $Id_Strategy
                 ]);
             }
         }

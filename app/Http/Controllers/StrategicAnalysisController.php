@@ -114,12 +114,12 @@ class StrategicAnalysisController extends Controller
     public function addDetail(Request $request)
     {
         try {
-            if (empty($request->Name_Strategic_Opportunity) || empty($request->Strategic_Id_Strategic)) {
+            if (empty($request->Name_Strategic_Opportunity) || empty($request->Strategic_Id)) {
                 return redirect()->back()->with('error', 'Name and Strategic ID are required.');
             }
 
             $opportunity = StrategicOpportunityModel::where('Name_Strategic_Opportunity', $request->Name_Strategic_Opportunity)
-                ->where('Strategic_Id_Strategic', $request->Strategic_Id_Strategic)
+                ->where('Strategic_Id', $request->Strategic_Id)
                 ->first();
 
             if (!$opportunity) {
@@ -174,14 +174,12 @@ class StrategicAnalysisController extends Controller
     // StrategicOpportunityController.php
     public function addOpportunity(Request $request)
     {
-        // Validate the incoming request data
         $validatedData = $request->validate([
             'Name_Strategic_Opportunity' => 'required|string|max:255',
-            'Strategic_Id_Strategic' => 'required|integer',
+            'Strategic_Id' => 'required|integer',
         ]);
 
         try {
-            // Create a new strategic opportunity
             StrategicOpportunityModel::create($validatedData);
 
             return redirect()->back()->with('success', 'Strategic Opportunity added successfully.');

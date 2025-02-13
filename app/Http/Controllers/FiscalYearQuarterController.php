@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\StrategicModel;
-use App\Models\StrategicHasQuarterProjectModel;
 use App\Models\FiscalYearQuarterModel;
 
 class StrategicController extends Controller
@@ -16,17 +15,13 @@ class StrategicController extends Controller
 
         if ($request->has('Fiscal_Year') && $request->Fiscal_Year != '') {
             $query->whereHas('quarterProjects', function ($q) use ($request) {
-                $q->whereHas('quarterProject', function ($q2) use ($request) {
-                    $q2->where('Fiscal_Year', $request->Fiscal_Year);
-                });
+                $q->where('Fiscal_Year', $request->Fiscal_Year);
             });
         }
 
         if ($request->has('Quarter') && $request->Quarter != '') {
             $query->whereHas('quarterProjects', function ($q) use ($request) {
-                $q->whereHas('quarterProject', function ($q2) use ($request) {
-                    $q2->where('Quarter', $request->Quarter);
-                });
+                $q->where('Quarter', $request->Quarter);
             });
         }
 

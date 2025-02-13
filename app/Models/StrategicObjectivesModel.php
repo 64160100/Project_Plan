@@ -11,7 +11,7 @@ class StrategicObjectivesModel extends Model
     protected $primaryKey = 'Id_Strategic_Objectives';
     protected $fillable = [
         'Id_Strategic_Objectives',
-        'Strategy_Id_Strategy',
+        'Strategy_Id',
         'Details_Strategic_Objectives',
     ];
     public $timestamps = false;

@@ -12,13 +12,23 @@ class StrategicOpportunityModel extends Model
     protected $keyType = 'int';
     protected $fillable = [
         'Name_Strategic_Opportunity',
-        'Strategic_Id_Strategic',
+        'Strategic_Id',
     ];
     public $timestamps = false;
 
-    public function strategic()
+    public function strategies()
     {
-        return $this->belongsTo(StrategicModel::class, 'Strategic_Id_Strategic', 'Id_Strategic');
+        return $this->hasMany(StrategyModel::class, 'Strategic_Id', 'Id_Strategic');
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(ListProjectModel::class, 'Strategic_Id', 'Id_Strategic');
+    }
+
+    public function quarterProjects()
+    {
+        return $this->belongsToMany(FiscalYearQuarterModel::class, 'StrategicHasQuarterProject', 'Strategic_Id', 'Quarter_Project_Id');
     }
 
     public function details()

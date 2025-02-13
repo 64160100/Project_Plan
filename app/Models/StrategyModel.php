@@ -25,7 +25,7 @@ class StrategyModel extends Model
 
     public function strategicObjectives()
     {
-        return $this->hasMany(StrategicObjectivesModel::class, 'Strategy_Id_Strategy', 'Id_Strategy');
+        return $this->hasMany(StrategicObjectivesModel::class, 'Strategy_Id', 'Id_Strategy');
     }
 
     public function strategic()

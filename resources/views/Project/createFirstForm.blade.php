@@ -105,49 +105,11 @@
                     </div>
                 </div>
 
-                <!-- วัตถุประสงค์โครงการ -->
-                <div class="content-box">
-                    <div class="section-header">
-                        <h4>
-                            4. วัตถุประสงค์โครงการ
-                        </h4>
-                    </div>
-                    <div id="objectiveDetails">
-                        <div class="form-group">
-                            <div class="d-flex align-items-center">
-                                <select class="form-control @error('Objective_Project') is-invalid @enderror"
-                                    id="Objective_Project" name="Objective_Project" required>
-                                    <option value="" disabled selected>กรอกข้อมูลวัตถุประสงค์</option>
-                                    @foreach($strategicObjectives as $objective)
-                                    <option value="{{ $objective->Details_Strategic_Objectives }}"
-                                        data-strategy-id="{{ $objective->Strategy_Id_Strategy }}">
-                                        {{ $objective->Details_Strategic_Objectives }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="form-check ms-2 d-flex align-items-center">
-                                    <input class="form-check-input" type="checkbox"
-                                        id="Objective_Project_Other_Checkbox">
-                                    <label class="form-check-label ms-1" for="Objective_Project_Other_Checkbox">
-                                        อื่น ๆ
-                                    </label>
-                                </div>
-                            </div>
-                            <textarea class="form-control mt-2" id="Objective_Project_Other"
-                                name="Objective_Project_Other" placeholder="กรอกข้อมูลวัตถุประสงค์อื่น ๆ"
-                                style="display: none;"></textarea>
-                            @error('Objective_Project')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        @include('Project.App.ProjectObjective')
-                    </div>
-                </div>
-
                 <!-- ตัวชี้วัดความสำเร็จของโครงการ -->
                 <div class="content-box">
                     <div class="section-header">
                         <h4>
-                            5. ตัวชี้วัดความสำเร็จของโครงการ
+                            4. ตัวชี้วัดความสำเร็จของโครงการ
                         </h4>
                     </div>
                     <div id="successIndicatorsDetails">
@@ -185,7 +147,7 @@
                 <div class="content-box">
                     <div class="section-header">
                         <h4>
-                            6. ค่าเป้าหมาย
+                            5. ค่าเป้าหมาย
                         </h4>
                     </div>
                     <div id="valueTargetDetails">
@@ -212,37 +174,11 @@
                     </div>
                 </div>
 
-                <!-- ระยะเวลาดำเนินโครงการ -->
-                <div class="content-box">
-                    <div class="section-header">
-                        <h4>
-                            7. ระยะเวลาดำเนินโครงการ
-                        </h4>
-                    </div>
-                    <div id="projectDurationDetails">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="First_Time">วันที่เริ่มต้น:</label>
-                                    <input type="date" class="form-control" id="First_Time" name="First_Time" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="End_Time">วันที่สิ้นสุด:</label>
-                                    <input type="date" class="form-control" id="End_Time" name="End_Time" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
                 <!-- แหล่งงบประมาณ -->
                 <div class="content-box">
                     <div class="section-header">
                         <h4>
-                            8. แหล่งงบประมาณ
+                            6. แหล่งงบประมาณ
                         </h4>
                     </div>
                     <div id="budgetDetails">
@@ -394,7 +330,7 @@
                 <div class="content-box">
                     <div class="section-header">
                         <h4>
-                            9. ผู้รับผิดชอบโครงการ
+                            7. ผู้รับผิดชอบโครงการ
                         </h4>
                     </div>
                     <div id="responsibleDetails">

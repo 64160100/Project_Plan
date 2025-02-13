@@ -7,6 +7,7 @@ use App\Http\Controllers\StatusController;
 use App\Http\Controllers\PlanDLCController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProjectBatchController;
+use App\Http\Controllers\FiscalYearQuarterController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -97,3 +98,6 @@ Route::get('/checkBudget', [PlanDLCController::class, 'checkBudget'])->name('Pla
 Route::get('/allProject', [PlanDLCController::class, 'allProject'])->name('PlanDLC.allProject');
 Route::get('/editBudget', [PlanDLCController::class, 'editBudget'])->name('PlanDLC.editBudget');
 Route::get('/showProjectDepartment/{Id_Department}', [PlanDLCController::class, 'showProjectDepartment'])->name('showProjectDepartment');
+
+// FiscalYearQuarter
+Route::resource('fiscalYearQuarter', FiscalYearQuarterController::class);

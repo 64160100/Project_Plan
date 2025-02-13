@@ -67,6 +67,49 @@ Carbon::setLocale('th');
         color: #a9a9a9;
     }
 
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        margin-bottom: 1px;
+        border: 1px solid #000;
+    }
+
+    th {
+        background-color: #c8e6c9 !important;
+        font-weight: bold;
+        text-align: center;
+        border: 2px solid #000 !important;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    td {
+        border: 2px solid #000 !important;
+        padding: 10px;
+        font-size: 14px;
+        vertical-align: top;
+        word-wrap: break-word;
+        background-color: white;
+    }
+
+    .summary-row {
+        background-color: #c8e6c9 !important;
+    }
+
+    .summary-row td {
+        background-color: #c8e6c9 !important;
+        padding: 20px 10px !important;
+        border: 2px solid #000 !important;
+        line-height: 1.2 !important;
+        vertical-align: middle !important;
+        font-weight: bold;
+    }
+
+    td[rowspan] {
+        border: 2px solid #000 !important;
+    }
+
     @media print {
         .button-container {
             display: none;
@@ -140,29 +183,34 @@ Carbon::setLocale('th');
             @php
             $filteredProjects = $Strategic->projects->filter(function($project) {
             return $project->Count_Steps == 0;
-            }); // Sort projects by strategy name
+            });
             $filteredProjectCount = $filteredProjects->count();
             $firstStrategicPlanName = $Strategic->Name_Strategic_Plan;
+            $totalStrategicBudget = $filteredProjects->sum(function($project) {
+            return $project->projectBudgetSources ? $project->projectBudgetSources->sum('Amount_Total') : 0;
+            });
+            $currentStrategy = null;
             @endphp
             <details class="accordion" id="{{ $Strategic->Id_Strategic }}">
                 <summary class="accordion-btn">
                     <b><a href="{{ route('viewProjectInStrategic', ['Id_Strategic' => $Strategic->Id_Strategic]) }}">
                             {{ $firstStrategicPlanName }}</a><br>จำนวนโครงการ :
-                        {{ $filteredProjectCount }} โครงการ</b>
+                        {{ $filteredProjectCount }} โครงการ<br>งบประมาณรวม:
+                        {{ number_format($totalStrategicBudget, 2) }} บาท</b>
                 </summary>
                 @if ($filteredProjectCount > 0)
                 <div class="accordion-content">
-                    <table>
+                    <table class="summary-table">
                         <thead>
                             <tr>
-                                <th style="width:10%">ยุทธศาสตร์ สำนักหอสมุด</th>
-                                <th style="width:10%">กลยุทธ์ สำนักหอสมุด</th>
-                                <th style="width:14%">โครงการ</th>
-                                <th style="width:14%">ตัวชี้วัดความสำเร็จ<br>ของโครงการ</th>
-                                <th style="width:12%">ค่าเป้าหมาย</th>
-                                <th style="width:10%">งบประมาณ (บาท)</th>
-                                <th style="width:12%">ผู้รับผิดชอบ</th>
-                                <th style="width:18%">การจัดการ</th>
+                                <th style="width:10%; text-align: center;">ยุทธศาสตร์ สำนักหอสมุด</th>
+                                <th style="width:10%; text-align: center;">กลยุทธ์ สำนักหอสมุด</th>
+                                <th style="width:14%; text-align: center;">โครงการ</th>
+                                <th style="width:14%; text-align: center;">ตัวชี้วัดความสำเร็จ<br>ของโครงการ</th>
+                                <th style="width:12%; text-align: center;">ค่าเป้าหมาย</th>
+                                <th style="width:10%; text-align: center;">งบประมาณ (บาท)</th>
+                                <th style="width:12%; text-align: center;">ผู้รับผิดชอบ</th>
+                                <th style="width:18%; text-align: center;">การจัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -170,13 +218,22 @@ Carbon::setLocale('th');
                             @php
                             $isStatusN = in_array('N', $Project->approvalStatuses);
                             $isStatusI = in_array('I', $Project->approvalStatuses);
+                            $allProjectsDeleted = $filteredProjects->every(function($project) {
+                            return in_array('N', $project->approvalStatuses);
+                            });
                             @endphp
                             <tr>
                                 @if ($index === 0)
                                 <td rowspan="{{ $filteredProjectCount }}">{{ $firstStrategicPlanName }}</td>
                                 @endif
-                                <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
+                                @if ($currentStrategy !== $Project->Name_Strategy)
+                                @php
+                                $currentStrategy = $Project->Name_Strategy;
+                                @endphp
+                                <td class="{{ $allProjectsDeleted ? 'text-gray' : '' }}"
+                                    rowspan="{{ $filteredProjects->where('Name_Strategy', $currentStrategy)->count() }}">
                                     {{ $Project->Name_Strategy ?? '-' }}</td>
+                                @endif
                                 <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
                                     <b>{{ $Project->Name_Project }}</b><br>
                                     @foreach($Project->subProjects as $subProject)
@@ -189,13 +246,13 @@ Carbon::setLocale('th');
                                     $Project->Value_Target ? nl2br(e($Project->Value_Target)) : '-' !!}</td>
                                 <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
                                     style="text-align: center;">
-                                    @php
-                                    $totalBudget = $Project->projectBatchHasProjects ?
-                                    $Project->projectBatchHasProjects->sum('Amount_Total') : 0;
-                                    @endphp
-                                    @if($totalBudget === 0)
+                                    @if($Project->Status_Budget === 'N')
                                     ไม่ใช้งบประมาณ
                                     @else
+                                    @php
+                                    $totalBudget = $Project->projectBudgetSources ?
+                                    $Project->projectBudgetSources->sum('Amount_Total') : 0;
+                                    @endphp
                                     {{ number_format($totalBudget, 2) }}
                                     @endif
                                 </td>
@@ -203,7 +260,8 @@ Carbon::setLocale('th');
                                     {{ $Project->employee->Firstname_Employee ?? '-' }}
                                     {{ $Project->employee->Lastname_Employee ?? '' }}
                                 </td>
-                                <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
+                                <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
+                                    style="text-align: center;">
                                     <a href="{{ route('editProject', ['Id_Project' => $Project->Id_Project, 'sourcePage' => 'proposeProject']) }}"
                                         class="btn btn-warning btn-sm">แก้ไข</a>
                                     @if (!$isStatusN || $isStatusI)
@@ -215,10 +273,14 @@ Carbon::setLocale('th');
                                     </form>
                                     @endif
                                 </td>
-                                <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                    <!-- {{ implode(', ', $Project->approvalStatuses) }}</td> -->
                             </tr>
                             @endforeach
+                            <tr class="summary-row">
+                                <td colspan="2" style="text-align: left; font-weight: bold;">รวมรายได้ทั้งหมด:</td>
+                                <td colspan="6" style="text-align: center; font-weight: bold;">
+                                    {{ number_format($totalStrategicBudget, 2) }} บาท
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

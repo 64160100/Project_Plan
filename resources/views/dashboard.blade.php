@@ -19,6 +19,7 @@
     <button id="button1" class="btn btn-primary">Show Popup</button>
     <!-- Button 2 -->
     <button id="button2" class="btn btn-secondary">Another Action</button>
+
 </div>
 
 <!-- Popup Modal -->

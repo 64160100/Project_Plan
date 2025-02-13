@@ -802,7 +802,7 @@ class ListProjectController extends Controller
             $incompleteStrategies = [];
             $allStrategiesComplete = false;
             $strategics = collect();
-    
+
             if ($projects->where('Count_Steps', 0)->isNotEmpty()) {
                 $strategics = StrategicModel::with(['projects' => function($query) {
                     $query->where('Count_Steps', 0)->orderBy('Name_Strategy');
@@ -831,23 +831,25 @@ class ListProjectController extends Controller
                 $incompleteStrategies = [];
                 foreach ($strategies as $strategy) {
                     $strategyProjects = $projects->where('Count_Steps', 0)
-                                                  ->where('Strategy_Id', $strategy->Id_Strategy)
-                                                  ->filter(function($project) {
-                                                      return $project->approvals->contains('Status', 'I');
-                                                  });
-                    log::info($strategyProjects);
-                    if ($strategyProjects->isEmpty()) {
+                                                ->where('Strategy_Id', $strategy->Id_Strategy)
+                                                ->filter(function($project) {
+                                                    return $project->approvals->contains('Status', 'I');
+                                                });
+
+                        if ($strategyProjects->isEmpty()) {
                         $incompleteStrategies[] = $strategy->Name_Strategy;
                     }
                 }
-    
+
                 usort($incompleteStrategies, function($a, $b) {
                     return strcmp($a, $b);
                 });
                 
                 $allStrategiesComplete = empty($incompleteStrategies);
             }
-    
+
+            
+
             return view('proposeProject', compact('projects', 'countStepsZero', 'filteredStrategics', 'approvals', 'strategies', 'incompleteStrategies', 'allStrategiesComplete', 'strategics'));
         } else {
             return redirect()->back()->with('error', 'You are not authorized to view these projects.');
@@ -1061,6 +1063,42 @@ class ListProjectController extends Controller
                 $supProject->Project_Id = $project->Id_Project ?? null;
                 $supProject->Name_Sup_Project = $supProjectName ?? null ; 
                 $supProject->save();
+            }
+        }
+
+        if ($request->Status_Budget !== 'N') {
+            if ($request->has('budget_source')) {
+                $projectBudgetSource = new ProjectHasBudgetSourceModel;
+                $projectBudgetSource->Project_Id = $project->Id_Project;
+                $projectBudgetSource->Budget_Source_Id = $request->budget_source;
+                $projectBudgetSource->Amount_Total = $request->input('amount_' . $request->budget_source) ?? null;
+                $projectBudgetSource->Details_Expense = $request->source_detail ?? null;
+                $projectBudgetSource->save();
+                Log::info('Project budget source created with ID: ' . $request->budget_source);
+            }
+        
+            if ($request->has('activity')) {
+                foreach ($request->activity as $index => $activity) {
+                    $budgetForm = new BudgetFormModel;
+                    $budgetForm->Budget_Source_Id = $request->budget_source;
+                    $budgetForm->Project_Id = $project->Id_Project;
+                    $budgetForm->Big_Topic = $activity ?? null;
+                    $budgetForm->Amount_Big = $request->total_amount[$index] ?? null;
+                    $budgetForm->save();
+                    Log::info('Budget form created with big topic: ' . $activity);
+        
+                    if ($request->has('subActivity')) {
+                        foreach ($request->subActivity[$index] as $subIndex => $subActivity) {
+                            $subtopicBudgetForm = new SubtopicBudgetHasBudgetFormModel;
+                            $subtopicBudgetForm->Subtopic_Budget_Id = $subActivity ?? null;
+                            $subtopicBudgetForm->Budget_Form_Id = $budgetForm->Id_Budget_Form;
+                            $subtopicBudgetForm->Details_Subtopic_Form = $request->description[$index][$subIndex] ?? null;
+                            $subtopicBudgetForm->Amount_Sub = $request->amount[$index][$subIndex] ?? null;
+                            $subtopicBudgetForm->save();
+                            Log::info('Subtopic budget form created with subtopic ID: ' . $subActivity);
+                        }
+                    }
+                }
             }
         }
 

@@ -21,10 +21,22 @@
         </div>
     </a>
 
+    <a href="{{ route('fiscalYearQuarter.index') }}" class="link-style">
+        <div class="card-style">
+            <div class="icon-style">
+                <i class='bx bx-calendar'></i>
+            </div>
+            <div>
+                <h2>ตั้งค่าไตรมาส</h2>
+                <p class="text-style">กำหนดไตรมาสและปีงบประมาณ</p>
+            </div>
+        </div>
+    </a>
+
     <a href="#" class="link-style">
         <div class="card-style">
             <div class="icon-style">
-                <i class='bx bx-world'></i> 
+                <i class='bx bx-world'></i>
             </div>
             <div>
                 <h2>ตั้งค่าบริบทเชิงกลยุทธ์</h2>
@@ -36,7 +48,7 @@
     <a href="#" class="link-style">
         <div class="card-style">
             <div class="icon-style">
-                <i class='bx bx-leaf'></i> 
+                <i class='bx bx-leaf'></i>
             </div>
             <div>
                 <h2>ตั้งค่าเป้าหมายการพัฒนาที่ยั่งยืน</h2>
@@ -48,7 +60,7 @@
     <a href="#" class="link-style">
         <div class="card-style">
             <div class="icon-style">
-                <i class='bx bxs-school'></i> 
+                <i class='bx bxs-school'></i>
             </div>
             <div>
                 <h2>ตั้งค่ายุทธศาสตร์มหาลัย</h2>
@@ -56,5 +68,6 @@
             </div>
         </div>
     </a>
+
 </div>
 @endsection

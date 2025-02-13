@@ -111,4 +111,9 @@ class ListProjectModel extends Model
         return $this->hasMany(ProjectHasBudgetSourceModel::class, 'Project_Id', 'Id_Project');
     }
 
+    public function quarterProjects()
+    {
+        return $this->hasMany(ProjectHasQuarterProject::class, 'Project_Id');
+    }
+
 }

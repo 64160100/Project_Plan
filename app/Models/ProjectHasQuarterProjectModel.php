@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class ProjectHasQuarterProjectModel extends Model
-{   
-
+{
     protected $connection = 'mydb';
     protected $table = 'Project_has_Quarter_Project';
     protected $fillable = [

@@ -113,7 +113,7 @@ class ListProjectModel extends Model
 
     public function quarterProjects()
     {
-        return $this->hasMany(ProjectHasQuarterProject::class, 'Project_Id');
+        return $this->hasMany(ProjectHasQuarterProjectModel::class, 'Project_Id');
     }
 
 }

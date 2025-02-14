@@ -42,18 +42,20 @@ use App\Models\StrategicObjectivesModel;
 use App\Models\KpiModel;
 use App\Models\ProjectBatchHasProjectModel;
 use App\Models\BatchProjectModel;
+use App\Models\FiscalYearQuarterModel;
 use Carbon\Carbon;
 
 class ListProjectController extends Controller
 {
     public function project()
     {
-        $strategics = StrategicModel::with('projects')->get();
+        $quarters = FiscalYearQuarterModel::all();
+        $strategics = StrategicModel::with(['projects', 'quarterProjects'])->get();
         $strategics->each(function ($strategics) {
             $strategics->project_count = $strategics->projects->count();
         });
 
-        return view('Project.listProject', compact('strategics')); 
+        return view('Project.listProject', compact('strategics', 'quarters')); 
     }
 
     public function viewProject($projectId)
@@ -801,16 +803,29 @@ class ListProjectController extends Controller
             $strategies = collect();
             $incompleteStrategies = [];
             $allStrategiesComplete = false;
-            $strategics = collect();
-
+    
             if ($projects->where('Count_Steps', 0)->isNotEmpty()) {
-                $strategics = StrategicModel::with(['projects' => function($query) {
-                    $query->where('Count_Steps', 0)->orderBy('Name_Strategy');
-                }])->get();
-                            
                 $approvals = ApproveModel::all();
                 $strategies = StrategyModel::all();
-                
+    
+                $quarters = FiscalYearQuarterModel::select('Id_Quarter_Project', 'Fiscal_Year', 'Quarter')
+                    ->orderBy('Id_Quarter_Project', 'asc')
+                    ->get();
+    
+                $query = StrategicModel::with('quarterProjects');
+    
+                if ($request->has('Fiscal_Year_Quarter') && $request->Fiscal_Year_Quarter != '') {
+                    list($fiscalYear, $quarter) = explode('-', $request->Fiscal_Year_Quarter);
+                    $query->whereHas('quarterProjects', function ($q) use ($fiscalYear, $quarter) {
+                        $q->whereHas('quarterProject', function ($q2) use ($fiscalYear, $quarter) {
+                            $q2->where('Fiscal_Year', $fiscalYear)
+                               ->where('Quarter', $quarter);
+                        });
+                    });
+                }
+    
+                $strategics = $query->get();
+    
                 $filteredStrategics = $strategics->filter(function($strategic) use ($approvals) {
                     foreach ($strategic->projects as $project) {
                         $projectApprovals = $approvals->where('Project_Id', $project->Id_Project);
@@ -820,14 +835,14 @@ class ListProjectController extends Controller
                         return $project->Count_Steps == 0;
                     });
                 });
-                
+    
                 foreach ($filteredStrategics as $strategic) {
                     foreach ($strategic->projects as $project) {
                         $projectApprovals = $approvals->where('Project_Id', $project->Id_Project);
                         $project->approvalStatuses = $projectApprovals->pluck('Status')->toArray();
                     }
                 }
-            
+    
                 $incompleteStrategies = [];
                 foreach ($strategies as $strategy) {
                     $strategyProjects = $projects->where('Count_Steps', 0)
@@ -835,22 +850,56 @@ class ListProjectController extends Controller
                                                 ->filter(function($project) {
                                                     return $project->approvals->contains('Status', 'I');
                                                 });
-
-                        if ($strategyProjects->isEmpty()) {
+    
+                    if ($strategyProjects->isEmpty()) {
                         $incompleteStrategies[] = $strategy->Name_Strategy;
                     }
                 }
-
+    
                 usort($incompleteStrategies, function($a, $b) {
                     return strcmp($a, $b);
                 });
-                
+    
                 $allStrategiesComplete = empty($incompleteStrategies);
             }
-
-            
-
-            return view('proposeProject', compact('projects', 'countStepsZero', 'filteredStrategics', 'approvals', 'strategies', 'incompleteStrategies', 'allStrategiesComplete', 'strategics'));
+    
+            $hasProjectsToPropose = false;
+            $hasStatusN = false;
+    
+            $quarterStyles = [
+                1 => 'border-blue-200 bg-blue-50',
+                2 => 'border-green-200 bg-green-50',
+                3 => 'border-yellow-200 bg-yellow-50',
+                4 => 'border-purple-200 bg-purple-50'
+            ];
+    
+            $quartersByFiscalYear = $quarters->groupBy(function($quarter) {
+                $calendarYear = intval(substr($quarter->Fiscal_Year, 0, 4));
+                return $calendarYear;
+            });
+    
+            foreach ($filteredStrategics as $Strategic) {
+                if ($Strategic->projects->contains(function($project) {
+                    return $project->Count_Steps == 0;
+                })) {
+                    $hasProjectsToPropose = true;
+                    break;
+                }
+            }
+    
+            foreach ($filteredStrategics as $Strategic) {
+                foreach ($Strategic->projects as $project) {
+                    if (in_array('N', $project->approvalStatuses)) {
+                        $hasStatusN = true;
+                    }
+                    if (in_array('I', $project->approvalStatuses)) {
+                        $hasStatusN = false;
+                        break 2;
+                    }
+                }
+            }
+    
+            return view('proposeProject', compact('projects', 'countStepsZero', 'quarters', 'filteredStrategics', 'approvals', 'strategies', 'incompleteStrategies', 'allStrategiesComplete', 'strategics', 'hasProjectsToPropose', 'hasStatusN', 'quarterStyles', 'quartersByFiscalYear'));
         } else {
             return redirect()->back()->with('error', 'You are not authorized to view these projects.');
         }

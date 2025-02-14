@@ -23,7 +23,7 @@ class StrategyController extends Controller
             $strategy = StrategyModel::where('Strategic_Id', $Id_Strategic)->get();
             $strategic = StrategicModel::with('strategies.kpis')->findOrFail($Id_Strategic);
     
-            $strategicOpportunities = StrategicOpportunityModel::where('Strategic_Id_Strategic', $Id_Strategic)
+            $strategicOpportunities = StrategicOpportunityModel::where('Strategic_Id', $Id_Strategic)
                 ->with(['details', 'challenges', 'advantages'])
                 ->get();
             

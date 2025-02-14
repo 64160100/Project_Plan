@@ -3,59 +3,57 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\StrategicModel;
 use App\Models\FiscalYearQuarterModel;
 
-class StrategicController extends Controller
+class FiscalYearQuarterController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $fiscalYears = FiscalYearQuarterModel::select('Fiscal_Year')->distinct()->pluck('Fiscal_Year');
-        $query = StrategicModel::query();
-
-        if ($request->has('Fiscal_Year') && $request->Fiscal_Year != '') {
-            $query->whereHas('quarterProjects', function ($q) use ($request) {
-                $q->where('Fiscal_Year', $request->Fiscal_Year);
-            });
-        }
-
-        if ($request->has('Quarter') && $request->Quarter != '') {
-            $query->whereHas('quarterProjects', function ($q) use ($request) {
-                $q->where('Quarter', $request->Quarter);
-            });
-        }
-
-        $strategic = $query->get();
-
-        if ($strategic->isEmpty()) {
-            $strategic = null;
-        }
-
-        return view('strategic.viewStrategic', compact('strategic', 'fiscalYears'));
+        $fiscalYearsAndQuarters = FiscalYearQuarterModel::all();
+        return view('fiscalYearQuarter.index', compact('fiscalYearsAndQuarters'));
     }
 
-    public function addStrategic(Request $request)
+    public function create()
     {
-        StrategicModel::create([
-            'Name_Strategic_Plan' => $request->Name_Strategic_Plan,
-            'Goals_Strategic' => $request->Goals_Strategic,
+        return view('fiscalYearQuarter.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'Fiscal_Year' => 'required|integer',
+            'Quarter' => 'required|integer|min:1|max:4',
         ]);
-        return redirect('/strategic')->with('success', 'บันทึกสำเร็จ');
+
+        FiscalYearQuarterModel::create($request->all());
+
+        return redirect()->route('fiscalYearQuarter.index')->with('success', 'Fiscal year and quarter created successfully.');
     }
 
-    public function updateStrategic(Request $request, $Id_Strategic)
+    public function edit($id)
     {
-        $strategic = StrategicModel::findOrFail($Id_Strategic);
-        $strategic->Name_Strategic_Plan = $request->Name_Strategic_Plan;
-        $strategic->Goals_Strategic = $request->Goals_Strategic;
-        $strategic->save();
-        return redirect()->route('strategic.index')->with('success', '');
+        $fiscalYearQuarter = FiscalYearQuarterModel::findOrFail($id);
+        return view('fiscalYearQuarter.edit', compact('fiscalYearQuarter'));
     }
 
-    public function deleteStrategic($Id_Strategic)
+    public function update(Request $request, $id)
     {
-        $strategic = StrategicModel::findOrFail($Id_Strategic);
-        $strategic->delete();
-        return redirect()->route('strategic.index')->with('success', '');
+        $request->validate([
+            'Fiscal_Year' => 'required|integer',
+            'Quarter' => 'required|integer|min:1|max:4',
+        ]);
+
+        $fiscalYearQuarter = FiscalYearQuarterModel::findOrFail($id);
+        $fiscalYearQuarter->update($request->all());
+
+        return redirect()->route('fiscalYearQuarter.index')->with('success', 'Fiscal year and quarter updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $fiscalYearQuarter = FiscalYearQuarterModel::findOrFail($id);
+        $fiscalYearQuarter->delete();
+
+        return redirect()->route('fiscalYearQuarter.index')->with('success', 'Fiscal year and quarter deleted successfully.');
     }
 }

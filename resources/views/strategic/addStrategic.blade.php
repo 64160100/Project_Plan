@@ -25,7 +25,17 @@
                         <label for="Goals_Strategic" class="form-label">เป้าหมายเชิงยุทธศาสตร์</label>
                         <textarea class="form-control" id="Goals_Strategic" name="Goals_Strategic" placeholder="กรอกเป้าหมายเชิงยุทธศาสตร์" required></textarea>
                     </div>
-                    
+                    <div class="mb-3">
+                        <label for="Fiscal_Year_Quarter_Add" class="form-label">ปีงบประมาณและไตรมาส</label>
+                        <select class="form-control" id="Fiscal_Year_Quarter_Add" name="Fiscal_Year_Quarter_Add" required>
+                            <option value="">เลือกปีงบประมาณและไตรมาส</option>
+                            @foreach($quarters as $quarter)
+                                <option value="{{ $quarter->Id_Quarter_Project }}">
+                                    ปีงบประมาณ {{ $quarter->Fiscal_Year }} ไตรมาส {{ $quarter->Quarter }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">ยกเลิก</button>

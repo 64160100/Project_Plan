@@ -31,4 +31,9 @@ class StrategicModel extends Model
     {
         return $this->hasMany(ListProjectModel::class, 'Strategic_Id', 'Id_Strategic');
     }
+
+    public function quarterProjects()
+    {
+        return $this->hasMany(StrategicHasQuarterProjectModel::class, 'Strategic_Id', 'Id_Strategic');
+    }
 }

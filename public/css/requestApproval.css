@@ -372,3 +372,57 @@ th {
     background-color: #c82333;
 }
 
+.page-container {
+    padding: 40px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin-bottom: 20px;
+}
+
+th,
+td {
+    border: 1px solid #000;
+    padding: 10px;
+    font-size: 14px;
+    vertical-align: top;
+    word-wrap: break-word;
+    background-color: white;
+}
+
+th {
+    background-color: #c8e6c9 !important;
+    font-weight: bold;
+    text-align: center;
+}
+
+.button-container {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.print-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.text-gray {
+    color: #a9a9a9;
+}
+
+@media print {
+    .button-container {
+        display: none;
+    }
+
+    @page {
+        size: A4 landscape;
+    }
+}

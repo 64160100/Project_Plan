@@ -18,6 +18,11 @@ class StrategyModel extends Model
     ];
     public $timestamps = false;
 
+    public function projects()
+    {
+        return $this->hasMany(ListProjectModel::class, 'Strategy_Id', 'Id_Strategy');
+    }
+
     public function kpis()
     {
         return $this->hasMany(KpiModel::class, 'Strategy_Id', 'Id_Strategy');
@@ -31,5 +36,10 @@ class StrategyModel extends Model
     public function strategic()
     {
         return $this->belongsTo(StrategicModel::class, 'Strategic_Id', 'Id_Strategic');
+    }
+
+    public function strategicHasQuarterProjects()
+    {
+        return $this->hasMany(StrategicHasQuarterProjectModel::class, 'Strategic_Id', 'Id_Strategic');
     }
 }

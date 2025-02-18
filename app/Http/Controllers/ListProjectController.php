@@ -43,6 +43,7 @@ use App\Models\KpiModel;
 use App\Models\ProjectBatchHasProjectModel;
 use App\Models\BatchProjectModel;
 use App\Models\FiscalYearQuarterModel;
+use App\Models\StrategicHasQuarterProjectModel;
 use Carbon\Carbon;
 
 class ListProjectController extends Controller
@@ -803,6 +804,9 @@ class ListProjectController extends Controller
             $strategies = collect();
             $incompleteStrategies = [];
             $allStrategiesComplete = false;
+            $quarterStyles = collect();
+            $quarters = collect();
+            $logData = [];
     
             if ($projects->where('Count_Steps', 0)->isNotEmpty()) {
                 $approvals = ApproveModel::all();
@@ -819,7 +823,7 @@ class ListProjectController extends Controller
                     $query->whereHas('quarterProjects', function ($q) use ($fiscalYear, $quarter) {
                         $q->whereHas('quarterProject', function ($q2) use ($fiscalYear, $quarter) {
                             $q2->where('Fiscal_Year', $fiscalYear)
-                               ->where('Quarter', $quarter);
+                            ->where('Quarter', $quarter);
                         });
                     });
                 }
@@ -843,16 +847,49 @@ class ListProjectController extends Controller
                     }
                 }
     
-                $incompleteStrategies = [];
-                foreach ($strategies as $strategy) {
-                    $strategyProjects = $projects->where('Count_Steps', 0)
-                                                ->where('Strategy_Id', $strategy->Id_Strategy)
-                                                ->filter(function($project) {
-                                                    return $project->approvals->contains('Status', 'I');
-                                                });
+                $quarters = $quarters->sortBy('Fiscal_Year');
     
-                    if ($strategyProjects->isEmpty()) {
-                        $incompleteStrategies[] = $strategy->Name_Strategy;
+                foreach ($quarters as $quarter) {
+                    $fiscalYear = $quarter->Fiscal_Year;
+                    $quarterName = $quarter->Quarter;
+    
+                    $strategics = StrategicModel::whereHas('quarterProjects', function ($query) use ($quarter) {
+                        $query->where('Quarter_Project_Id', $quarter->Id_Quarter_Project);
+                    })->with('strategies.projects.approvals')->get();
+    
+                    foreach ($strategics as $strategic) {
+                        $strategicName = $strategic->Name_Strategic_Plan;
+    
+                        if ($strategic->strategies->isEmpty()) {
+                            $logData[] = "Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName, Status: No strategies created";
+                        }
+    
+                        $allStrategies = StrategyModel::where('Strategic_Id', $strategic->Id_Strategic)->get();
+                        $createdStrategies = $strategic->strategies->pluck('Id_Strategy')->toArray();
+                        $missingStrategies = $allStrategies->filter(function ($strategy) use ($createdStrategies) {
+                            return !in_array($strategy->Id_Strategy, $createdStrategies);
+                        });
+    
+                        foreach ($missingStrategies as $missingStrategy) {
+                            $projectsWithStrategy = ListProjectModel::where('Strategy_Id', $missingStrategy->Id_Strategy)->exists();
+                            if (!$projectsWithStrategy) {
+                                $logData[] = "Missing Strategy: {$missingStrategy->Name_Strategy}, Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName";
+                            }
+                        }
+    
+                        foreach ($strategic->strategies as $strategy) {
+                            $strategyName = $strategy->Name_Strategy;
+    
+                            if ($strategy->projects->isEmpty()) {
+                                $logData[] = "Strategy: $strategyName, Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName, Status: No projects created";
+                            }
+    
+                            foreach ($strategy->projects as $project) {
+                                $projectName = $project->Name_Project;
+                                $projectStatus = $project->approvals->first()->Status ?? 'Unknown';
+                                $logData[] = "Project: $projectName, Strategy: $strategyName, Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName, Status: $projectStatus";
+                            }
+                        }
                     }
                 }
     
@@ -865,13 +902,6 @@ class ListProjectController extends Controller
     
             $hasProjectsToPropose = false;
             $hasStatusN = false;
-    
-            $quarterStyles = [
-                1 => 'border-blue-200 bg-blue-50',
-                2 => 'border-green-200 bg-green-50',
-                3 => 'border-yellow-200 bg-yellow-50',
-                4 => 'border-purple-200 bg-purple-50'
-            ];
     
             $quartersByFiscalYear = $quarters->groupBy(function($quarter) {
                 $calendarYear = intval(substr($quarter->Fiscal_Year, 0, 4));
@@ -899,15 +929,21 @@ class ListProjectController extends Controller
                 }
             }
     
-            return view('proposeProject', compact('projects', 'countStepsZero', 'quarters', 'filteredStrategics', 'approvals', 'strategies', 'incompleteStrategies', 'allStrategiesComplete', 'strategics', 'hasProjectsToPropose', 'hasStatusN', 'quarterStyles', 'quartersByFiscalYear'));
+            return view('proposeProject', compact('projects', 'countStepsZero', 'quarters', 'filteredStrategics', 'approvals', 'strategies', 'incompleteStrategies', 'allStrategiesComplete', 'hasProjectsToPropose', 'hasStatusN', 'quarterStyles', 'quartersByFiscalYear', 'strategicName', 'logData'));
         } else {
             return redirect()->back()->with('error', 'You are not authorized to view these projects.');
         }
     }
 
     public function submitForAllApproval(Request $request)
-    {
-        $projects = ListProjectModel::where('Count_Steps', 0)->get();
+    {       
+        $fiscalYear = $request->input('fiscal_year');
+        $quarter = $request->input('quarter');
+        $projectIds = $request->input('project_ids', []);
+    
+        $projects = ListProjectModel::whereIn('Id_Project', $projectIds)
+            ->where('Count_Steps', 0)
+            ->get();
     
         foreach ($projects as $project) {
             $approval = ApproveModel::where('Project_Id', $project->Id_Project)->first();

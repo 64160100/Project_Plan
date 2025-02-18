@@ -21,61 +21,6 @@ Carbon::setLocale('th');
         font-weight: bold;
         src: url('{{ storage_path('fonts/THSarabunNew Bold.ttf') }}') format('truetype');
     }
-
-    .page-container {
-        padding: 40px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-        margin-bottom: 20px;
-    }
-
-    th,
-    td {
-        border: 1px solid #000;
-        padding: 10px;
-        font-size: 14px;
-        vertical-align: top;
-        word-wrap: break-word;
-        background-color: white;
-    }
-
-    th {
-        background-color: #c8e6c9 !important;
-        font-weight: bold;
-        text-align: center;
-    }
-
-    .button-container {
-        margin: 20px 0;
-        text-align: center;
-    }
-
-    .print-button {
-        background-color: #4CAF50;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .text-gray {
-        color: #a9a9a9;
-    }
-
-    @media print {
-        .button-container {
-            display: none;
-        }
-
-        @page {
-            size: A4 landscape;
-        }
-    }
     </style>
 </hade>
 
@@ -239,10 +184,28 @@ Carbon::setLocale('th');
     @endphp
 
     @if($hasProjectsToApprove)
+    @foreach ($quartersByFiscalYear as $fiscalYear => $yearQuarters)
+    @foreach ($yearQuarters->sortBy('Quarter') as $quarter)
+    @php
+    $quarterProjects = $filteredStrategics->filter(function($strategic) use ($quarter) {
+    return $strategic->quarterProjects->contains('Quarter_Project_Id', $quarter->Id_Quarter_Project);
+    });
+    $quarterStyle = $quarterStyles[$quarter->Quarter] ?? 'border-gray-200';
+
+    $filteredProjects = $quarterProjects->flatMap(function($strategic) {
+    return $strategic->projects->filter(function($project) {
+    return $project->Count_Steps == 1;
+    });
+    });
+    $filteredProjectCount = $filteredProjects->count();
+    @endphp
+
+    @if($filteredProjectCount > 0)
     <div class="card mb-3">
         <div class="card-body">
-            <h5 class="card-title">การอนุมัติจากผู้อำนวยการ</h5>
-            @foreach ($strategics as $Strategic)
+            <h5 class="card-title">การอนุมัติจากผู้อำนวยการ ปีงบประมาณ {{ $fiscalYear }} ไตรมาส {{ $quarter->Quarter }}
+            </h5>
+            @foreach ($quarterProjects as $Strategic)
             @php
             $filteredProjects = $Strategic->projects->filter(function($project) {
             return $project->Count_Steps == 1;
@@ -354,9 +317,19 @@ Carbon::setLocale('th');
             </div>
         </div>
     </div>
+    @endif
+    @endforeach
+    @endforeach
 
     <!-- Modal for not approving all projects -->
-    @foreach ($strategics as $Strategic)
+    @foreach ($quartersByFiscalYear as $fiscalYear => $yearQuarters)
+    @foreach ($yearQuarters->sortBy('Quarter') as $quarter)
+    @php
+    $quarterProjects = $filteredStrategics->filter(function($strategic) use ($quarter) {
+    return $strategic->quarterProjects->contains('Quarter_Project_Id', $quarter->Id_Quarter_Project);
+    });
+    @endphp
+    @foreach ($quarterProjects as $Strategic)
     <div class="modal fade" id="commentModal-{{ $Strategic->Id_Strategic }}" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -383,9 +356,18 @@ Carbon::setLocale('th');
         </div>
     </div>
     @endforeach
+    @endforeach
+    @endforeach
 
     <!-- Modal for not approving individual projects -->
-    @foreach ($strategics as $Strategic)
+    @foreach ($quartersByFiscalYear as $fiscalYear => $yearQuarters)
+    @foreach ($yearQuarters->sortBy('Quarter') as $quarter)
+    @php
+    $quarterProjects = $filteredStrategics->filter(function($strategic) use ($quarter) {
+    return $strategic->quarterProjects->contains('Quarter_Project_Id', $quarter->Id_Quarter_Project);
+    });
+    @endphp
+    @foreach ($quarterProjects as $Strategic)
     @foreach ($Strategic->projects as $Project)
     <div class="modal fade" id="commentModal-{{ $Project->Id_Project }}" tabindex="-1">
         <div class="modal-dialog">
@@ -408,6 +390,8 @@ Carbon::setLocale('th');
             </div>
         </div>
     </div>
+    @endforeach
+    @endforeach
     @endforeach
     @endforeach
     @endif

@@ -21,6 +21,11 @@ class StrategicHasQuarterProjectModel extends Model
         return $this->belongsTo(StrategicModel::class, 'Strategic_Id', 'Id_Strategic');
     }
 
+    public function strategy()
+    {
+        return $this->belongsTo(StrategyModel::class, 'Strategic_Id', 'Id_Strategic');
+    }
+
     public function quarterProject()
     {
         return $this->belongsTo(FiscalYearQuarterModel::class, 'Quarter_Project_Id', 'Id_Quarter_Project');

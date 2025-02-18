@@ -54,3 +54,4 @@ git config --global --unset https.proxy
 ตรวจสอบค่า
 git config --global -l
 
+UPDATE Project SET Count_Steps = 0;

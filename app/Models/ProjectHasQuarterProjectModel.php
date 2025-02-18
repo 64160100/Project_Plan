@@ -19,6 +19,7 @@ class ProjectHasQuarterProjectModel extends Model
     {
         return $this->belongsTo(Project::class, 'Project_Id');
     }
+    
 
     public function quarterProject()
     {

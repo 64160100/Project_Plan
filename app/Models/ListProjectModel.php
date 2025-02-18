@@ -36,6 +36,11 @@ class ListProjectModel extends Model
         return $this->belongsTo(StrategicModel::class, 'Strategic_Id', 'Id_Strategic');
     }
 
+    public function strategy()
+    {
+        return $this->belongsTo(StrategyModel::class, 'Strategy_Id');
+    }
+
     public function employee()
     {
         return $this->belongsTo(EmployeeModel::class, 'Employee_Id', 'Id_Employee');

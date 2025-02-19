@@ -11,7 +11,7 @@ use App\Models\StrategyModel;
 use App\Models\FiscalYearQuarterModel;
 use App\Models\ApproveModel;
 use App\Models\RecordHistory;
-
+use Carbon\Carbon;
 
 class ProposeProjectController extends Controller
 {
@@ -91,6 +91,7 @@ class ProposeProjectController extends Controller
             $allStrategiesComplete = false;
             $quarterStyles = collect();
             $quarters = collect();
+            $strategicName = collect();
             $logData = [];
     
             if ($projects->where('Count_Steps', 0)->isNotEmpty()) {
@@ -354,4 +355,135 @@ class ProposeProjectController extends Controller
     
         return redirect()->route('proposeProject')->with('error', 'Project not found.');
     }
+
+    public function editProject(Request $request, $Id_Project)
+    {
+        $project = ListProjectModel::findOrFail($Id_Project);
+        $strategics = StrategicModel::all();
+        $strategies = StrategyModel::where('Strategic_Id', $project->Strategic_Id)->get();
+        $employees = EmployeeModel::all();
+        $budgetSources = BudgetSourceModel::all();
+        $subtopBudgets = SubtopBudgetModel::all();
+        $strategicObjectives = StrategicObjectivesModel::all();
+        $kpis = KpiModel::all();
+        $sourcePage = $request->input('sourcePage', 'listProject');
+    
+        return view('Project.editProject', compact('project', 'strategics', 'strategies', 'employees', 'budgetSources', 'subtopBudgets', 'strategicObjectives', 'kpis', 'sourcePage'));
+    }
+    
+    public function updateProject(Request $request, $id)
+    {
+        $sourcePage = $request->input('sourcePage', 'proposeProject');
+
+        $request->validate([
+            'Name_Strategy' => 'required',
+        ]);
+
+        $strategy = StrategyModel::find($request->input('Name_Strategy'));
+        
+        $nameStrategy = $strategy ? $strategy->Name_Strategy : null;
+        $strategyId = $strategy ? $strategy->Id_Strategy : null;
+
+        $project = ListProjectModel::findOrFail($id);
+
+        $project->Strategic_Id = $request->Strategic_Id ?? $project->Strategic_Id;
+        $project->Strategy_Id = $strategyId; 
+        $project->Name_Strategy = $nameStrategy;
+        $project->Name_Project = $request->Name_Project ?? $project->Name_Project;
+        $project->Employee_Id = $request->Employee_Id ?? $project->Employee_Id;
+        $project->Objective_Project = $request->Objective_Project ?? $project->Objective_Project;
+        $project->Principles_Reasons = $request->Principles_Reasons ?? $project->Principles_Reasons;
+        $project->Success_Indicators = $request->Success_Indicators ?? $project->Success_Indicators;
+        $project->Value_Target = $request->Value_Target ?? $project->Value_Target;
+        $project->Project_Type = $request->Project_Type ?? $project->Project_Type;
+        $project->Status_Budget = $request->Status_Budget ?? $project->Status_Budget;
+        $project->First_Time = $request->First_Time ?? $project->First_Time;
+        $project->End_Time = $request->End_Time ?? $project->End_Time;
+        $project->Count_Steps = $request->Count_Steps ?? $project->Count_Steps;
+
+        $project->save();
+
+        if (in_array($project->Count_Steps, [3, 4, 5])) {
+            $project->Count_Steps = 2;
+            $project->save();
+        }
+
+        if (in_array($project->Count_Steps, [7, 8])) {
+            $project->Count_Steps = 6;
+            $project->save();
+        }
+
+        $approve = ApproveModel::where('Project_Id', $project->Id_Project)->first();
+        if ($approve) {
+            $approve->Status = 'I';
+            $approve->save();
+        }
+
+        if ($request->has('Name_Sup_Project')) {
+            $project->supProjects()->delete();
+            foreach ($request->Name_Sup_Project as $supProjectName) {
+                $supProject = new SupProjectModel;
+                $supProject->Project_Id = $project->Id_Project ?? null;
+                $supProject->Name_Sup_Project = $supProjectName ?? null ; 
+                $supProject->save();
+            }
+        }
+
+        if ($request->Status_Budget !== 'N') {
+            if ($request->has('budget_source')) {
+                $projectBudgetSource = new ProjectHasBudgetSourceModel;
+                $projectBudgetSource->Project_Id = $project->Id_Project;
+                $projectBudgetSource->Budget_Source_Id = $request->budget_source;
+                $projectBudgetSource->Amount_Total = $request->input('amount_' . $request->budget_source) ?? null;
+                $projectBudgetSource->Details_Expense = $request->source_detail ?? null;
+                $projectBudgetSource->save();
+                Log::info('Project budget source created with ID: ' . $request->budget_source);
+            }
+        
+            if ($request->has('activity')) {
+                foreach ($request->activity as $index => $activity) {
+                    $budgetForm = new BudgetFormModel;
+                    $budgetForm->Budget_Source_Id = $request->budget_source;
+                    $budgetForm->Project_Id = $project->Id_Project;
+                    $budgetForm->Big_Topic = $activity ?? null;
+                    $budgetForm->Amount_Big = $request->total_amount[$index] ?? null;
+                    $budgetForm->save();
+                    Log::info('Budget form created with big topic: ' . $activity);
+        
+                    if ($request->has('subActivity')) {
+                        foreach ($request->subActivity[$index] as $subIndex => $subActivity) {
+                            $subtopicBudgetForm = new SubtopicBudgetHasBudgetFormModel;
+                            $subtopicBudgetForm->Subtopic_Budget_Id = $subActivity ?? null;
+                            $subtopicBudgetForm->Budget_Form_Id = $budgetForm->Id_Budget_Form;
+                            $subtopicBudgetForm->Details_Subtopic_Form = $request->description[$index][$subIndex] ?? null;
+                            $subtopicBudgetForm->Amount_Sub = $request->amount[$index][$subIndex] ?? null;
+                            $subtopicBudgetForm->save();
+                            Log::info('Subtopic budget form created with subtopic ID: ' . $subActivity);
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($sourcePage === 'proposeProject') {
+            return redirect()->route('proposeProject')->with('success', 'Project updated successfully');
+        } else {
+            return redirect()->route('project')->with('success', 'Project updated successfully');
+        }
+    }
+
+    public function updateStatus($id)
+    {
+        $approval = ApproveModel::where('Project_Id', $id)->first();
+
+        if (!$approval) {
+            return redirect()->back()->with('error', 'Approval record not found.');
+        }
+
+        $approval->Status = 'N';
+        $approval->save();
+
+        return redirect()->route('proposeProject')->with('success', 'Project status updated successfully.');
+    }
+
 }

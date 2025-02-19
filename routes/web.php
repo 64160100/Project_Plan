@@ -8,6 +8,8 @@ use App\Http\Controllers\PlanDLCController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProjectBatchController;
 use App\Http\Controllers\FiscalYearQuarterController;
+use App\Http\Controllers\ProposeProjectController;
+use App\Http\Controllers\RequestApprovalController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -18,17 +20,27 @@ require __DIR__.'/strategic.php';
 Route::get('/setting', [SettingController::class, 'settings'])->name('setting');
 
 Route::get('/listProject', [ListProjectController::class, 'project'])->name('project');
-Route::get('/projects/{Id_Project}/edit', [ProjectController::class, 'editProject'])->name('editProject');
+// Route::get('/projects/{Id_Project}/edit', [ProjectController::class, 'editProject'])->name('editProject');
 
 // ฟอร์มเริ่มต้น [count-step-0,1]
 
 Route::get('/createFirstForm/{Strategic_Id}', [ListProjectController::class, 'showCreateFirstForm'])->name('showCreateFirstForm');
-
-Route::put('/disapprove-project/{id}', [ListProjectController::class, 'disapproveProject'])->name('disapproveProject');
-Route::put('/approvals/disapproveAll/{id}', [ListProjectController::class, 'disapproveAll'])->name('disapproveAll');
-
 Route::get('/createProject/{Strategic_Id}', [ListProjectController::class, 'showCreateForm'])->name('showCreateProject');
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
+
+Route::put('/approvals/disapproveAll/{id}', [ListProjectController::class, 'disapproveAll'])->name('disapproveAll');
+
+Route::put('/approvals/updateAllStatus', [RequestApprovalController::class, 'updateAllStatus'])->name('updateAllStatus');
+
+
+// การเสนอโครงการ
+Route::get('/proposeProject', [ProposeProjectController::class, 'proposeProject'])->name('proposeProject');
+Route::post('/projects/submit-for-approval/{id}', [ProposeProjectController::class, 'submitForApproval'])->name('projects.submitForApproval');
+
+Route::post('/projects/update-status/{id}', [ProposeProjectController::class, 'updateStatus'])->name('projects.updateStatus');
+
+Route::post('/submit-for-all-approval', [ProposeProjectController::class, 'submitForAllApproval'])->name('projects.submitForAllApproval');
+
 
 // สร้างชุดโครงการ
 Route::get('/createSetProject', [ProjectBatchController::class, 'createSetProject'])->name('createSetProject');
@@ -48,8 +60,6 @@ Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'cre
 Route::match(['get', 'post'],'/editProject/{Id_Project}', [ListProjectController::class, 'editProject'])->name('editProject');
 Route::put('/editProject/{Id_Project}', [ListProjectController::class, 'updateProject'])->name('updateProject');
 
-Route::post('/projects/update-status/{id}', [ListProjectController::class, 'updateStatus'])->name('projects.updateStatus');
-
 // แก้ไขโครงการ
 Route::get('/project/{id}/edit', [ListProjectController::class, 'edit'])->name('projects.edit');
 Route::put('/project/{id}', [ListProjectController::class, 'update'])->name('projects.update');
@@ -60,15 +70,11 @@ Route::get('/viewProjectInStrategic/{Id_Strategic}', [ListProjectController::cla
 Route::get('/viewProject/{Id_Project}', [ListProjectController::class, 'viewProject'])->name('viewProject');
 
 //การอนุมัติโครงการ
-Route::get('/requestApproval', [ListProjectController::class, 'showAllApprovals'])->name('requestApproval');
-Route::put('/approvals/{id}/status/{status}', [ListProjectController::class, 'updateApprovalStatus'])->name('approvals.updateStatus');
-Route::get('/editForm', [ListProjectController::class, 'approveProject'])->name('approveProject');
-Route::post('/submit-for-all-approval', [ListProjectController::class, 'submitForAllApproval'])->name('projects.submitForAllApproval');
+Route::get('/requestApproval', [RequestApprovalController::class, 'showAllApprovals'])->name('requestApproval');
+Route::put('/approvals/{id}/status/{status}', [RequestApprovalController::class, 'updateApprovalStatus'])->name('approvals.updateStatus');
+Route::get('/editForm', [RequestApprovalController::class, 'approveProject'])->name('approveProject');
+Route::put('/disapprove-project/{id}', [RequestApprovalController::class, 'disapproveProject'])->name('disapproveProject');
 
-// การเสนอโครงการ
-Route::get('/proposeProject', [ListProjectController::class, 'proposeProject'])->name('proposeProject');
-Route::post('/projects/submit-for-approval/{id}', [ListProjectController::class, 'submitForApproval'])->name('projects.submitForApproval');
-Route::put('/approvals/updateAllStatus', [ListProjectController::class, 'updateAllStatus'])->name('approvals.updateAllStatus');
 
 // คลังไฟล์ PDF
 Route::get('/storage-files/{project_id?}', [StorageFileController::class, 'index'])->name('StorageFiles.index');

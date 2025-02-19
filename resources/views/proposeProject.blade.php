@@ -28,274 +28,6 @@ Carbon::setLocale('th');
 <div class="container">
     <h1>เสนอโครงการเพื่อพิจารณา</h1>
 
-    <!-- <div class="mb-3">
-        <a href="{{ route('createSetProject') }}" class="btn btn-primary">
-            <i class='bx bx-plus'></i> สร้างชุดโครงการ ({{ $countStepsZero }} โครงการ)
-        </a>
-    </div> -->
-
-    @php
-    $incompleteStrategiesByYear = collect($incompleteStrategies)->groupBy('Fiscal_Year');
-    @endphp
-
-    @foreach ($quartersByFiscalYear as $fiscalYear => $yearQuarters)
-    @foreach ($yearQuarters->sortBy('Quarter') as $quarter)
-    @php
-    $quarterProjects = $filteredStrategics->filter(function($strategic) use ($quarter) {
-    return $strategic->quarterProjects->contains('Quarter_Project_Id', $quarter->Id_Quarter_Project);
-    });
-    $quarterStyle = $quarterStyles[$quarter->Quarter] ?? 'border-gray-200';
-
-    $hasIncompleteStrategies = isset($incompleteStrategiesByYear[$fiscalYear]) &&
-    $incompleteStrategiesByYear[$fiscalYear]->isNotEmpty();
-    $missingStrategies = [];
-    $logDataIncompleteStrategies = [];
-
-    // Process logData to extract incomplete strategies and missing strategies for the specific fiscal year and quarter
-    foreach ($logData as $logEntry) {
-    if (strpos($logEntry, "Fiscal Year: $fiscalYear, Quarter: $quarter->Quarter") !== false) {
-    if (strpos($logEntry, 'Status: No strategies created') !== false || strpos($logEntry, 'Status: No projects created')
-    !== false) {
-    $logDataIncompleteStrategies[] = preg_replace('/Fiscal Year: \d{4}, Quarter: \d, Status: (No strategies created|No
-    projects created)/', '', $logEntry);
-    }
-    if (strpos($logEntry, 'Missing Strategy:') !== false) {
-    preg_match('/Missing Strategy: (.*?),/', $logEntry, $matches);
-    if (isset($matches[1])) {
-    $missingStrategies[] = $matches[1];
-    }
-    }
-    }
-    }
-
-    // Format logDataIncompleteStrategies to display only the required parts
-    $logDataIncompleteStrategies = array_map(function($logEntry) {
-    preg_match('/Strategy: (.*?), Strategic: (.*?),/', $logEntry, $matches);
-    if (isset($matches[1], $matches[2])) {
-    return "{$matches[2]}, {$matches[1]}";
-    } elseif (preg_match('/Strategic: (.*?),/', $logEntry, $matches)) {
-    return "{$matches[1]}, ไม่มีกลยุทธ์";
-    } else {
-    return $logEntry;
-    }
-    }, $logDataIncompleteStrategies);
-
-    foreach ($quarterProjects as $Strategic) {
-    foreach ($Strategic->projects as $project) {
-    $strategyName = $project->Name_Strategy;
-    $strategyProjects = $Strategic->projects->filter(function($p) use ($strategyName) {
-    return $p->Name_Strategy === $strategyName;
-    });
-
-    $allProjectsStatusN = $strategyProjects->every(function($p) {
-    return in_array('N', $p->approvalStatuses) || !isset($p->approvalStatuses);
-    });
-
-    $hasProjectStatusI = $strategyProjects->contains(function($p) {
-    return in_array('I', $p->approvalStatuses);
-    });
-
-    if ($allProjectsStatusN && !$hasProjectStatusI) {
-    $missingStrategies[] = $strategyName;
-    }
-    }
-    }
-
-    $missingStrategies = array_unique($missingStrategies);
-    $allStrategiesComplete = empty($missingStrategies) && empty($logDataIncompleteStrategies);
-    @endphp
-
-    @if($quarterProjects->isNotEmpty())
-    <div class="card mb-4 border-2 {{ $quarterStyle }}">
-        <div class="card-body">
-            <h5 class="card-title">เสนอหาผู้อำนวยการ ปีงบประมาณ {{ $fiscalYear }} ไตรมาส {{ $quarter->Quarter }}</h5>
-
-            @if ($hasIncompleteStrategies || !empty($missingStrategies) || !empty($logDataIncompleteStrategies))
-            <div class="alert alert-warning">
-                <strong>กลยุทธ์ยังไม่ครบสำหรับปีงบประมาณ {{ $fiscalYear }} ไตรมาส {{ $quarter->Quarter }}</strong>
-                <ul>
-                    @if ($hasIncompleteStrategies)
-                    @foreach ($incompleteStrategiesByYear[$fiscalYear] as $strategy)
-                    <li>{{ $strategy }}</li>
-                    @endforeach
-                    @endif
-                    @foreach ($missingStrategies as $strategy)
-                    <li>{{ $strategy }}: ไม่มีกลยุทธ์</li>
-                    @endforeach
-                    @foreach ($logDataIncompleteStrategies as $logEntry)
-                    <li>{{ $logEntry }}</li>
-                    @endforeach
-                </ul>
-            </div>
-            @else
-            <div class="alert alert-success">
-                <strong>กลยุทธ์ครบแล้วสำหรับปีงบประมาณ {{ $fiscalYear }} ไตรมาส {{ $quarter->Quarter }}</strong>
-            </div>
-            @endif
-
-            <div class="mb-3">
-                @foreach ($quarterProjects as $Strategic)
-                @php
-                $filteredProjects = $Strategic->projects->filter(function($project) {
-                return $project->Count_Steps == 0;
-                });
-                $filteredProjectCount = $filteredProjects->count();
-                $firstStrategicPlanName = $Strategic->Name_Strategic_Plan;
-
-                // Check for missing strategies
-                $hasStrategies = !$Strategic->strategies->isEmpty();
-                $hasProjects = $filteredProjectCount > 0;
-
-                $totalStrategicBudget = $filteredProjects->sum(function($project) {
-                return $project->projectBudgetSources ? $project->projectBudgetSources->sum('Amount_Total') : 0;
-                });
-                $projectsByStrategy = $filteredProjects->groupBy('Name_Strategy');
-                @endphp
-
-                <details class="accordion" id="{{ $Strategic->Id_Strategic }}">
-                    <summary class="accordion-btn">
-                        <b>
-                            <a>{{ $firstStrategicPlanName }}</a>
-                            @if(!$hasStrategies)
-                            <br><span class="badge bg-danger">ยังไม่มีกลยุทธ์</span>
-                            @elseif(!$hasProjects)
-                            <br><span class="badge bg-warning">มีกลยุทธ์แต่ยังไม่มีโครงการ</span>
-                            <br>กลยุทธ์ที่มี:
-                            <ul class="strategy-list">
-                                @foreach($Strategic->strategies as $strategy)
-                                <li>{{ $strategy->Name_Strategy }}</li>
-                                @endforeach
-                            </ul>
-                            @endif
-                            <br>จำนวนโครงการ : {{ $filteredProjectCount }} โครงการ
-                            <br>งบประมาณรวม: {{ number_format($totalStrategicBudget, 2) }} บาท
-                        </b>
-                    </summary>
-                    @if ($filteredProjectCount > 0)
-                    <div class="accordion-content">
-                        <table class="summary-table">
-                            <thead>
-                                <tr>
-                                    <th style="width:10%; text-align: center;">ยุทธศาสตร์ สำนักหอสมุด</th>
-                                    <th style="width:10%; text-align: center;">กลยุทธ์ สำนักหอสมุด</th>
-                                    <th style="width:14%; text-align: center;">โครงการ</th>
-                                    <th style="width:14%; text-align: center;">ตัวชี้วัดความสำเร็จ<br>ของโครงการ</th>
-                                    <th style="width:12%; text-align: center;">ค่าเป้าหมาย</th>
-                                    <th style="width:10%; text-align: center;">งบประมาณ (บาท)</th>
-                                    <th style="width:12%; text-align: center;">ผู้รับผิดชอบ</th>
-                                    <th style="width:18%; text-align: center;">การจัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($projectsByStrategy as $strategyName => $projects)
-                                @php
-                                $strategyCount = $projects->count();
-                                @endphp
-                                @foreach ($projects as $index => $Project)
-                                @php
-                                $isStatusN = in_array('N', $Project->approvalStatuses);
-                                $isStatusI = in_array('I', $Project->approvalStatuses);
-                                $allProjectsDeleted = $projects->every(function($project) {
-                                return in_array('N', $project->approvalStatuses);
-                                });
-                                @endphp
-                                <tr>
-                                    @if ($index === 0 && $loop->parent->first)
-                                    <td rowspan="{{ $filteredProjectCount }}">{{ $firstStrategicPlanName }}</td>
-                                    @endif
-                                    @if ($index === 0)
-                                    <td class="{{ $allProjectsDeleted ? 'text-gray' : '' }}"
-                                        rowspan="{{ $strategyCount }}">
-                                        {{ $strategyName ?? '-' }}
-                                    </td>
-                                    @endif
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        <b>{{ $Project->Name_Project }}</b><br>
-                                        @foreach($Project->subProjects as $subProject)
-                                        - {{ $subProject->Name_Sup_Project }}<br>
-                                        @endforeach
-                                    </td>
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        {!! $Project->Success_Indicators ? nl2br(e($Project->Success_Indicators)) : '-'
-                                        !!}
-                                    </td>
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        {!! $Project->Value_Target ? nl2br(e($Project->Value_Target)) : '-' !!}
-                                    </td>
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
-                                        style="text-align: center;">
-                                        @if($Project->Status_Budget === 'N')
-                                        ไม่ใช้งบประมาณ
-                                        @else
-                                        @php
-                                        $totalBudget = $Project->projectBudgetSources ?
-                                        $Project->projectBudgetSources->sum('Amount_Total') : 0;
-                                        @endphp
-                                        {{ number_format($totalBudget, 2) }}
-                                        @endif
-                                    </td>
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        {{ $Project->employee->Firstname_Employee ?? '-' }}
-                                        {{ $Project->employee->Lastname_Employee ?? '' }}
-                                    </td>
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
-                                        style="text-align: center;">
-                                        <a href="{{ route('editProject', ['Id_Project' => $Project->Id_Project, 'sourcePage' => 'proposeProject']) }}"
-                                            class="btn btn-warning btn-sm">แก้ไข</a>
-                                        @if (!$isStatusN || $isStatusI)
-                                        <form
-                                            action="{{ route('projects.updateStatus', ['id' => $Project->Id_Project]) }}"
-                                            method="POST" style="display:inline;">
-                                            @csrf
-                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Are you sure you want to update the status of this project?');">ลบ</button>
-                                        </form>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforeach
-                                @endforeach
-                                <tr class="summary-row">
-                                    <td colspan="2" style="text-align: left; font-weight: bold;">รวมรายได้ทั้งหมด:</td>
-                                    <td colspan="6" style="text-align: center; font-weight: bold;">
-                                        {{ number_format($totalStrategicBudget, 2) }} บาท
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    @else
-                    <div class="accordion-content">
-                        <p>ไม่มีโครงการที่เกี่ยวข้อง</p>
-                    </div>
-                    @endif
-                </details>
-                @endforeach
-            </div>
-
-            <div class="button-container mt-3">
-                <form action="{{ route('projects.submitForAllApproval') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="quarter" value="{{ $quarter->Quarter }}">
-                    <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
-                    @foreach ($quarterProjects as $Strategic)
-                    @foreach ($Strategic->projects as $project)
-                    <input type="hidden" name="project_ids[]" value="{{ $project->Id_Project }}">
-                    @endforeach
-                    @endforeach
-                    <button type="submit" class="btn btn-primary w-full"
-                        {{ $allStrategiesComplete && !$hasStatusN ? '' : 'disabled' }}>
-                        เสนอโครงการทั้งหมด ไตรมาส {{ $quarter->Quarter }}
-                    </button>
-                </form>
-            </div>
-            
-        </div>
-    </div>
-    @endif
-    @endforeach
-    @endforeach
-
     @foreach($projects as $project)
     @if($project->Count_Steps !== 0)
     <div class="outer-container">
@@ -620,6 +352,275 @@ Carbon::setLocale('th');
     </div>
     @endif
     @endforeach
+
+    <!-- <div class="mb-3">
+        <a href="{{ route('createSetProject') }}" class="btn btn-primary">
+            <i class='bx bx-plus'></i> สร้างชุดโครงการ ({{ $countStepsZero }} โครงการ)
+        </a>
+    </div> -->
+
+    @php
+    $incompleteStrategiesByYear = collect($incompleteStrategies)->groupBy('Fiscal_Year');
+    @endphp
+
+    @foreach ($quartersByFiscalYear as $fiscalYear => $yearQuarters)
+    @foreach ($yearQuarters->sortBy('Quarter') as $quarter)
+    @php
+    $quarterProjects = $filteredStrategics->filter(function($strategic) use ($quarter) {
+    return $strategic->quarterProjects->contains('Quarter_Project_Id', $quarter->Id_Quarter_Project);
+    });
+    $quarterStyle = $quarterStyles[$quarter->Quarter] ?? 'border-gray-200';
+
+    $hasIncompleteStrategies = isset($incompleteStrategiesByYear[$fiscalYear]) &&
+    $incompleteStrategiesByYear[$fiscalYear]->isNotEmpty();
+    $missingStrategies = [];
+    $logDataIncompleteStrategies = [];
+
+    // Process logData to extract incomplete strategies and missing strategies for the specific fiscal year and quarter
+    foreach ($logData as $logEntry) {
+    if (strpos($logEntry, "Fiscal Year: $fiscalYear, Quarter: $quarter->Quarter") !== false) {
+    if (strpos($logEntry, 'Status: No strategies created') !== false || strpos($logEntry, 'Status: No projects created')
+    !== false) {
+    $logDataIncompleteStrategies[] = preg_replace('/Fiscal Year: \d{4}, Quarter: \d, Status: (No strategies created|No
+    projects created)/', '', $logEntry);
+    }
+    if (strpos($logEntry, 'Missing Strategy:') !== false) {
+    preg_match('/Missing Strategy: (.*?),/', $logEntry, $matches);
+    if (isset($matches[1])) {
+    $missingStrategies[] = $matches[1];
+    }
+    }
+    }
+    }
+
+    // Format logDataIncompleteStrategies to display only the required parts
+    $logDataIncompleteStrategies = array_map(function($logEntry) {
+    preg_match('/Strategy: (.*?), Strategic: (.*?),/', $logEntry, $matches);
+    if (isset($matches[1], $matches[2])) {
+    return "{$matches[2]}, {$matches[1]}";
+    } elseif (preg_match('/Strategic: (.*?),/', $logEntry, $matches)) {
+    return "{$matches[1]}, ไม่มีกลยุทธ์";
+    } else {
+    return $logEntry;
+    }
+    }, $logDataIncompleteStrategies);
+
+    foreach ($quarterProjects as $Strategic) {
+    foreach ($Strategic->projects as $project) {
+    $strategyName = $project->Name_Strategy;
+    $strategyProjects = $Strategic->projects->filter(function($p) use ($strategyName) {
+    return $p->Name_Strategy === $strategyName;
+    });
+
+    $allProjectsStatusN = $strategyProjects->every(function($p) {
+    return in_array('N', $p->approvalStatuses) || !isset($p->approvalStatuses);
+    });
+
+    $hasProjectStatusI = $strategyProjects->contains(function($p) {
+    return in_array('I', $p->approvalStatuses);
+    });
+
+    if ($allProjectsStatusN && !$hasProjectStatusI) {
+    $missingStrategies[] = $strategyName;
+    }
+    }
+    }
+
+    $missingStrategies = array_unique($missingStrategies);
+    $allStrategiesComplete = empty($missingStrategies) && empty($logDataIncompleteStrategies);
+    @endphp
+
+    @if($quarterProjects->isNotEmpty())
+    <div class="card mb-4 border-2 {{ $quarterStyle }}">
+        <div class="card-body">
+            <h5 class="card-title">เสนอหาผู้อำนวยการ ปีงบประมาณ {{ $fiscalYear }} ไตรมาส {{ $quarter->Quarter }}</h5>
+
+            @if ($hasIncompleteStrategies || !empty($missingStrategies) || !empty($logDataIncompleteStrategies))
+            <div class="alert alert-warning">
+                <strong>กลยุทธ์ยังไม่ครบสำหรับปีงบประมาณ {{ $fiscalYear }} ไตรมาส {{ $quarter->Quarter }}</strong>
+                <ul>
+                    @if ($hasIncompleteStrategies)
+                    @foreach ($incompleteStrategiesByYear[$fiscalYear] as $strategy)
+                    <li>{{ $strategy }}</li>
+                    @endforeach
+                    @endif
+                    @foreach ($missingStrategies as $strategy)
+                    <li>{{ $strategy }}: ไม่มีกลยุทธ์</li>
+                    @endforeach
+                    @foreach ($logDataIncompleteStrategies as $logEntry)
+                    <li>{{ $logEntry }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @else
+            <div class="alert alert-success">
+                <strong>กลยุทธ์ครบแล้วสำหรับปีงบประมาณ {{ $fiscalYear }} ไตรมาส {{ $quarter->Quarter }}</strong>
+            </div>
+            @endif
+
+            <div class="mb-3">
+                @foreach ($quarterProjects as $Strategic)
+                @php
+                $filteredProjects = $Strategic->projects->filter(function($project) {
+                return $project->Count_Steps == 0;
+                });
+                $filteredProjectCount = $filteredProjects->count();
+                $firstStrategicPlanName = $Strategic->Name_Strategic_Plan;
+
+                // Check for missing strategies
+                $hasStrategies = !$Strategic->strategies->isEmpty();
+                $hasProjects = $filteredProjectCount > 0;
+
+                $totalStrategicBudget = $filteredProjects->sum(function($project) {
+                return $project->projectBudgetSources ? $project->projectBudgetSources->sum('Amount_Total') : 0;
+                });
+                $projectsByStrategy = $filteredProjects->groupBy('Name_Strategy');
+                @endphp
+
+                <details class="accordion" id="{{ $Strategic->Id_Strategic }}">
+                    <summary class="accordion-btn">
+                        <b>
+                            <a>{{ $firstStrategicPlanName }}</a>
+                            @if(!$hasStrategies)
+                            <br><span class="badge bg-danger">ยังไม่มีกลยุทธ์</span>
+                            @elseif(!$hasProjects)
+                            <br><span class="badge bg-warning">มีกลยุทธ์แต่ยังไม่มีโครงการ</span>
+                            <br>กลยุทธ์ที่มี:
+                            <ul class="strategy-list">
+                                @foreach($Strategic->strategies as $strategy)
+                                <li>{{ $strategy->Name_Strategy }}</li>
+                                @endforeach
+                            </ul>
+                            @endif
+                            <br>จำนวนโครงการ : {{ $filteredProjectCount }} โครงการ
+                            <br>งบประมาณรวม: {{ number_format($totalStrategicBudget, 2) }} บาท
+                        </b>
+                    </summary>
+                    @if ($filteredProjectCount > 0)
+                    <div class="accordion-content">
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:10%; text-align: center;">ยุทธศาสตร์ สำนักหอสมุด</th>
+                                    <th style="width:10%; text-align: center;">กลยุทธ์ สำนักหอสมุด</th>
+                                    <th style="width:14%; text-align: center;">โครงการ</th>
+                                    <th style="width:14%; text-align: center;">ตัวชี้วัดความสำเร็จ<br>ของโครงการ</th>
+                                    <th style="width:12%; text-align: center;">ค่าเป้าหมาย</th>
+                                    <th style="width:10%; text-align: center;">งบประมาณ (บาท)</th>
+                                    <th style="width:12%; text-align: center;">ผู้รับผิดชอบ</th>
+                                    <th style="width:18%; text-align: center;">การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($projectsByStrategy as $strategyName => $projects)
+                                @php
+                                $strategyCount = $projects->count();
+                                @endphp
+                                @foreach ($projects as $index => $Project)
+                                @php
+                                $isStatusN = in_array('N', $Project->approvalStatuses);
+                                $isStatusI = in_array('I', $Project->approvalStatuses);
+                                $allProjectsDeleted = $projects->every(function($project) {
+                                return in_array('N', $project->approvalStatuses);
+                                });
+                                @endphp
+                                <tr>
+                                    @if ($index === 0 && $loop->parent->first)
+                                    <td rowspan="{{ $filteredProjectCount }}">{{ $firstStrategicPlanName }}</td>
+                                    @endif
+                                    @if ($index === 0)
+                                    <td class="{{ $allProjectsDeleted ? 'text-gray' : '' }}"
+                                        rowspan="{{ $strategyCount }}">
+                                        {{ $strategyName ?? '-' }}
+                                    </td>
+                                    @endif
+                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
+                                        <b>{{ $Project->Name_Project }}</b><br>
+                                        @foreach($Project->subProjects as $subProject)
+                                        - {{ $subProject->Name_Sup_Project }}<br>
+                                        @endforeach
+                                    </td>
+                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
+                                        {!! $Project->Success_Indicators ? nl2br(e($Project->Success_Indicators)) : '-'
+                                        !!}
+                                    </td>
+                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
+                                        {!! $Project->Value_Target ? nl2br(e($Project->Value_Target)) : '-' !!}
+                                    </td>
+                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
+                                        style="text-align: center;">
+                                        @if($Project->Status_Budget === 'N')
+                                        ไม่ใช้งบประมาณ
+                                        @else
+                                        @php
+                                        $totalBudget = $Project->projectBudgetSources ?
+                                        $Project->projectBudgetSources->sum('Amount_Total') : 0;
+                                        @endphp
+                                        {{ number_format($totalBudget, 2) }}
+                                        @endif
+                                    </td>
+                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
+                                        {{ $Project->employee->Firstname_Employee ?? '-' }}
+                                        {{ $Project->employee->Lastname_Employee ?? '' }}
+                                    </td>
+                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
+                                        style="text-align: center;">
+                                        <a href="{{ route('editProject', ['Id_Project' => $Project->Id_Project, 'sourcePage' => 'proposeProject']) }}"
+                                            class="btn btn-warning btn-sm">แก้ไข</a>
+                                        @if (!$isStatusN || $isStatusI)
+                                        <form
+                                            action="{{ route('projects.updateStatus', ['id' => $Project->Id_Project]) }}"
+                                            method="POST" style="display:inline;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Are you sure you want to update the status of this project?');">ลบ</button>
+                                        </form>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                                @endforeach
+                                <tr class="summary-row">
+                                    <td colspan="2" style="text-align: left; font-weight: bold;">รวมรายได้ทั้งหมด:</td>
+                                    <td colspan="6" style="text-align: center; font-weight: bold;">
+                                        {{ number_format($totalStrategicBudget, 2) }} บาท
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    @else
+                    <div class="accordion-content">
+                        <p>ไม่มีโครงการที่เกี่ยวข้อง</p>
+                    </div>
+                    @endif
+                </details>
+                @endforeach
+            </div>
+
+            <div class="button-container mt-3">
+                <form action="{{ route('projects.submitForAllApproval') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="quarter" value="{{ $quarter->Quarter }}">
+                    <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
+                    @foreach ($quarterProjects as $Strategic)
+                    @foreach ($Strategic->projects as $project)
+                    <input type="hidden" name="project_ids[]" value="{{ $project->Id_Project }}">
+                    @endforeach
+                    @endforeach
+                    <button type="submit" class="btn btn-primary w-full"
+                        {{ $allStrategiesComplete && !$hasStatusN ? '' : 'disabled' }}>
+                        เสนอโครงการทั้งหมด ไตรมาส {{ $quarter->Quarter }}
+                    </button>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+    @endif
+    @endforeach
+    @endforeach
+
 </div>
 
 <script>

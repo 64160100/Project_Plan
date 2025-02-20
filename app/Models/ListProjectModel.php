@@ -51,7 +51,7 @@ class ListProjectModel extends Model
         return $this->hasMany(ApproveModel::class, 'Project_Id', 'Id_Project');
     }
 
-    public function subProjects()
+    public function supProjects()
     {
         return $this->hasMany(SupProjectModel::class, 'Project_Id', 'Id_Project');
     }

@@ -11,6 +11,8 @@ use App\Models\StrategyModel;
 use App\Models\FiscalYearQuarterModel;
 use App\Models\ApproveModel;
 use App\Models\RecordHistory;
+use App\Models\SDGsModel;
+use App\Models\StrategicObjectivesModel;
 use Carbon\Carbon;
 
 class ProposeProjectController extends Controller
@@ -485,5 +487,6 @@ class ProposeProjectController extends Controller
 
         return redirect()->route('proposeProject')->with('success', 'Project status updated successfully.');
     }
+
 
 }

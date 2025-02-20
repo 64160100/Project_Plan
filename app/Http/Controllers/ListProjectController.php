@@ -438,14 +438,6 @@ class ListProjectController extends Controller
         return redirect()->route('project', ['Strategic_Id' => $Strategic_Id])->with('success', 'โครงการถูกสร้างเรียบร้อยแล้ว');
     }
          
-    // public function edit($id, Request $request)
-    // {
-    //     $project = ListProjectModel::with('supProjects')->findOrFail($id);
-    //     $strategies = StrategyModel::all();
-    //     $sdgs = SustainableDevelopmentGoalsModel::all();
-    //     return view('Project.editProject', compact('project', 'strategies', 'sdgs'));
-    // }
-
     public function editProject(Request $request, $Id_Project)
     {
         $project = ListProjectModel::findOrFail($Id_Project);
@@ -561,4 +553,38 @@ class ListProjectController extends Controller
             return redirect()->route('project')->with('success', 'Project updated successfully');
         }
     }
+
+    public function editAllProject($Id_Project, Request $request)
+    {
+        $project = ListProjectModel::findOrFail($Id_Project);
+        $strategics = StrategicModel::with(['strategies.kpis', 'strategies.strategicObjectives', 'projects'])->findOrFail($project->Strategic_Id);
+        $strategies = $strategics->strategies;
+        $projects = $strategics->projects; 
+        $employees = EmployeeModel::all();
+        $sdgs = SDGsModel::all(); 
+        $nameStrategicPlan = $strategics->Name_Strategic_Plan;
+        $integrationCategories = IntegrationModel::orderBy('Id_Integration_Category', 'asc')->get();
+        $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
+        $pdcaStages = PdcaModel::all();
+        $budgetSources = BudgetSourceModel::all();
+        $subtopBudgets = SubtopBudgetModel::all();
+        $kpis = KpiModel::all();
+        $strategicObjectives = StrategicObjectivesModel::all();
+        $sourcePage = $request->input('sourcePage', 'listProject');
+        
+        log::info($project);
+    
+        return view('Project.editBigFormProject', compact('project', 'strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets', 'kpis', 'strategicObjectives', 'sourcePage'));
+    }
+
+    public function resetStatus($id)
+    {
+        $project = ListProjectModel::findOrFail($id);
+        $project->approvals->first()->Status = 'I';
+        $project->approvals->first()->save();
+
+        return redirect()->route('proposeProject')->with('success', 'Project status reset to I successfully.');
+    }
+
+
 }

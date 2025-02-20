@@ -41,6 +41,9 @@ Route::post('/projects/update-status/{id}', [ProposeProjectController::class, 'u
 
 Route::post('/submit-for-all-approval', [ProposeProjectController::class, 'submitForAllApproval'])->name('projects.submitForAllApproval');
 
+Route::get('/project/{id}/edit', [ListProjectController::class, 'editAllProject'])->name('projects.edit');
+
+Route::post('/projects/reset-status/{id}', [ListProjectController::class, 'resetStatus'])->name('projects.resetStatus');
 
 // สร้างชุดโครงการ
 Route::get('/createSetProject', [ProjectBatchController::class, 'createSetProject'])->name('createSetProject');
@@ -61,7 +64,6 @@ Route::match(['get', 'post'],'/editProject/{Id_Project}', [ListProjectController
 Route::put('/editProject/{Id_Project}', [ListProjectController::class, 'updateProject'])->name('updateProject');
 
 // แก้ไขโครงการ
-Route::get('/project/{id}/edit', [ListProjectController::class, 'edit'])->name('projects.edit');
 Route::put('/project/{id}', [ListProjectController::class, 'update'])->name('projects.update');
 Route::get('/project/{Id_Project}', [ProjectController::class, 'viewProject'])->name('viewProject');
 

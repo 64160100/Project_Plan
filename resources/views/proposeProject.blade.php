@@ -185,6 +185,11 @@ Carbon::setLocale('th');
                                         สถานะ: รอการพิจารณาจากผู้บริหาร
                                     </div>
                                     @elseif($project->Count_Steps === 2)
+                                    @if($project->approvals->first()->Status === 'Y')
+                                    <div class="status-text">
+                                        กรอกข้อมูลของโครงการทั้งหมด
+                                    </div>
+                                    @else
                                     @if($project->Status_Budget === 'N')
                                     <div class="status-text">
                                         ขั้นตอนที่ 3: การพิจารณาโดยหัวหน้าฝ่าย
@@ -199,6 +204,7 @@ Carbon::setLocale('th');
                                     <div class="status-text">
                                         ถึง: ฝ่ายการเงินตรวจสอบงบประมาณ
                                     </div>
+                                    @endif
                                     @endif
                                     @elseif($project->Count_Steps === 3)
                                     <div class="status-text">
@@ -320,6 +326,11 @@ Carbon::setLocale('th');
                             </button>
                         </form>
                         @else
+                        @if($project->Count_Steps === 2 && $project->approvals->first()->Status === 'Y')
+                        <a href="{{ route('projects.edit', ['id' => $project->Id_Project ]) }}" class="btn btn-warning">
+                            <i class='bx bx-edit'></i> กลับไปแก้ไขฟอร์ม
+                        </a>
+                        @else
                         <form action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
                             method="POST" style="display:inline;">
                             @csrf
@@ -328,16 +339,13 @@ Carbon::setLocale('th');
                             </button>
                         </form>
                         @endif
+                        @endif
                         @elseif($project->Count_Steps === 9)
                         <form action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
                             method="POST" style="display:inline;">
                             @csrf
                             <button type="submit" class="btn btn-secondary">สิ้นสุดโครงการ</button>
                         </form>
-                        @elseif($project->approvals->first()->Status === 'N')
-                        <a href="{{ route('projects.edit', ['id' => $project->Id_Project ]) }}" class="btn btn-warning">
-                            <i class='bx bx-edit'></i> กลับไปแก้ไขฟอร์ม
-                        </a>
                         @else
                         <button type="button" class="btn btn-secondary" disabled>
                             <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
@@ -614,7 +622,7 @@ Carbon::setLocale('th');
                     </button>
                 </form>
             </div>
-            
+
         </div>
     </div>
     @endif

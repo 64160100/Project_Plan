@@ -14,7 +14,6 @@
                 class="needs-validation" novalidate>
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="sourcePage" value="{{ $sourcePage }}">
 
 
                 <!-- ความสอดคล้องกับยุทธศาสตร์ส่วนงาน -->

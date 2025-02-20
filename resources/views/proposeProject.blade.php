@@ -542,12 +542,7 @@ Carbon::setLocale('th');
                                         {{ $strategyName ?? '-' }}
                                     </td>
                                     @endif
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        <b>{{ $Project->Name_Project }}</b><br>
-                                        @foreach($Project->subProjects as $subProject)
-                                        - {{ $subProject->Name_Sup_Project }}<br>
-                                        @endforeach
-                                    </td>
+
                                     <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
                                         {!! $Project->Success_Indicators ? nl2br(e($Project->Success_Indicators)) : '-'
                                         !!}

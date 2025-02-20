@@ -586,5 +586,17 @@ class ListProjectController extends Controller
         return redirect()->route('proposeProject')->with('success', 'Project status reset to I successfully.');
     }
 
+    public function updateField(Request $request)
+    {
+        $project = ListProjectModel::findOrFail($request->id);
+        $field = $request->field;
+        $value = $request->value;
+
+        $project->$field = $value;
+        $project->save();
+
+        return response()->json(['success' => true]);
+    }
+
 
 }

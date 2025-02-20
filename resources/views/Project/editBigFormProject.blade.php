@@ -2,6 +2,31 @@
 
 <hade>
     <link rel="stylesheet" href="{{ asset('css/createProject.css') }}">
+
+    <style>
+    .editable {
+        border: 1px solid transparent;
+        padding: 5px;
+        cursor: pointer;
+        transition: border-color 0.3s, background-color 0.3s;
+    }
+
+    .editable:hover {
+        border-color: #ccc;
+        background-color: #f9f9f9;
+    }
+
+    .editable:focus {
+        outline: none;
+        border-color: #007bff;
+        background-color: #e9f7ff;
+    }
+
+    .editable.editing {
+        border-color: #007bff;
+        background-color: #e9f7ff;
+    }
+    </style>
 </hade>
 
 @section('content')
@@ -24,9 +49,12 @@
                     <div id="projectDetails">
                         <div class="form-group">
                             <label for="Name_Project" class="form-label">สร้างชื่อโครงการ</label>
-                            <input type="text" class="form-control @error('Name_Project') is-invalid @enderror"
-                                id="Name_Project" name="Name_Project" placeholder="กรอกชื่อโครงการ"
-                                value="{{ $project->Name_Project }}" required>
+                            <div class="editable" style="border: 1px solid #007bff; padding: px; border-radius: 5px;"
+                                contenteditable="true"
+                                onblur="saveData(this, '{{ $project->Id_Project }}', 'Name_Project')"
+                                onkeypress="checkEnter(event, this)">
+                                {{ $project->Name_Project }}
+                            </div>
                             @error('Name_Project')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -51,7 +79,7 @@
                         </h4>
                     </div>
                     <div class="form-group-radio">
-                        <div class=" radio-item">
+                        <div class="radio-item">
                             <input type="radio" name="projectType" value="1" id="newProject"
                                 onchange="toggleTextbox(this, 'textbox-projectType-')" checked>
                             <label for="newProject">โครงการใหม่</label>
@@ -63,7 +91,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <input type=" text" id="textbox-projectType-2" class="hidden form-control"
+                        <input type="text" id="textbox-projectType-2" class="hidden form-control"
                             data-group="projectType" placeholder="กรอกชื่อโครงการเดิม">
                     </div>
                 </div>
@@ -103,18 +131,18 @@
                         </h4>
                     </div>
                     <div id="strategicDetails">
-                        <div id=" platform-container">
+                        <div id="platform-container">
                             <div class="platform-card">
                                 <div class="card-header">
                                     <h3 class="card-title">แพลตฟอร์มที่ 1</h3>
-                                    <button type="button" class="btn btn-danger" onclick="removePlatform(this)" ">
+                                    <button type="button" class="btn btn-danger" onclick="removePlatform(this)">
                                         <i class='bx bx-trash'></i> ลบแพลตฟอร์ม
                                     </button>
                                 </div>
-                                <div class=" form-group">
-                                        <label class="form-label">ชื่อแพลตฟอร์ม</label>
-                                        <input type="text" name="platforms[0][name]" class="form-control"
-                                            placeholder="กรุณากรอกชื่อแพลตฟอร์ม" required>
+                                <div class="form-group">
+                                    <label class="form-label">ชื่อแพลตฟอร์ม</label>
+                                    <input type="text" name="platforms[0][name]" class="form-control"
+                                        placeholder="กรุณากรอกชื่อแพลตฟอร์ม" required>
                                 </div>
 
                                 <div class="form-group">
@@ -133,7 +161,7 @@
                                         <div class="input-group">
                                             <input type="text" name="platforms[0][kpis][]" class="form-control"
                                                 placeholder="กรุณากรอก KPI" required>
-                                            <button type="button" class="btn btn-danger" onclick="removeKpi(this)" ">
+                                            <button type="button" class="btn btn-danger" onclick="removeKpi(this)">
                                                 <i class='bx bx-trash'></i>
                                             </button>
                                         </div>
@@ -142,694 +170,625 @@
                             </div>
                         </div>
                     </div>
-                        <button type=" button" class="btn-add" onclick="addPlatform()">เพิ่มแพลตฟอร์ม</button>
+                    <button type="button" class="btn-add" onclick="addPlatform()">เพิ่มแพลตฟอร์ม</button>
+                </div>
 
+                <!-- ความสอดคล้องกับยุทธศาสตร์ส่วนงาน -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            5. ความสอดคล้องกับยุทธศาสตร์ส่วนงาน
+                        </h4>
+                    </div>
+                    <div id="departmentStrategicDetails">
+                        <div class=" mb-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="Name_Strategic_Plan" class="form-label">ชื่อแผนยุทธศาสตร์</label>
+                                <input type="text" class="form-control" id="Name_Strategic_Plan"
+                                    name="Name_Strategic_Plan" value="{{ $nameStrategicPlan }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="Name_Strategy" class="form-label">กลยุทธ์</label>
+                                <select class="form-select @error('Name_Strategy') is-invalid @enderror"
+                                    name="Name_Strategy" id="Name_Strategy" required>
+                                    <option value="" selected disabled>เลือกกลยุทธ์</option>
+                                    @if($strategies->isNotEmpty())
+                                    @foreach($strategies as $strategy)
+                                    <option value="{{ $strategy->Name_Strategy }}">
+                                        {{ $strategy->Name_Strategy }}
+                                    </option>
+                                    @endforeach
+                                    @else
+                                    <option value="" disabled>ไม่มีกลยุทธ์ที่เกี่ยวข้อง
+                                    </option>
+                                    @endif
+                                </select>
+                                @error('Name_Strategy')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                                            <!-- ความสอดคล้องกับยุทธศาสตร์ส่วนงาน -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        5. ความสอดคล้องกับยุทธศาสตร์ส่วนงาน
-                                                    </h4>
+                <!-- SDGs -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            6. ความสอดคล้องกับ (SDGs)
+                        </h4>
+                    </div>
+                    <div id="sdgsDetails">
+                        <div class=" sdgs-grid">
+                            @foreach ($sdgs as $sdg)
+                            <div class="form-group-sdgs">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="sdgs[]"
+                                        value="{{ $sdg->id_SDGs }}" id="sdg_{{ $sdg->id_SDGs }}">
+                                    <label class="form-check-label"
+                                        for="sdg_{{ $sdg->id_SDGs }}">{{ $sdg->Name_SDGs }}</label>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <!-- การบูรณาการงานโครงการ -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            7. การบูรณาการงานโครงการ/กิจกรรม
+                        </h4>
+                    </div>
+                    <div id="integrationDetails">
+                        <div class=" dropdown-container">
+                            <div class="dropdown-options">
+                                @foreach ($integrationCategories as $category)
+                                <div class="option-item">
+                                    <label>
+                                        <input type="checkbox"
+                                            name="integrationCategories[{{ $category->Id_Integration_Category }}][checked]"
+                                            onchange="toggleSelectTextbox(this)">
+                                        {{ $category->Name_Integration_Category }}
+                                    </label>
+                                    @if ($category->Name_Integration_Category !==
+                                    'การบริการสารสนเทศ')
+                                    <input type="text" class="additional-info"
+                                        name="integrationCategories[{{ $category->Id_Integration_Category }}][details]"
+                                        placeholder="ระบุข้อมูลเพิ่มเติม" disabled style="width: 100%;">
+                                    @endif
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- หลักการและเหตุผล -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            8. หลักการและเหตุผล
+                        </h4>
+                    </div>
+                    <div id="rationaleDetails">
+                        <div class="form-group">
+                            <textarea class="form-control @error('Principles_Reasons') is-invalid @enderror" rows="15"
+                                name="Principles_Reasons" placeholder="กรอกข้อมูล"></textarea>
+                            @error('Principles_Reasons')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <!-- วัตถุประสงค์โครงการ -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            9. วัตถุประสงค์โครงการ
+                        </h4>
+                    </div>
+                    <div id="objectiveDetails">
+                        <div class="form-group">
+                            <textarea class="form-control @error('Objective_Project') is-invalid @enderror"
+                                id="Objective_Project" name="Objective_Project" rows="15" placeholder="กรอกข้อมูล"
+                                required></textarea>
+                            @error('Objective_Project')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        @include('Project.App.ProjectObjective')
+                    </div>
+                </div>
+
+                <!-- กลุ่มเป้าหมาย -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            10. กลุ่มเป้าหมาย
+                        </h4>
+                    </div>
+                    <div id="targetGroupDetails">
+                        <div id="targetGroupContainer">
+                            <div class="target-group-item">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text" name="target_group[]" class="form-control"
+                                            placeholder="กรอกกลุ่มเป้าหมาย" required>
+                                        <input type="number" name="target_count[]" class="form-control"
+                                            placeholder="จำนวน" required>
+                                        <input type="text" name="target_unit[]" class="form-control" placeholder="หน่วย"
+                                            required>
+                                        <button type="button" class="btn btn-danger btn-sm remove-target-group">
+                                            <i class='bx bx-trash'></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="addTargetGroupBtn" class="btn-addlist">
+                            <i class='bx bx-plus-circle'></i>เพิ่มกลุ่มเป้าหมาย
+                        </button>
+
+                        <div class="form-group mt-3">
+                            <label>พื้นที่/ชุมชนเป้าหมาย (ถ้ามี ระบุ)</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="targetAreaCheckbox"
+                                    onchange="toggleTargetAreaDetails()">
+                                <label class="form-check-label"
+                                    for="targetAreaCheckbox">เลือกพื้นที่/ชุมชนเป้าหมาย</label>
+                            </div>
+                            <div id="targetAreaDetails">
+                                <div class="form-group mt-3">
+                                    <label>รายละเอียดกลุ่มเป้าหมาย</label>
+                                    <textarea class="form-control" name="target_details"
+                                        placeholder="กรอกรายละเอียด"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- สถานที่ -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            11. สถานที่ดำเนินงาน
+                        </h4>
+                    </div>
+                    <div id="locationDetails">
+                        <div id="locationContainer">
+                            <div class="form-group location-item">
+                                <input type="text" class="form-control small-input" name="location[]"
+                                    placeholder="กรอกสถานที่">
+                                <button type="button" class="btn btn-danger btn-sm remove-location">
+                                    <i class='bx bx-trash'></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" id="addLocationBtn" class="btn-addlist">
+                            <i class='bx bx-plus-circle'></i>เพิ่มสถานที่
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ตัวชี้วัด -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            12. ตัวชี้วัด
+                        </h4>
+                    </div>
+                    <div id="indicatorsDetails">
+                        <div class="form-group-radio mt-3">
+                            <div class="radio-group">
+                                <input type="checkbox" name="goal[]" value="1" id="quantitative"
+                                    onchange="toggleGoalInputs(this)">
+                                <label for="quantitative">เชิงปริมาณ</label>
+
+                                <input type="checkbox" name="goal[]" value="2" id="qualitative"
+                                    onchange="toggleGoalInputs(this)">
+                                <label for="qualitative">เชิงคุณภาพ</label>
+                            </div>
+                        </div>
+                        <div id="quantitative-inputs" class="goal-inputs">
+                            <h6>เชิงปริมาณ</h6>
+                            <div id="quantitative-items" class="mt-3">
+                                <div class="form-group mt-2">
+                                    <label>ข้อที่ 1</label>
+                                    <input type="text" class="form-control" name="quantitative[]"
+                                        placeholder="เพิ่มรายการ">
+                                    <button type="button" class="btn btn-danger btn-sm remove-quantitative-item mt-2">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-addlist" onclick="addQuantitativeItem()">
+                                <i class='bx bx-plus-circle'></i>เพิ่มรายการ
+                            </button>
+                        </div>
+                        <div id="qualitative-inputs" class="goal-inputs">
+                            <h6>เชิงคุณภาพ</h6>
+                            <div id="qualitative-items" class="mt-3">
+                                <div class="form-group mt-2">
+                                    <label>ข้อที่ 1</label>
+                                    <input type="text" class="form-control" name="qualitative[]"
+                                        placeholder="เพิ่มข้อความ">
+                                    <button type="button" class="btn btn-danger btn-sm remove-qualitative-item mt-2">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-addlist" onclick="addQualitativeItem()">
+                                <i class='bx bx-plus-circle'></i>เพิ่มรายการ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ระยะเวลาดำเนินโครงการ -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            13. ระยะเวลาดำเนินโครงการ
+                        </h4>
+                    </div>
+                    <div id="projectDurationDetails">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="First_Time">วันที่เริ่มต้น:</label>
+                                    <input type="date" class="form-control" id="First_Time" name="First_Time" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="End_Time">วันที่สิ้นสุด:</label>
+                                    <input type="date" class="form-control" id="End_Time" name="End_Time" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ขั้นตอนและแผนการดำเนินงาน -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            14. ขั้นตอนและแผนการดำเนินงาน (PDCA)
+                        </h4>
+                    </div>
+                    <div id="planDetails">
+                        <div class="form-group-radio mb-4">
+                            <input type="radio" name="Project_Type" value="S" id="shortTermProject" checked>
+                            <label for="shortTermProject">โครงการระยะสั้น</label>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="Project_Type" value="L" id="longTermProject">
+                            <label for="longTermProject">โครงการระยะยาว</label>
+                        </div>
+
+                        <!-- วิธีการดำเนินงาน -->
+                        <div id="textbox-planType-1" data-group="planType">
+                            <div class="method-form">
+                                <div class="form-label">วิธีการดำเนินงาน</div>
+                                <div id="methodContainer" class="method-items">
+                                    <div class="form-group mt-2">
+                                        <input type="text" class="form-control" name="Details_Short_Project[]"
+                                            placeholder="เพิ่มรายการ">
+                                        <button type="button" class="btn btn-danger btn-sm remove-method mt-2">
+                                            <i class='bx bx-trash'></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-addlist" onclick="addMethodItem()">
+                                    <i class='bx bx-plus-circle'></i>เพิ่มรายการ
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="textbox-planType-2" class="hidden" data-group="planType">
+                            <table class="table-PDCA">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2">กิจกรรมและแผนการเบิกจ่ายงบประมาณ
+                                        </th>
+                                        <th colspan="12">ปีงบประมาณ พ.ศ. 2567</th>
+                                    </tr>
+                                    <tr>
+                                        @foreach($months as $month)
+                                        <th>{{ $month }}</th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($pdcaStages as $stage)
+                                    <tr>
+                                        <td class="PDCA">
+                                            <div class="plan-text">{{ $stage->Name_PDCA }}
+                                            </div>
+                                            <textarea class="plan-textarea auto-expand"
+                                                name="pdca[{{ $stage->Id_PDCA_Stages }}][detail]"
+                                                placeholder="เพิ่มรายละเอียด"></textarea>
+                                        </td>
+                                        @for($i = 1; $i <= 12; $i++) <td class="checkbox-container">
+                                            <input type="checkbox" name="pdca[{{ $stage->Id_PDCA_Stages }}][months][]"
+                                                value="{{ $i }}">
+                                            </td>
+                                            @endfor
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- แหล่งงบประมาณ -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            15. แหล่งงบประมาณ
+                        </h4>
+                    </div>
+                    <div id="budgetDetails">
+                        <div class="form-group-radio">
+                            <label>ประเภทโครงการ</label>
+                            <div class="radio-group">
+                                <input type="radio" name="Status_Budget" value="N" id="non_income"
+                                    onchange="toggleIncomeForm(this)" checked>
+                                <label for="non_income">ไม่แสวงหารายได้</label>
+
+                                <input type="radio" name="Status_Budget" value="Y" id="income_seeking"
+                                    onchange="toggleIncomeForm(this)">
+                                <label for="income_seeking">แสวงหารายได้</label>
+                            </div>
+                        </div>
+
+                        <div id="incomeForm" class="income-form">
+                            <div class="form-group">
+                                <label>แหล่งงบประมาณ</label>
+                                <div class="mb-4">
+                                    @foreach($budgetSources as $source)
+                                    <div class="form-check mb-2 d-flex align-items-center">
+                                        <input type="radio" id="{{ $source->Id_Budget_Source }}" name="budget_source"
+                                            value="{{ $source->Id_Budget_Source }}" class="form-check-input"
+                                            data-id="{{ $source->Id_Budget_Source }}"
+                                            onchange="handleSourceSelect(this)">
+                                        <label class="form-check-label d-flex align-items-center w-100"
+                                            for="{{ $source->Id_Budget_Source }}">
+                                            <span class="label-text">{{ $source->Name_Budget_Source }}</span>
+                                            <input type="number" name="amount_{{ $source->Id_Budget_Source }}"
+                                                class="form-control form-control-sm w-25 ml-2" placeholder="จำนวนเงิน"
+                                                disabled>
+                                            <span class="ml-2">บาท</span>
+                                        </label>
+                                    </div>
+                                    @endforeach
+                                </div>
+
+                                <!-- รายละเอียดการเบิกจ่าย -->
+                                <div id="sourceDetailForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">รายละเอียดค่าใช้จ่าย</label>
+                                        <textarea name="source_detail" class="form-control"
+                                            placeholder="ระบุรายละเอียดค่าใช้จ่าย"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-radio">
+                                    <label>กรอกแบบฟอร์มงบประมาณ</label>
+                                    <div class="radio-group">
+                                        <input type="radio" name="fill_budget_form" value="yes" id="fill_yes"
+                                            onchange="toggleBudgetForm(this)">
+                                        <label for="fill_yes">กรอกแบบฟอร์มงบประมาณ</label>
+
+                                        <input type="radio" name="fill_budget_form" value="no" id="fill_no"
+                                            onchange="toggleBudgetForm(this)" checked>
+                                        <label for="fill_no">ไม่กรอกแบบฟอร์มงบประมาณ</label>
+                                    </div>
+                                </div>
+
+                                <!-- แบบฟอร์มงบประมาณ -->
+                                <div id="budgetFormsContainer">
+                                    <div id="budgetFormTemplate" class="budget-form card mb-3">
+                                        <div class="card-body">
+                                            <h5>แบบฟอร์มที่ 1</h5>
+                                            <button type="button" class="btn btn-danger btn-sm remove-form-btn"
+                                                onclick="removeBudgetForm(this)">ลบแบบฟอร์ม</button>
+                                            <div class="mb-3 d-flex align-items-center">
+                                                <div style="flex: 3;">
+                                                    <label class="form-label">หัวข้อใหญ่</label>
+                                                    <textarea name="activity[]" class="form-control"
+                                                        placeholder="เช่น กิจกรรมการประชุมคณะกรรมการและอนุกรรมการ"></textarea>
                                                 </div>
-                                                <div id="departmentStrategicDetails">
-                                                    <div class=" mb-3 col-md-6">
-                                                        <div class="mb-3">
-                                                            <label for="Name_Strategic_Plan"
-                                                                class="form-label">ชื่อแผนยุทธศาสตร์</label>
-                                                            <input type="text" class="form-control"
-                                                                id="Name_Strategic_Plan" name="Name_Strategic_Plan"
-                                                                value="{{ $nameStrategicPlan }}" readonly>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label for="Name_Strategy"
-                                                                class="form-label">กลยุทธ์</label>
-                                                            <select
-                                                                class="form-select @error('Name_Strategy') is-invalid @enderror"
-                                                                name="Name_Strategy" id="Name_Strategy" required>
-                                                                <option value="" selected disabled>เลือกกลยุทธ์</option>
-                                                                @if($strategies->isNotEmpty())
-                                                                @foreach($strategies as $strategy)
-                                                                <option value="{{ $strategy->Name_Strategy }}">
-                                                                    {{ $strategy->Name_Strategy }}
-                                                                </option>
-                                                                @endforeach
-                                                                @else
-                                                                <option value="" disabled>ไม่มีกลยุทธ์ที่เกี่ยวข้อง
-                                                                </option>
-                                                                @endif
-                                                            </select>
-                                                            @error('Name_Strategy')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
+                                                <div style="flex: 1; margin-left: 1rem;">
+                                                    <label class="form-label">จำนวนเงินทั้งหมด</label>
+                                                    <div class="input-group">
+                                                        <input type="number" name="total_amount[]" class="form-control"
+                                                            placeholder="จำนวนเงิน">
+                                                        <span class="input-group-text">บาท</span>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <!-- SDGs -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        6. ความสอดคล้องกับ (SDGs)
-                                                    </h4>
-                                                </div>
-                                                <div id="sdgsDetails">
-                                                    <div class=" sdgs-grid">
-                                                        @foreach ($sdgs as $sdg)
-                                                        <div class="form-group-sdgs">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                    name="sdgs[]" value="{{ $sdg->id_SDGs }}"
-                                                                    id="sdg_{{ $sdg->id_SDGs }}">
-                                                                <label class="form-check-label"
-                                                                    for="sdg_{{ $sdg->id_SDGs }}">{{ $sdg->Name_SDGs }}</label>
-                                                            </div>
-                                                        </div>
+                                            <div id="subActivityContainer">
+                                                <div class="sub-activity mb-3">
+                                                    <label class="form-label">หัวข้อย่อย</label>
+                                                    <select name="subActivity[0][]" class="form-control">
+                                                        <option value="" disabled selected>
+                                                            เลือกหัวข้อย่อย</option>
+                                                        @foreach($subtopBudgets as $subtop)
+                                                        <option value="{{ $subtop->Id_Subtopic_Budget }}">
+                                                            {{ $subtop->Name_Subtopic_Budget }}
+                                                        </option>
                                                         @endforeach
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- การบูรณาการงานโครงการ -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        7. การบูรณาการงานโครงการ/กิจกรรม
-                                                    </h4>
-                                                </div>
-                                                <div id="integrationDetails">
-                                                    <div class=" dropdown-container">
-                                                        <div class="dropdown-options">
-                                                            @foreach ($integrationCategories as $category)
-                                                            <div class="option-item">
-                                                                <label>
-                                                                    <input type="checkbox"
-                                                                        name="integrationCategories[{{ $category->Id_Integration_Category }}][checked]"
-                                                                        onchange="toggleSelectTextbox(this)">
-                                                                    {{ $category->Name_Integration_Category }}
-                                                                </label>
-                                                                @if ($category->Name_Integration_Category !==
-                                                                'การบริการสารสนเทศ')
-                                                                <input type="text" class="additional-info"
-                                                                    name="integrationCategories[{{ $category->Id_Integration_Category }}][details]"
-                                                                    placeholder="ระบุข้อมูลเพิ่มเติม" disabled
-                                                                    style="width: 100%;">
-                                                                @endif
+                                                    </select>
+                                                    <div class="detailsContainer">
+                                                        <div class="mb-3 d-flex align-items-center detail-item">
+                                                            <div style="flex: 3;">
+                                                                <label class="form-label">รายละเอียด</label>
+                                                                <textarea name="description[0][]" class="form-control"
+                                                                    placeholder="เช่น ค่าอาหารว่างสำหรับการจัดประชุมคณะกรรมการจัดการความรู้"></textarea>
                                                             </div>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- หลักการและเหตุผล -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        8. หลักการและเหตุผล
-                                                    </h4>
-                                                </div>
-                                                <div id="rationaleDetails">
-                                                    <div class="form-group">
-                                                        <textarea
-                                                            class="form-control @error('Principles_Reasons') is-invalid @enderror"
-                                                            rows="15" name="Principles_Reasons"
-                                                            placeholder="กรอกข้อมูล"></textarea>
-                                                        @error('Principles_Reasons')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- วัตถุประสงค์โครงการ -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        9. วัตถุประสงค์โครงการ
-                                                    </h4>
-                                                </div>
-                                                <div id="objectiveDetails">
-                                                    <div class="form-group">
-                                                        <textarea
-                                                            class="form-control @error('Objective_Project') is-invalid @enderror"
-                                                            id="Objective_Project" name="Objective_Project" rows="15"
-                                                            placeholder="กรอกข้อมูล" required></textarea>
-                                                        @error('Objective_Project')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    @include('Project.App.ProjectObjective')
-                                                </div>
-                                            </div>
-
-                                            <!-- กลุ่มเป้าหมาย -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        10. กลุ่มเป้าหมาย
-                                                    </h4>
-                                                </div>
-                                                <div id="targetGroupDetails">
-                                                    <div id="targetGroupContainer">
-                                                        <div class="target-group-item">
-                                                            <div class="form-group">
+                                                            <div style="flex: 1; margin-left: 1rem;">
+                                                                <label class="form-label">จำนวนเงิน</label>
                                                                 <div class="input-group">
-                                                                    <input type="text" name="target_group[]"
-                                                                        class="form-control"
-                                                                        placeholder="กรอกกลุ่มเป้าหมาย" required>
-                                                                    <input type="number" name="target_count[]"
-                                                                        class="form-control" placeholder="จำนวน"
-                                                                        required>
-                                                                    <input type="text" name="target_unit[]"
-                                                                        class="form-control" placeholder="หน่วย"
-                                                                        required>
-                                                                    <button type="button"
-                                                                        class="btn btn-danger btn-sm remove-target-group">
-                                                                        <i class='bx bx-trash'></i>
-                                                                    </button>
+                                                                    <input type="number" name="amount[0][]"
+                                                                        class="form-control" placeholder="880">
+                                                                    <span class="input-group-text">บาท</span>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" id="addTargetGroupBtn" class="btn-addlist">
-                                                        <i class='bx bx-plus-circle'></i>เพิ่มกลุ่มเป้าหมาย
-                                                    </button>
-
-                                                    <div class="form-group mt-3">
-                                                        <label>พื้นที่/ชุมชนเป้าหมาย (ถ้ามี ระบุ)</label>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                id="targetAreaCheckbox"
-                                                                onchange="toggleTargetAreaDetails()">
-                                                            <label class="form-check-label"
-                                                                for="targetAreaCheckbox">เลือกพื้นที่/ชุมชนเป้าหมาย</label>
-                                                        </div>
-                                                        <div id="targetAreaDetails">
-                                                            <div class="form-group mt-3">
-                                                                <label>รายละเอียดกลุ่มเป้าหมาย</label>
-                                                                <textarea class="form-control" name="target_details"
-                                                                    placeholder="กรอกรายละเอียด"></textarea>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- สถานที่ -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        11. สถานที่ดำเนินงาน
-                                                    </h4>
-                                                </div>
-                                                <div id="locationDetails">
-                                                    <div id="locationContainer">
-                                                        <div class="form-group location-item">
-                                                            <input type="text" class="form-control small-input"
-                                                                name="location[]" placeholder="กรอกสถานที่">
                                                             <button type="button"
-                                                                class="btn btn-danger btn-sm remove-location">
-                                                                <i class='bx bx-trash'></i>
-                                                            </button>
+                                                                class="btn btn-danger btn-sm ml-2 remove-btn"
+                                                                onclick="removeDetail(this)">ลบ</button>
                                                         </div>
                                                     </div>
-                                                    <button type="button" id="addLocationBtn" class="btn-addlist">
-                                                        <i class='bx bx-plus-circle'></i>เพิ่มสถานที่
-                                                    </button>
+                                                    <button type="button" class="btn btn-success btn-sm"
+                                                        onclick="addDetail(this)">เพิ่มรายละเอียด</button>
                                                 </div>
                                             </div>
+                                            <button type="button" class="btn btn-secondary btn-sm"
+                                                onclick="addSubActivity(this)">เพิ่มหัวข้อย่อย</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm"
+                                    onclick="addBudgetForm()">เพิ่มแบบฟอร์ม</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                                            <!-- ตัวชี้วัด -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        12. ตัวชี้วัด
-                                                    </h4>
-                                                </div>
-                                                <div id="indicatorsDetails">
-                                                    <div class="form-group-radio mt-3">
-                                                        <div class="radio-group">
-                                                            <input type="checkbox" name="goal[]" value="1"
-                                                                id="quantitative" onchange="toggleGoalInputs(this)">
-                                                            <label for="quantitative">เชิงปริมาณ</label>
 
-                                                            <input type="checkbox" name="goal[]" value="2"
-                                                                id="qualitative" onchange="toggleGoalInputs(this)">
-                                                            <label for="qualitative">เชิงคุณภาพ</label>
-                                                        </div>
-                                                    </div>
-                                                    <div id="quantitative-inputs" class="goal-inputs">
-                                                        <h6>เชิงปริมาณ</h6>
-                                                        <div id="quantitative-items" class="mt-3">
-                                                            <div class="form-group mt-2">
-                                                                <label>ข้อที่ 1</label>
-                                                                <input type="text" class="form-control"
-                                                                    name="quantitative[]" placeholder="เพิ่มรายการ">
-                                                                <button type="button"
-                                                                    class="btn btn-danger btn-sm remove-quantitative-item mt-2">
-                                                                    <i class='bx bx-trash'></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <button type="button" class="btn-addlist"
-                                                            onclick="addQuantitativeItem()">
-                                                            <i class='bx bx-plus-circle'></i>เพิ่มรายการ
-                                                        </button>
-                                                    </div>
-                                                    <div id="qualitative-inputs" class="goal-inputs">
-                                                        <h6>เชิงคุณภาพ</h6>
-                                                        <div id="qualitative-items" class="mt-3">
-                                                            <div class="form-group mt-2">
-                                                                <label>ข้อที่ 1</label>
-                                                                <input type="text" class="form-control"
-                                                                    name="qualitative[]" placeholder="เพิ่มข้อความ">
-                                                                <button type="button"
-                                                                    class="btn btn-danger btn-sm remove-qualitative-item mt-2">
-                                                                    <i class='bx bx-trash'></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <button type="button" class="btn-addlist"
-                                                            onclick="addQualitativeItem()">
-                                                            <i class='bx bx-plus-circle'></i>เพิ่มรายการ
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                <!-- Output -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            16. เป้าหมายเชิงผลผลิต (Output)
+                        </h4>
+                    </div>
+                    <div id="outputDetails">
+                        <div id="outputContainer" class="dynamic-container">
+                            <div class="form-group mt-2">
+                                <input type="text" class="form-control" name="outputs[]" placeholder="เพิ่มรายการ">
+                                <button type="button" class="btn btn-danger btn-sm remove-field mt-2">
+                                    <i class='bx bx-trash'></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-addlist" onclick="addField('outputContainer', 'outputs[]')">
+                            <i class='bx bx-plus-circle'></i>เพิ่มรายการ
+                        </button>
+                    </div>
+                </div>
 
-                                            <!-- ระยะเวลาดำเนินโครงการ -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        13. ระยะเวลาดำเนินโครงการ
-                                                    </h4>
-                                                </div>
-                                                <div id="projectDurationDetails">
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="First_Time">วันที่เริ่มต้น:</label>
-                                                                <input type="date" class="form-control" id="First_Time"
-                                                                    name="First_Time" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="End_Time">วันที่สิ้นสุด:</label>
-                                                                <input type="date" class="form-control" id="End_Time"
-                                                                    name="End_Time" required>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                <!-- Outcome -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            17. เป้าหมายเชิงผลลัพธ์ (Outcome)
+                        </h4>
+                    </div>
+                    <div id="outcomeDetails">
+                        <div id="outcomeContainer" class="dynamic-container">
+                            <div class="form-group mt-2">
+                                <input type="text" class="form-control" name="outcomes[]" placeholder="เพิ่มรายการ">
+                                <button type="button" class="btn btn-danger btn-sm remove-field mt-2">
+                                    <i class='bx bx-trash'></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-addlist" onclick="addField('outcomeContainer', 'outcomes[]')">
+                            <i class='bx bx-plus-circle'></i>เพิ่มรายการ
+                        </button>
+                    </div>
+                </div>
 
-                                            <!-- ขั้นตอนและแผนการดำเนินงาน -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        14. ขั้นตอนและแผนการดำเนินงาน (PDCA)
-                                                    </h4>
-                                                </div>
-                                                <div id="planDetails">
-                                                    <div class="form-group-radio mb-4">
-                                                        <input type="radio" name="Project_Type" value="S"
-                                                            id="shortTermProject" checked>
-                                                        <label for="shortTermProject">โครงการระยะสั้น</label>
-                                                        &nbsp;&nbsp;
-                                                        <input type="radio" name="Project_Type" value="L"
-                                                            id="longTermProject">
-                                                        <label for="longTermProject">โครงการระยะยาว</label>
-                                                    </div>
+                <!-- ผลที่คาดว่าจะได้รับ -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            18. ผลที่คาดว่าจะได้รับ
+                        </h4>
+                    </div>
+                    <div id="resultDetails">
+                        <div id="resultContainer" class="dynamic-container">
+                            <div class="form-group mt-2">
+                                <input type="text" class="form-control" name="expected_results[]"
+                                    placeholder="เพิ่มรายการ">
+                                <button type="button" class="btn btn-danger btn-sm remove-field mt-2">
+                                    <i class='bx bx-trash'></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-addlist"
+                            onclick="addField('resultContainer', 'expected_results[]')">
+                            <i class='bx bx-plus-circle'></i>เพิ่มรายการ
+                        </button>
+                    </div>
+                </div>
 
-                                                    <!-- วิธีการดำเนินงาน -->
-                                                    <div id="textbox-planType-1" data-group="planType">
-                                                        <div class="method-form">
-                                                            <div class="form-label">วิธีการดำเนินงาน</div>
-                                                            <div id="methodContainer" class="method-items">
-                                                                <div class="form-group mt-2">
-                                                                    <input type="text" class="form-control"
-                                                                        name="Details_Short_Project[]"
-                                                                        placeholder="เพิ่มรายการ">
-                                                                    <button type="button"
-                                                                        class="btn btn-danger btn-sm remove-method mt-2">
-                                                                        <i class='bx bx-trash'></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                            <button type="button" class="btn-addlist"
-                                                                onclick="addMethodItem()">
-                                                                <i class='bx bx-plus-circle'></i>เพิ่มรายการ
-                                                            </button>
-                                                        </div>
-                                                    </div>
+                <!-- ตัวชี้วัดความสำเร็จของโครงการ -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            19. ตัวชี้วัดความสำเร็จของโครงการ
+                        </h4>
+                    </div>
+                    <div id="successIndicatorsDetails">
+                        <div class="form-group">
+                            <label for="Success_Indicators"></label>
+                            <textarea class="form-control @error('Success_Indicators') is-invalid @enderror"
+                                id="Success_Indicators" name="Success_Indicators" rows="4"
+                                placeholder="กรอกตัวชี้วัดความสำเร็จของโครงการ">{{ old('Success_Indicators') }}</textarea>
+                            @error('Success_Indicators')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
 
-                                                    <div id="textbox-planType-2" class="hidden" data-group="planType">
-                                                        <table class="table-PDCA">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th rowspan="2">กิจกรรมและแผนการเบิกจ่ายงบประมาณ
-                                                                    </th>
-                                                                    <th colspan="12">ปีงบประมาณ พ.ศ. 2567</th>
-                                                                </tr>
-                                                                <tr>
-                                                                    @foreach($months as $month)
-                                                                    <th>{{ $month }}</th>
-                                                                    @endforeach
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach($pdcaStages as $stage)
-                                                                <tr>
-                                                                    <td class="PDCA">
-                                                                        <div class="plan-text">{{ $stage->Name_PDCA }}
-                                                                        </div>
-                                                                        <textarea class="plan-textarea auto-expand"
-                                                                            name="pdca[{{ $stage->Id_PDCA_Stages }}][detail]"
-                                                                            placeholder="เพิ่มรายละเอียด"></textarea>
-                                                                    </td>
-                                                                    @for($i = 1; $i <= 12; $i++) <td
-                                                                        class="checkbox-container">
-                                                                        <input type="checkbox"
-                                                                            name="pdca[{{ $stage->Id_PDCA_Stages }}][months][]"
-                                                                            value="{{ $i }}">
-                                                                        </td>
-                                                                        @endfor
-                                                                </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- แหล่งงบประมาณ -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        15. แหล่งงบประมาณ
-                                                    </h4>
-                                                </div>
-                                                <div id="budgetDetails">
-                                                    <div class="form-group-radio">
-                                                        <label>ประเภทโครงการ</label>
-                                                        <div class="radio-group">
-                                                            <input type="radio" name="Status_Budget" value="N"
-                                                                id="non_income" onchange="toggleIncomeForm(this)"
-                                                                checked>
-                                                            <label for="non_income">ไม่แสวงหารายได้</label>
-
-                                                            <input type="radio" name="Status_Budget" value="Y"
-                                                                id="income_seeking" onchange="toggleIncomeForm(this)">
-                                                            <label for="income_seeking">แสวงหารายได้</label>
-                                                        </div>
-                                                    </div>
-
-                                                    <div id="incomeForm" class="income-form">
-                                                        <div class="form-group">
-                                                            <label>แหล่งงบประมาณ</label>
-                                                            <div class="mb-4">
-                                                                @foreach($budgetSources as $source)
-                                                                <div class="form-check mb-2 d-flex align-items-center">
-                                                                    <input type="radio"
-                                                                        id="{{ $source->Id_Budget_Source }}"
-                                                                        name="budget_source"
-                                                                        value="{{ $source->Id_Budget_Source }}"
-                                                                        class="form-check-input"
-                                                                        data-id="{{ $source->Id_Budget_Source }}"
-                                                                        onchange="handleSourceSelect(this)">
-                                                                    <label
-                                                                        class="form-check-label d-flex align-items-center w-100"
-                                                                        for="{{ $source->Id_Budget_Source }}">
-                                                                        <span
-                                                                            class="label-text">{{ $source->Name_Budget_Source }}</span>
-                                                                        <input type="number"
-                                                                            name="amount_{{ $source->Id_Budget_Source }}"
-                                                                            class="form-control form-control-sm w-25 ml-2"
-                                                                            placeholder="จำนวนเงิน" disabled>
-                                                                        <span class="ml-2">บาท</span>
-                                                                    </label>
-                                                                </div>
-                                                                @endforeach
-                                                            </div>
-
-                                                            <!-- รายละเอียดการเบิกจ่าย -->
-                                                            <div id="sourceDetailForm">
-                                                                <div class="mb-3">
-                                                                    <label
-                                                                        class="form-label">รายละเอียดค่าใช้จ่าย</label>
-                                                                    <textarea name="source_detail" class="form-control"
-                                                                        placeholder="ระบุรายละเอียดค่าใช้จ่าย"></textarea>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="form-group-radio">
-                                                                <label>กรอกแบบฟอร์มงบประมาณ</label>
-                                                                <div class="radio-group">
-                                                                    <input type="radio" name="fill_budget_form"
-                                                                        value="yes" id="fill_yes"
-                                                                        onchange="toggleBudgetForm(this)">
-                                                                    <label for="fill_yes">กรอกแบบฟอร์มงบประมาณ</label>
-
-                                                                    <input type="radio" name="fill_budget_form"
-                                                                        value="no" id="fill_no"
-                                                                        onchange="toggleBudgetForm(this)" checked>
-                                                                    <label for="fill_no">ไม่กรอกแบบฟอร์มงบประมาณ</label>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- แบบฟอร์มงบประมาณ -->
-                                                            <div id="budgetFormsContainer">
-                                                                <div id="budgetFormTemplate"
-                                                                    class="budget-form card mb-3">
-                                                                    <div class="card-body">
-                                                                        <h5>แบบฟอร์มที่ 1</h5>
-                                                                        <button type="button"
-                                                                            class="btn btn-danger btn-sm remove-form-btn"
-                                                                            onclick="removeBudgetForm(this)">ลบแบบฟอร์ม</button>
-                                                                        <div class="mb-3 d-flex align-items-center">
-                                                                            <div style="flex: 3;">
-                                                                                <label
-                                                                                    class="form-label">หัวข้อใหญ่</label>
-                                                                                <textarea name="activity[]"
-                                                                                    class="form-control"
-                                                                                    placeholder="เช่น กิจกรรมการประชุมคณะกรรมการและอนุกรรมการ"></textarea>
-                                                                            </div>
-                                                                            <div style="flex: 1; margin-left: 1rem;">
-                                                                                <label
-                                                                                    class="form-label">จำนวนเงินทั้งหมด</label>
-                                                                                <div class="input-group">
-                                                                                    <input type="number"
-                                                                                        name="total_amount[]"
-                                                                                        class="form-control"
-                                                                                        placeholder="จำนวนเงิน">
-                                                                                    <span
-                                                                                        class="input-group-text">บาท</span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div id="subActivityContainer">
-                                                                            <div class="sub-activity mb-3">
-                                                                                <label
-                                                                                    class="form-label">หัวข้อย่อย</label>
-                                                                                <select name="subActivity[0][]"
-                                                                                    class="form-control">
-                                                                                    <option value="" disabled selected>
-                                                                                        เลือกหัวข้อย่อย</option>
-                                                                                    @foreach($subtopBudgets as $subtop)
-                                                                                    <option
-                                                                                        value="{{ $subtop->Id_Subtopic_Budget }}">
-                                                                                        {{ $subtop->Name_Subtopic_Budget }}
-                                                                                    </option>
-                                                                                    @endforeach
-                                                                                </select>
-                                                                                <div class="detailsContainer">
-                                                                                    <div
-                                                                                        class="mb-3 d-flex align-items-center detail-item">
-                                                                                        <div style="flex: 3;">
-                                                                                            <label
-                                                                                                class="form-label">รายละเอียด</label>
-                                                                                            <textarea
-                                                                                                name="description[0][]"
-                                                                                                class="form-control"
-                                                                                                placeholder="เช่น ค่าอาหารว่างสำหรับการจัดประชุมคณะกรรมการจัดการความรู้"></textarea>
-                                                                                        </div>
-                                                                                        <div
-                                                                                            style="flex: 1; margin-left: 1rem;">
-                                                                                            <label
-                                                                                                class="form-label">จำนวนเงิน</label>
-                                                                                            <div class="input-group">
-                                                                                                <input type="number"
-                                                                                                    name="amount[0][]"
-                                                                                                    class="form-control"
-                                                                                                    placeholder="880">
-                                                                                                <span
-                                                                                                    class="input-group-text">บาท</span>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <button type="button"
-                                                                                            class="btn btn-danger btn-sm ml-2 remove-btn"
-                                                                                            onclick="removeDetail(this)">ลบ</button>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <button type="button"
-                                                                                    class="btn btn-success btn-sm"
-                                                                                    onclick="addDetail(this)">เพิ่มรายละเอียด</button>
-                                                                            </div>
-                                                                        </div>
-                                                                        <button type="button"
-                                                                            class="btn btn-secondary btn-sm"
-                                                                            onclick="addSubActivity(this)">เพิ่มหัวข้อย่อย</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <button type="button" class="btn btn-primary btn-sm"
-                                                                onclick="addBudgetForm()">เพิ่มแบบฟอร์ม</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Output -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        16. เป้าหมายเชิงผลผลิต (Output)
-                                                    </h4>
-                                                </div>
-                                                <div id="outputDetails">
-                                                    <div id="outputContainer" class="dynamic-container">
-                                                        <div class="form-group mt-2">
-                                                            <input type="text" class="form-control" name="outputs[]"
-                                                                placeholder="เพิ่มรายการ">
-                                                            <button type="button"
-                                                                class="btn btn-danger btn-sm remove-field mt-2">
-                                                                <i class='bx bx-trash'></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="btn-addlist"
-                                                        onclick="addField('outputContainer', 'outputs[]')">
-                                                        <i class='bx bx-plus-circle'></i>เพิ่มรายการ
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- Outcome -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        17. เป้าหมายเชิงผลลัพธ์ (Outcome)
-                                                    </h4>
-                                                </div>
-                                                <div id="outcomeDetails">
-                                                    <div id="outcomeContainer" class="dynamic-container">
-                                                        <div class="form-group mt-2">
-                                                            <input type="text" class="form-control" name="outcomes[]"
-                                                                placeholder="เพิ่มรายการ">
-                                                            <button type="button"
-                                                                class="btn btn-danger btn-sm remove-field mt-2">
-                                                                <i class='bx bx-trash'></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="btn-addlist"
-                                                        onclick="addField('outcomeContainer', 'outcomes[]')">
-                                                        <i class='bx bx-plus-circle'></i>เพิ่มรายการ
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- ผลที่คาดว่าจะได้รับ -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        18. ผลที่คาดว่าจะได้รับ
-                                                    </h4>
-                                                </div>
-                                                <div id="resultDetails">
-                                                    <div id="resultContainer" class="dynamic-container">
-                                                        <div class="form-group mt-2">
-                                                            <input type="text" class="form-control"
-                                                                name="expected_results[]" placeholder="เพิ่มรายการ">
-                                                            <button type="button"
-                                                                class="btn btn-danger btn-sm remove-field mt-2">
-                                                                <i class='bx bx-trash'></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="btn-addlist"
-                                                        onclick="addField('resultContainer', 'expected_results[]')">
-                                                        <i class='bx bx-plus-circle'></i>เพิ่มรายการ
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- ตัวชี้วัดความสำเร็จของโครงการ -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        19. ตัวชี้วัดความสำเร็จของโครงการ
-                                                    </h4>
-                                                </div>
-                                                <div id="successIndicatorsDetails">
-                                                    <div class="form-group">
-                                                        <label for="Success_Indicators"></label>
-                                                        <textarea
-                                                            class="form-control @error('Success_Indicators') is-invalid @enderror"
-                                                            id="Success_Indicators" name="Success_Indicators" rows="4"
-                                                            placeholder="กรอกตัวชี้วัดความสำเร็จของโครงการ">{{ old('Success_Indicators') }}</textarea>
-                                                        @error('Success_Indicators')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- ค่าเป้าหมาย -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>
-                                                        20. ค่าเป้าหมาย
-                                                    </h4>
-                                                </div>
-                                                <div id="valueTargetDetails">
-                                                    <div class="form-group">
-                                                        <label for="Value_Target"></label>
-                                                        <textarea
-                                                            class="form-control @error('Value_Target') is-invalid @enderror"
-                                                            id="Value_Target" name="Value_Target" rows="4"
-                                                            placeholder="กรอกค่าเป้าหมาย">{{ old('Value_Target') }}</textarea>
-                                                        @error('Value_Target')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                            </div>
+                <!-- ค่าเป้าหมาย -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>
+                            20. ค่าเป้าหมาย
+                        </h4>
+                    </div>
+                    <div id="valueTargetDetails">
+                        <div class="form-group">
+                            <label for="Value_Target"></label>
+                            <textarea class="form-control @error('Value_Target') is-invalid @enderror" id="Value_Target"
+                                name="Value_Target" rows="4"
+                                placeholder="กรอกค่าเป้าหมาย">{{ old('Value_Target') }}</textarea>
+                            @error('Value_Target')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
 
 
 
-                                            <!-- เอกสารเพิ่มเติม -->
-                                            <div class="content-box">
-                                                <div class="section-header">
-                                                    <h4>21. เอกสารเพิ่มเติม</h4>
-                                                </div>
-                                                <div class="form-group">
-                                                    <input type="file" class="form-control" id="myFile" name="filename">
-                                                    <small
-                                                        class="form-text text-muted">อัพโหลดไฟล์เอกสารที่เกี่ยวข้องกับโครงการ</small>
-                                                </div>
-                                            </div>
+                <!-- เอกสารเพิ่มเติม -->
+                <div class="content-box">
+                    <div class="section-header">
+                        <h4>21. เอกสารเพิ่มเติม</h4>
+                    </div>
+                    <div class="form-group">
+                        <input type="file" class="form-control" id="myFile" name="filename">
+                        <small class="form-text text-muted">อัพโหลดไฟล์เอกสารที่เกี่ยวข้องกับโครงการ</small>
+                    </div>
+                </div>
 
-                                            <!-- ปุ่มบันทึก -->
-                                            <div class="form-actions">
-                                                <button type="submit" class="btn btn-primary btn-lg">
-                                                    <i class='bx bx-save'></i> บันทึกข้อมูล
-                                                </button>
-                                            </div>
+                <!-- ปุ่มบันทึก -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class='bx bx-save'></i> บันทึกข้อมูล
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -1471,5 +1430,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ============ ค่าเป้าหมาย ============
 });
+</script>
+
+
+<script>
+    function saveData(element, projectId, fieldName) {
+        const newValue = element.innerText;
+
+        fetch('{{ route('projects.updateField') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ id: projectId, field: fieldName, value: newValue })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Data saved successfully');
+                element.classList.remove('editing');
+            } else {
+                console.error('Error saving data');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function checkEnter(event, element) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            element.blur();
+        }
+    }
+
+    document.querySelectorAll('.editable').forEach(element => {
+        element.addEventListener('focus', () => {
+            element.classList.add('editing');
+        });
+        element.addEventListener('blur', () => {
+            element.classList.remove('editing');
+        });
+    });
 </script>
 @endsection

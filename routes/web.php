@@ -109,3 +109,5 @@ Route::get('/showProjectDepartment/{Id_Department}', [PlanDLCController::class, 
 
 // FiscalYearQuarter
 Route::resource('fiscalYearQuarter', FiscalYearQuarterController::class);
+
+Route::post('/projects/update-field', [ListProjectController::class, 'updateField'])->name('projects.updateField');

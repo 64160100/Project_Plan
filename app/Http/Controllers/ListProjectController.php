@@ -440,7 +440,7 @@ class ListProjectController extends Controller
          
     public function editProject(Request $request, $Id_Project)
     {
-        $project = ListProjectModel::findOrFail($Id_Project);
+        $project = ListProjectModel::with(['supProjects','sdgs', 'locations'])->findOrFail($Id_Project);
         $strategics = StrategicModel::all();
         $strategies = StrategyModel::where('Strategic_Id', $project->Strategic_Id)->get();
         $employees = EmployeeModel::all();
@@ -449,6 +449,11 @@ class ListProjectController extends Controller
         $strategicObjectives = StrategicObjectivesModel::all();
         $kpis = KpiModel::all();
         $sourcePage = $request->input('sourcePage', 'listProject');
+
+        if ($request->field == 'sdgs') {
+            $sdgs = $request->value ? explode(',', $request->value) : [];
+            $project->sdgs()->sync($sdgs);
+        }
     
         return view('Project.editProject', compact('project', 'strategics', 'strategies', 'employees', 'budgetSources', 'subtopBudgets', 'strategicObjectives', 'kpis', 'sourcePage'));
     }

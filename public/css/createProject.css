@@ -124,6 +124,9 @@
 }
 
 .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
 }
 
@@ -334,6 +337,15 @@
     background-color: #0056b3;
 }
 
+.btn-danger{
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
 /* Add this CSS to your stylesheet */
 .form-group-radio {
     margin-bottom: 20px;
@@ -364,6 +376,10 @@
 .form-check-label {
     align-items: center;
     width: 100%;
+}
+.form-check-input{
+    background-origin: padding-box;
+    border-color: #000000;
 }
 
 .label-text {
@@ -396,6 +412,10 @@
 .d-flex.align-items-center {
     display: flex;
     align-items: center;
+}
+
+.form-group.d-flex input {
+    flex-grow: 1; 
 }
 
 .ml-3 {

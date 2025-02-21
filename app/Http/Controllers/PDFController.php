@@ -109,7 +109,7 @@ class PDFController extends Controller
     public function ctrlpPDFProject($Id_Project)
     {
         $project = ListProjectModel::with([
-            'subProjects',
+            'supProjects',
             'projectHasIntegrationCategories',
             'targets.targetDetails',
         ])->where('Id_Project', $Id_Project)->firstOrFail();
@@ -119,8 +119,6 @@ class PDFController extends Controller
     
         $projectBudgetSources = ProjectHasBudgetSourceModel::where('Project_Id', $Id_Project)->get();
             
-        log::info($project);
-
         return view('PDF.ctrlP.pdfproject', compact('project', 'strategies', 'projectBudgetSources'));
     }
 

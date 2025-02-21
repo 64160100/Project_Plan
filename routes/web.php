@@ -10,6 +10,7 @@ use App\Http\Controllers\ProjectBatchController;
 use App\Http\Controllers\FiscalYearQuarterController;
 use App\Http\Controllers\ProposeProjectController;
 use App\Http\Controllers\RequestApprovalController;
+use App\Http\Controllers\ReportFormController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -111,3 +112,6 @@ Route::get('/showProjectDepartment/{Id_Department}', [PlanDLCController::class, 
 Route::resource('fiscalYearQuarter', FiscalYearQuarterController::class);
 
 Route::post('/projects/update-field', [ListProjectController::class, 'updateField'])->name('projects.updateField');
+
+Route::get('/report-form/{id}', [ReportFormController::class, 'showReportForm'])->name('reportForm');
+Route::post('/projects/complete/{id}', [ReportFormController::class, 'completeProject'])->name('projects.complete');

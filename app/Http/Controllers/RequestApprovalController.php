@@ -181,6 +181,8 @@ class RequestApprovalController extends Controller
                 $logData = collect();
             }
 
+            log::info($logData);
+
         } else {
             Log::warning('No employee data found in session.');
         }
@@ -399,16 +401,21 @@ class RequestApprovalController extends Controller
                             $project->Count_Steps = 9;
                             break;
                         case 11:
-                            $project->Count_Steps = 2; 
+                            $project->Count_Steps = 2;
+                            $approval->Status = 'Y';
+                            $approval->save();
                             break;
                         default:
                             break;
                     }
                     $project->save();
-
-                    if ($project->Count_Steps <= 9) {
-                        $approval->Status = 'I';
-                        $approval->save();
+            
+                    if ($project->Count_Steps <= 9 || $project->Count_Steps == 11) {
+                        if ($project->Count_Steps == 2 && $approval->Status == 'Y') {
+                        } else {
+                            $approval->Status = 'I';
+                            $approval->save();
+                        }
                     }
                 }
             }

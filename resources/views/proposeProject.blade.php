@@ -92,7 +92,7 @@ Carbon::setLocale('th');
                         ข้อเสนอแนะ({{ $project->approvals->first()->recordHistory->where('Status_Record', 'N')->count() }})
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="commentsDropdown-{{ $project->Id_Project }}"
-                        style="max-height: 200px; overflow-y: auto; width: 300px;">
+                        style="max-height: 400px; overflow-y: auto; width: 400px;">
                         @php
                         $filteredRecords = $project->approvals->first()->recordHistory->where('Status_Record', 'N');
                         @endphp
@@ -175,14 +175,14 @@ Carbon::setLocale('th');
                                         ขั้นตอนที่ 1: เริ่มต้นการเสนอโครงการ
                                     </div>
                                     <div class="status-text">
-                                        ถึง: ผู้บริหารพิจารณาเบื้องต้น
+                                        ถึง: ผู้อำนวยการพิจารณาเบื้องต้น
                                     </div>
                                     @elseif($project->Count_Steps === 1)
                                     <div class="status-text">
                                         ขั้นตอนที่ 2: อยู่ระหว่างการพิจารณาเบื้องต้น
                                     </div>
                                     <div class="status-text">
-                                        สถานะ: รอการพิจารณาจากผู้บริหาร
+                                        สถานะ: รอการพิจารณาจากผู้อำนวยการ
                                     </div>
                                     @elseif($project->Count_Steps === 2)
                                     @if($project->approvals->first()->Status === 'Y')
@@ -225,15 +225,21 @@ Carbon::setLocale('th');
                                         ขั้นตอนที่ 6: การพิจารณาขั้นสุดท้าย
                                     </div>
                                     <div class="status-text">
-                                        สถานะ: อยู่ระหว่างการพิจารณาโดยผู้บริหาร
+                                        สถานะ: อยู่ระหว่างการพิจารณาโดยผู้อำนวยการ
                                     </div>
                                     @elseif($project->Count_Steps === 6)
                                     <div class="status-text">
                                         ขั้นตอนที่ 7: การดำเนินโครงการ
                                     </div>
-                                    <div class="status-text">
-                                        สถานะ: อยู่ระหว่างการดำเนินงาน
+                                    @if(\Carbon\Carbon::now()->lte(\Carbon\Carbon::parse($project->End_Time)))
+                                    <div class="status-text text-success">
+                                        สถานะ: เสร็จทันเวลา
                                     </div>
+                                    @else
+                                    <div class="status-text text-danger">
+                                        สถานะ: เสร็จไม่ทันเวลา
+                                    </div>
+                                    @endif
                                     @elseif($project->Count_Steps === 7)
                                     <div class="status-text">
                                         ขั้นตอนที่ 8: การตรวจสอบผลการดำเนินงาน
@@ -246,7 +252,7 @@ Carbon::setLocale('th');
                                         ขั้นตอนที่ 9: การรับรองผลการดำเนินงาน
                                     </div>
                                     <div class="status-text">
-                                        สถานะ: รอการรับรองจากผู้บริหาร
+                                        สถานะ: รอการรับรองจากผู้อำนวยการ
                                     </div>
                                     @elseif($project->Count_Steps === 9)
                                     <div class="status-text">
@@ -260,7 +266,7 @@ Carbon::setLocale('th');
                                         สถานะพิเศษ: การดำเนินการล่าช้า
                                     </div>
                                     <div class="status-text">
-                                        สถานะ: รอการพิจารณาจากผู้บริหาร
+                                        สถานะ: รอการพิจารณาจากผู้อำนวยการ
                                     </div>
                                     @else
                                     <div class="status-text">
@@ -316,19 +322,24 @@ Carbon::setLocale('th');
 
                     <div class="button-container">
                         @if(in_array($project->Count_Steps, [0, 2, 6]))
-                        @if($project->Count_Steps === 6 &&
-                        \Carbon\Carbon::now()->gt(\Carbon\Carbon::parse($project->End_Time)))
+                        @if($project->Count_Steps === 6)
+                        @if(\Carbon\Carbon::now()->gt(\Carbon\Carbon::parse($project->End_Time)))
                         <form action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
                             method="POST" style="display:inline;">
                             @csrf
                             <button type="submit" class="btn btn-primary">
-                                <i class='bx bx-log-in-circle'></i> ส่งให้ผู้บริหารตรวจสอบ
+                                <i class='bx bx-log-in-circle'></i> ส่งให้ผู้อำนวยการตรวจสอบ
                             </button>
                         </form>
                         @else
+                        <a href="{{ route('reportForm', ['id' => $project->Id_Project]) }}" class="btn btn-success">
+                            <i class='bx bx-file'></i> ปุ่มรายงานโครงการ
+                        </a>
+                        @endif
+                        @else
                         @if($project->Count_Steps === 2 && $project->approvals->first()->Status === 'Y')
                         <a href="{{ route('projects.edit', ['id' => $project->Id_Project ]) }}" class="btn btn-warning">
-                            <i class='bx bx-edit'></i> กลับไปแก้ไขฟอร์ม
+                            <i class='bx bx-edit'></i> แก้ไขฟอร์ม
                         </a>
                         @else
                         <form action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
@@ -366,10 +377,6 @@ Carbon::setLocale('th');
             <i class='bx bx-plus'></i> สร้างชุดโครงการ ({{ $countStepsZero }} โครงการ)
         </a>
     </div> -->
-
-    @php
-    $incompleteStrategiesByYear = collect($incompleteStrategies)->groupBy('Fiscal_Year');
-    @endphp
 
     @foreach ($quartersByFiscalYear as $fiscalYear => $yearQuarters)
     @foreach ($yearQuarters->sortBy('Quarter') as $quarter)
@@ -443,7 +450,30 @@ Carbon::setLocale('th');
         <div class="card-body">
             <h5 class="card-title">เสนอหาผู้อำนวยการ ปีงบประมาณ {{ $fiscalYear }} ไตรมาส {{ $quarter->Quarter }}</h5>
 
-            @if ($hasIncompleteStrategies || !empty($missingStrategies) || !empty($logDataIncompleteStrategies))
+            @if ($hasIncompleteStrategies || !empty($missingStrategies) || !empty($logDataIncompleteStrategies) ||
+            $quarterProjects->contains(function($strategic) {
+            return $strategic->projects->contains(function($project) {
+            return $project->approvals->first()->Status !== 'I' && $project->Count_Steps !== 2;
+            });
+            }) ||
+            $quarterProjects->contains(function($strategic) {
+            $projectsWithCountStepsZero = $strategic->projects->filter(function($project) {
+            return $project->Count_Steps === 0;
+            });
+            $projectsWithStatusI = $projectsWithCountStepsZero->contains(function($project) {
+            return $project->approvals->first()->Status === 'I';
+            });
+            return !$projectsWithStatusI && $projectsWithCountStepsZero->isNotEmpty();
+            }) ||
+            $quarterProjects->contains(function($strategic) {
+            $projectsWithCountStepsOne = $strategic->projects->filter(function($project) {
+            return $project->Count_Steps === 1;
+            });
+            $projectsWithCountStepsZeroAndStatusN = $strategic->projects->filter(function($project) {
+            return $project->Count_Steps === 0 && $project->approvals->first()->Status === 'N';
+            });
+            return $projectsWithCountStepsOne->isNotEmpty() && $projectsWithCountStepsZeroAndStatusN->isNotEmpty();
+            }))
             <div class="alert alert-warning">
                 <strong>กลยุทธ์ยังไม่ครบสำหรับปีงบประมาณ {{ $fiscalYear }} ไตรมาส {{ $quarter->Quarter }}</strong>
                 <ul>
@@ -457,6 +487,15 @@ Carbon::setLocale('th');
                     @endforeach
                     @foreach ($logDataIncompleteStrategies as $logEntry)
                     <li>{{ $logEntry }}</li>
+                    @endforeach
+                    @foreach ($quarterProjects as $strategic)
+                    @if (!in_array($strategic->Name_Strategy, $missingStrategies))
+                    @foreach ($strategic->projects as $project)
+                    @if ($project->approvals->first()->Status !== 'I' && $project->Count_Steps !== 2)
+                    <li>โครงการ {{ $project->Name_Project }} ยังไม่ได้ส่งไปหา ผู้อำนวยการ</li>
+                    @endif
+                    @endforeach
+                    @endif
                     @endforeach
                 </ul>
             </div>
@@ -542,7 +581,12 @@ Carbon::setLocale('th');
                                         {{ $strategyName ?? '-' }}
                                     </td>
                                     @endif
-
+                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
+                                        <b>{{ $Project->Name_Project }}</b><br>
+                                        @foreach($Project->supProjects as $supProject)
+                                        - {{ $subProject->Name_Sup_Project }}<br>
+                                        @endforeach
+                                    </td>
                                     <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
                                         {!! $Project->Success_Indicators ? nl2br(e($Project->Success_Indicators)) : '-'
                                         !!}

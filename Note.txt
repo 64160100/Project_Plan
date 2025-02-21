@@ -10,6 +10,10 @@ git checkout ชื่อ branch
 docker-compose exec app php artisan config:cac
 docker-compose exec app php artisan migrate
 
+composer require tymon/jwt-auth
+php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
+php artisan jwt:secret
+
 git push --force origin main
 
 mkdir -p storage/logs
@@ -55,3 +59,4 @@ git config --global --unset https.proxy
 git config --global -l
 
 UPDATE Project SET Count_Steps = 0;
+UPDATE Approve SET Status = 'I';

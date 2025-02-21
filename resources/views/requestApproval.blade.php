@@ -146,6 +146,8 @@ Carbon::setLocale('th');
             }
             }
             @endphp
+
+            @if($filteredProjectCount > 0)
             <details class="accordion">
                 <summary class="accordion-btn">
                     <b>
@@ -184,30 +186,32 @@ Carbon::setLocale('th');
                             @php
                             $strategyDisplayed = false;
                             $allProjectsGray = true;
+                            $filteredProjects = $strategy->projects->filter(function($project) {
+                            return $project->Count_Steps == 1;
+                            });
                             @endphp
-                            @foreach($strategy->projects as $index => $project)
-                            @if($project->Count_Steps == 1)
+                            @if($filteredProjects->count() > 0)
+                            @foreach($filteredProjects as $index => $project)
                             @php
                             if ($project->approvals->first()->Status !== 'N') {
                             $allProjectsGray = false;
                             }
                             @endphp
                             <tr>
-                                @if ($index === 0 && $loop->parent->first)
-                                <td rowspan="{{ $filteredProjectCount }}">{{ $strategic->Name_Strategic_Plan }}</td>
-                                @endif
-                                @if ($index === 0)
-                                <td rowspan="{{ $strategy->projects->count() }}"
+                                <td rowspan="{{ $filteredProjects->count() }}">{{ $strategic->Name_Strategic_Plan }}
+                                </td>
+                                <td rowspan="{{ $filteredProjects->count() }}"
                                     class="{{ $allProjectsGray ? 'text-gray' : '' }}">{{ $strategy->Name_Strategy }}
                                 </td>
-                                @endif
                                 <td class="{{ $project->approvals->first()->Status === 'N' ? 'text-gray' : '' }}">
                                     <b>{{ $project->Name_Project }}</b>
                                 </td>
                                 <td class="{{ $project->approvals->first()->Status === 'N' ? 'text-gray' : '' }}">
-                                    {{ $project->Success_Indicators ?? '-' }}</td>
+                                    {{ $project->Success_Indicators ?? '-' }}
+                                </td>
                                 <td class="{{ $project->approvals->first()->Status === 'N' ? 'text-gray' : '' }}">
-                                    {{ $project->Value_Target ?? '-' }}</td>
+                                    {{ $project->Value_Target ?? '-' }}
+                                </td>
                                 <td class="{{ $project->Status_Budget === 'N' ? 'text-gray' : '' }}"
                                     style="text-align: center;">
                                     @if($project->Status_Budget === 'N')
@@ -222,7 +226,8 @@ Carbon::setLocale('th');
                                 </td>
                                 <td class="{{ $project->approvals->first()->Status === 'N' ? 'text-gray' : '' }}">
                                     {{ $project->employee->Firstname_Employee ?? '-' }}
-                                    {{ $project->employee->Lastname_Employee ?? '-' }}</td>
+                                    {{ $project->employee->Lastname_Employee ?? '-' }}
+                                </td>
                                 <td>
                                     @if($project->approvals->first()->Status !== 'N')
                                     <button type="button" class="btn btn-danger btn-sm custom-disapprove-btn"
@@ -231,19 +236,14 @@ Carbon::setLocale('th');
                                     @endif
                                 </td>
                             </tr>
+                            @endforeach
                             @endif
                             @endforeach
-                            @endforeach
-                            <tr class="summary-row">
-                                <td colspan="2" style="text-align: left; font-weight: bold;">รวมรายได้ทั้งหมด:</td>
-                                <td colspan="6" style="text-align: center; font-weight: bold;">
-                                    {{ number_format($totalStrategicBudget, 2) }} บาท
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
             </details>
+            @endif
             @endif
             @endforeach
             @endforeach

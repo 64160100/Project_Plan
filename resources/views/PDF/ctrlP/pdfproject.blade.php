@@ -149,7 +149,7 @@
                     <td>{{ $project->Name_Strategy ?? '-'}}</td>
                     <td>
                         <b>{{ $project->Name_Project }}</b><br>
-                        @foreach($project->subProjects as $subProject)
+                        @foreach($project->supProjects as $subProject)
                         - {{ $subProject->Name_Sup_Project }}<br>
                         @endforeach
                     </td>

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator; 
+use Illuminate\Support\Facades\Validator;
+use PDF;
+use Illuminate\Support\Facades\Storage;
 use App\Models\ListProjectModel;
 use App\Models\StrategicModel;
 use App\Models\StrategyModel;
@@ -39,6 +41,7 @@ use App\Models\OutputModel;
 use App\Models\StrategicObjectivesModel;
 use App\Models\KpiModel;
 use App\Models\FiscalYearQuarterModel;
+use App\Models\StorageFileModel;
 use Carbon\Carbon;
 
 class ListProjectController extends Controller
@@ -430,7 +433,101 @@ class ListProjectController extends Controller
                     Log::info('Output created with name: ' . $output);
                 }
             }
-    
+
+            try {
+                // Define file size limits and allowed types
+                $maxFileSizeInMB = config('filesystems.max_upload_size', 20);
+                $maxFileSizeInBytes = $maxFileSizeInMB * 1024 * 1024;
+            
+                // Create base directory if it doesn't exist
+                $baseDir = storage_path('app/public/uploads');
+                if (!file_exists($baseDir)) {
+                    mkdir($baseDir, 0755, true);
+                }
+            
+                // สร้างชื่อโฟลเดอร์ตาม project_id
+                $folderPath = 'uploads/project_' . $project->Id_Project;
+            
+                // Ensure directory exists
+                if (!Storage::disk('public')->exists($folderPath)) {
+                    Storage::disk('public')->makeDirectory($folderPath);
+                    Log::info('Project directory created', ['path' => $folderPath]);
+                }
+            
+                // Load project with relationships
+                $pdfData = [
+                    'project' => $project->load([
+                        'supProjects',
+                        'projectBudgetSources.budget_source',
+                        'strategic',
+                        'strategy',
+                        'employee',
+                        'targets',
+                        'locations',
+                        'pdca',
+                        'platforms',
+                        'projectHasSDGs.sdgs',
+                        'projectHasIntegrationCategories.integrationCategory',
+                        'projectHasIndicators.indicators'
+                    ]),
+                    'strategy' => $strategy,
+                    'nameCreator' => $nameCreator,
+                    'roleCreator' => $roleCreator,
+                    'projectBudgetSources' => $project->projectBudgetSources
+                ];
+            
+                $pdf = PDF::loadView('PDF.PDFFirstForm', $pdfData);
+                $pdf->setPaper('A4');
+            
+                $pdf->getDomPDF()->set_option("fontDir", public_path('fonts/'));
+                $pdf->getDomPDF()->set_option("font_cache", public_path('fonts/'));
+                $pdf->getDomPDF()->set_option("defaultFont", "THSarabunNew");
+                $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
+            
+                $filename = 'project_' . $project->Id_Project . '_summary_' . date('Y-m-d') . '.pdf';
+                $filePath = $folderPath . '/' . $filename;
+            
+                $pdfContent = $pdf->output();
+            
+                $pdfSize = strlen($pdfContent);
+                $pdfSizeInMB = round($pdfSize / (1024 * 1024), 2);
+            
+                if ($pdfSizeInMB > $maxFileSizeInMB) {
+                    throw new \Exception("PDF size ({$pdfSizeInMB} MB) exceeds the limit of {$maxFileSizeInMB} MB");
+                }
+            
+                if (Storage::disk('public')->put($filePath, $pdfContent)) {
+                    $storageFile = StorageFileModel::create([
+                        'Name_Storage_File' => $filename,
+                        'Path_Storage_File' => $filePath,
+                        'Type_Storage_File' => 'application/pdf',
+                        'Size' => $pdfSize,
+                        'Project_Id' => $project->Id_Project
+                    ]);
+            
+                    if (!$storageFile) {
+                        throw new \Exception('Failed to create storage file record');
+                    }
+            
+                    Log::info('PDF generated and saved successfully', [
+                        'project_id' => $project->Id_Project,
+                        'file_name' => $filename,
+                        'path' => $filePath,
+                        'size' => $storageFile->getSizeInMB() . 'MB'
+                    ]);
+            
+                } else {
+                    throw new \Exception('Failed to save PDF file');
+                }
+            
+            } catch (\Exception $e) {
+                Log::error('Failed to generate PDF', [
+                    'project_id' => $project->Id_Project,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+            
         } else {
             Log::error('Failed to create project.');
         }
@@ -597,6 +694,5 @@ class ListProjectController extends Controller
 
         return response()->json(['success' => true]);
     }
-
 
 }

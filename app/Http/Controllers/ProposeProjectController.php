@@ -29,7 +29,7 @@ class ProposeProjectController extends Controller
                 $projectsQuery->where('Employee_Id', $employee->Id_Employee);
             }
     
-            $projects = $projectsQuery->whereIn('Count_Steps', [0, 1, 2, 6])
+            $projects = $projectsQuery->whereIn('Count_Steps', [0, 1, 2, 6, 9])
                 ->with(['approvals.recordHistory', 'employee.department', 'employee'])
                 ->get();
     
@@ -95,17 +95,18 @@ class ProposeProjectController extends Controller
             $quarters = collect();
             $strategicName = collect();
             $logData = [];
-    
+            $strategics = collect();
+            
             if ($projects->where('Count_Steps', 0)->isNotEmpty()) {
                 $approvals = ApproveModel::all();
                 $strategies = StrategyModel::all();
-    
+            
                 $quarters = FiscalYearQuarterModel::select('Id_Quarter_Project', 'Fiscal_Year', 'Quarter')
                     ->orderBy('Id_Quarter_Project', 'asc')
                     ->get();
-    
+            
                 $query = StrategicModel::with('quarterProjects');
-    
+            
                 if ($request->has('Fiscal_Year_Quarter') && $request->Fiscal_Year_Quarter != '') {
                     list($fiscalYear, $quarter) = explode('-', $request->Fiscal_Year_Quarter);
                     $query->whereHas('quarterProjects', function ($q) use ($fiscalYear, $quarter) {
@@ -115,9 +116,9 @@ class ProposeProjectController extends Controller
                         });
                     });
                 }
-    
+            
                 $strategics = $query->get();
-    
+            
                 $filteredStrategics = $strategics->filter(function($strategic) use ($approvals) {
                     foreach ($strategic->projects as $project) {
                         $projectApprovals = $approvals->where('Project_Id', $project->Id_Project);
@@ -127,75 +128,79 @@ class ProposeProjectController extends Controller
                         return $project->Count_Steps == 0;
                     });
                 });
-    
+            
                 foreach ($filteredStrategics as $strategic) {
                     foreach ($strategic->projects as $project) {
                         $projectApprovals = $approvals->where('Project_Id', $project->Id_Project);
                         $project->approvalStatuses = $projectApprovals->pluck('Status')->toArray();
                     }
                 }
-    
+            
                 $quarters = $quarters->sortBy('Fiscal_Year');
-    
+            
                 foreach ($quarters as $quarter) {
                     $fiscalYear = $quarter->Fiscal_Year;
                     $quarterName = $quarter->Quarter;
-    
+            
                     $strategics = StrategicModel::whereHas('quarterProjects', function ($query) use ($quarter) {
                         $query->where('Quarter_Project_Id', $quarter->Id_Quarter_Project);
                     })->with('strategies.projects.approvals')->get();
-    
+            
                     foreach ($strategics as $strategic) {
                         $strategicName = $strategic->Name_Strategic_Plan;
-    
-                        if ($strategic->strategies->isEmpty()) {
+            
+                        if (is_iterable($strategic->strategies) && $strategic->strategies->isEmpty()) {
                             $logData[] = "Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName, Status: No strategies created";
                         }
-    
+            
                         $allStrategies = StrategyModel::where('Strategic_Id', $strategic->Id_Strategic)->get();
                         $createdStrategies = $strategic->strategies->pluck('Id_Strategy')->toArray();
                         $missingStrategies = $allStrategies->filter(function ($strategy) use ($createdStrategies) {
                             return !in_array($strategy->Id_Strategy, $createdStrategies);
                         });
-    
+            
                         foreach ($missingStrategies as $missingStrategy) {
                             $projectsWithStrategy = ListProjectModel::where('Strategy_Id', $missingStrategy->Id_Strategy)->exists();
                             if (!$projectsWithStrategy) {
                                 $logData[] = "Missing Strategy: {$missingStrategy->Name_Strategy}, Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName";
                             }
                         }
-    
-                        foreach ($strategic->strategies as $strategy) {
-                            $strategyName = $strategy->Name_Strategy;
-    
-                            if ($strategy->projects->isEmpty()) {
-                                $logData[] = "Strategy: $strategyName, Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName, Status: No projects created";
-                            }
-    
-                            foreach ($strategy->projects as $project) {
-                                $projectName = $project->Name_Project;
-                                $projectStatus = $project->approvals->first()->Status ?? 'Unknown';
-                                $logData[] = "Project: $projectName, Strategy: $strategyName, Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName, Status: $projectStatus";
+            
+                        if (is_iterable($strategic->strategies)) {
+                            foreach ($strategic->strategies as $strategy) {
+                                $strategyName = $strategy->Name_Strategy;
+            
+                                if (is_iterable($strategy->projects) && $strategy->projects->isEmpty()) {
+                                    $logData[] = "Strategy: $strategyName, Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName, Status: No projects created";
+                                }
+            
+                                if (is_iterable($strategy->projects)) {
+                                    foreach ($strategy->projects as $project) {
+                                        $projectName = $project->Name_Project;
+                                        $projectStatus = $project->approvals->first()->Status ?? 'Unknown';
+                                        $logData[] = "Project: $projectName, Strategy: $strategyName, Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName, Status: $projectStatus";
+                                    }
+                                }
                             }
                         }
                     }
                 }
-    
+            
                 usort($incompleteStrategies, function($a, $b) {
                     return strcmp($a, $b);
                 });
-    
+            
                 $allStrategiesComplete = empty($incompleteStrategies);
             }
-    
+            
             $hasProjectsToPropose = false;
             $hasStatusN = false;
-    
+            
             $quartersByFiscalYear = $quarters->groupBy(function($quarter) {
                 $calendarYear = intval(substr($quarter->Fiscal_Year, 0, 4));
                 return $calendarYear;
             });
-    
+            
             foreach ($filteredStrategics as $Strategic) {
                 if ($Strategic->projects->contains(function($project) {
                     return $project->Count_Steps == 0;
@@ -204,7 +209,7 @@ class ProposeProjectController extends Controller
                     break;
                 }
             }
-    
+            
             foreach ($filteredStrategics as $Strategic) {
                 foreach ($Strategic->projects as $project) {
                     if (in_array('N', $project->approvalStatuses)) {
@@ -213,6 +218,28 @@ class ProposeProjectController extends Controller
                     if (in_array('I', $project->approvalStatuses)) {
                         $hasStatusN = false;
                         break 2;
+                    }
+                }
+            }
+            
+            foreach ($strategics as $strategic) {
+                $strategicName = $strategic->Name_Strategic_Plan;
+            
+                if (is_iterable($strategic->strategies)) {
+                    foreach ($strategic->strategies as $strategy) {
+                        $strategyName = $strategy->Name_Strategy;
+            
+                        if (is_iterable($strategy->projects) && $strategy->projects->isEmpty()) {
+                            $logData[] = "Strategy: $strategyName, Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName, Status: No projects created";
+                        }
+            
+                        if (is_iterable($strategy->projects)) {
+                            foreach ($strategy->projects as $project) {
+                                $projectName = $project->Name_Project;
+                                $projectStatus = $project->approvals->first()->Status ?? 'Unknown';
+                                $logData[] = "Project: $projectName, Strategy: $strategyName, Strategic: $strategicName, Fiscal Year: $fiscalYear, Quarter: $quarterName, Status: $projectStatus";
+                            }
+                        }
                     }
                 }
             }

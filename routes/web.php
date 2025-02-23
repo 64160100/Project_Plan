@@ -10,6 +10,8 @@ use App\Http\Controllers\ProjectBatchController;
 use App\Http\Controllers\FiscalYearQuarterController;
 use App\Http\Controllers\ProposeProjectController;
 use App\Http\Controllers\RequestApprovalController;
+use App\Http\Controllers\SustainableDevelopmentGoalsController;
+
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -91,7 +93,7 @@ Route::get('/statusTracking', [StatusController::class, 'statusTracking'])->name
 Route::get('/project/{Id_Project}', [StatusController::class, 'showDetails'])->name('project.details');
 
 // การแสดง PDF
-Route::get('generate-pdf/{id}', [PDFController::class, 'generatePDF']);
+Route::get('generate-pdf/{id}', [PDFController::class, 'generatePDF'])->name('PDF.generate');
 Route::get('actionplan-pdf', [PDFController::class, 'ActionPlanPDF']);
 Route::get('strategic-pdf/{Id_Strategic}', [PDFController::class, 'PDFStrategic'])->name('PDF.strategic');
 
@@ -111,3 +113,9 @@ Route::get('/showProjectDepartment/{Id_Department}', [PlanDLCController::class, 
 Route::resource('fiscalYearQuarter', FiscalYearQuarterController::class);
 
 Route::post('/projects/update-field', [ListProjectController::class, 'updateField'])->name('projects.updateField');
+
+//Sdg
+Route::get('showSdg', [SustainableDevelopmentGoalsController::class, 'showSdg'])->name('showSdg');
+Route::post('/showSdg', [SustainableDevelopmentGoalsController::class, 'createSDG'])->name('createSDG');
+Route::put('/editSDG/{id_SDGs}', [SustainableDevelopmentGoalsController::class, 'editSDG'])->name('editSDG');
+Route::delete('/deleteSDG/{id_SDGs}', [SustainableDevelopmentGoalsController::class, 'deleteSDG'])->name('deleteSDG');

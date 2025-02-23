@@ -55,7 +55,8 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit" class='bx bx-trash'
-                                onclick="return confirm('คุณยืนยันที่จะลบข้อมูลนี้หรือไม่');"></button>
+                                onclick="return confirm('คุณยืนยันที่จะลบข้อมูลนี้หรือไม่');">
+                            </button>
                         </form>
                     </div>
                 </div>

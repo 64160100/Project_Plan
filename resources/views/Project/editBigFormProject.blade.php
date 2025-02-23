@@ -90,19 +90,15 @@
                             <label for="continuousProject">โครงการต่อเนื่อง</label>
                         </div>
                     </div>
-                    <!-- <div class="form-group">
-                        <input type="text" id="textbox-projectType-2" class="hidden form-control"
-                            data-group="projectType" placeholder="กรอกชื่อโครงการเดิม">
-                    </div> -->
+
                     <div class="form-group">
-                        <div class="editable hidden form-control" id="textbox-projectType-2"
-                            style="border: 1px solid #007bff; padding: 5px; border-radius: 5px;"
+                        <div class="editable hidden" style="border: 1px solid #007bff; padding: px; border-radius: 5px;" 
+                            id="textbox-projectType-2"
                             data-group="projectType" contenteditable="true"
-                            onblur="saveData(this, '{{ $project->Id_Project }}', '')"
-                            onkeypress="checkEnter(event, this)">
+                            onblur="saveData(this, '{{ $project->Id_Project }}', 'projectType')"
+                            onkeyup="checkEnter(event, this)">
                         </div>
                     </div>
-
                 </div>
 
                 <!-- ผู้รับผิดชอบโครงการ -->
@@ -238,19 +234,26 @@
                     </div>
                     <div id="sdgsDetails">
                         <div class=" sdgs-grid">
-                            @foreach ($sdgs as $sdg)
+                        @foreach ($sdgs as $sdg)
                             <div class="form-group-sdgs">
                                 <div class="form-check">
                                     <label class="form-check-label" for="sdg_{{ $sdg->id_SDGs }}">
-                                        <input class="form-check-input" type="checkbox" name="sdgs[]"
-                                            value="{{ $sdg->id_SDGs }}" id="sdg_{{ $sdg->id_SDGs }}"
-                                            onchange="saveData(this, '{{ $project->Id_Project }}', 'sdgs')"
-                                            onkeypress="checkEnter(event, this)">
+                                        <input 
+                                            class="form-check-input" 
+                                            type="checkbox" 
+                                            name="sdgs[]" 
+                                            value="{{ $sdg->id_SDGs }}" 
+                                            id="sdg_{{ $sdg->id_SDGs }}" 
+                                            onkeydown="checkEnter(event, this, '{{ $project->Id_Project }}', 'sdgs')"
+                                            onblur="saveData(this, '{{ $project->Id_Project }}', 'sdgs')"
+                                            @if($project->sdgs->contains('id_SDGs', $sdg->id_SDGs)) checked @endif>
                                         {{ $sdg->Name_SDGs }}  
                                     </label>
                                 </div>
                             </div>
-                            @endforeach
+                        @endforeach
+
+
                         </div>
                     </div>
                 </div>
@@ -380,16 +383,14 @@
                             11. สถานที่ดำเนินงาน
                         </h4>
                     </div>
-                    <div id="locationDetails">
-                        <div id="locationContainer">
-                            <div class="form-group location-item">
-                                <div class="editable" style="border: 1px solid #007bff; padding: px; border-radius: 5px;"
+                    <div id="locations-container">
+                        <div class="location-item">
+                                <input type="text" class="form-control small-input editable" name="location[]" placeholder="กรอกสถานที่"
+                                    style="border: 1px solid #007bff; padding: px; border-radius: 5px;"
                                     name="location[]" placeholder="กรอกสถานที่"    
                                     contenteditable="true"
                                     onblur="saveData(this, '{{ $project->Id_Project }}', 'Name_Location')"
                                     onkeypress="checkEnter(event, this)">
-                                    {{ $project->locations->first()->Name_Location }}
-                                </div>
                                 <button type="button" class="btn btn-danger btn-sm remove-location">
                                     <i class='bx bx-trash'></i>
                                 </button>
@@ -397,7 +398,7 @@
                         </div>
                         <button type="button" id="addLocationBtn" class="btn-addlist">
                             <i class='bx bx-plus-circle'></i>เพิ่มสถานที่
-                        </button>
+                        </button> 
                     </div>
                 </div>
 
@@ -832,11 +833,11 @@
                 </div>
 
                 <!-- ปุ่มบันทึก -->
-                <div class="form-actions">
+                <!-- <div class="form-actions">
                     <button type="submit" class="btn btn-primary btn-lg">
                         <i class='bx bx-save'></i> บันทึกข้อมูล
                     </button>
-                </div>
+                </div> -->
             </form>
         </div>
     </div>
@@ -852,17 +853,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const index = container.children.length; // Start from 1
         const div = document.createElement('div');
         div.classList.add('form-group', 'mb-2', 'dynamic-field');
+
         div.innerHTML = `
         <div class="input-group">
             <span class="input-group-text">1.${index}</span>
-            <input type="text" class="form-control editable-input" name="${fieldName}" placeholder="กรอกชื่อโครงการย่อย" required
+            <input type="text" class="form-control editable" name="${fieldName}" placeholder="กรอกชื่อโครงการย่อย" required
+                class="editable" style="border: 1px solid #007bff; padding: px; border-radius: 5px;"
                 onkeypress="checkEnter(event, this)" 
-                onblur="saveData(this, '{{ $project->Id_Project }}', 'Name_Sup_Project')">
+                onblur="saveData(this, '{{ $project->supProjects }}', 'Name_Sup_Project')">
             <button type="button" class="btn btn-danger" onclick="removeField(this)">
                 <i class='bx bx-trash'></i>
             </button>
         </div>
-
     `;
         container.appendChild(div);
         updateRemoveButtons(container);
@@ -1592,54 +1594,71 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
     function saveData(element, projectId, fieldName) {
-        let newValue;
+    let newValue;
+
+    if (fieldName === 'sdgs') {
+        newValue = [];
+        document.querySelectorAll('input[name="sdgs[]"]:checked').forEach(checkbox => {
+            newValue.push(checkbox.value);
+        });
+    } else {
         if (element.tagName === 'INPUT' && element.type === 'checkbox') {
-            newValue = element.checked ? element.value : null; 
+            newValue = element.checked;
         } else if (element.tagName === 'INPUT' || element.tagName === 'SELECT' || element.tagName === 'TEXTAREA') {
             newValue = element.value;
+        } else if (element.tagName === 'DIV' && element.contentEditable === 'true') {
+            newValue = element.innerText;
         } else {
             newValue = element.innerText;
         }
-
-
-        fetch('{{ route('projects.updateField') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ id: projectId, field: fieldName, value: newValue })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Data saved successfully');
-                element.classList.remove('editing');
-            } else {
-                console.error('Error saving data');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
     }
 
-    function checkEnter(event, element) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            element.blur();
-        }
-    }
-
-
-    document.querySelectorAll('.editable').forEach(element => {
-        element.addEventListener('focus', () => {
-            element.classList.add('editing');
-        });
-        element.addEventListener('blur', () => {
+    fetch('{{ route('projects.updateField') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            id: projectId,
+            field: fieldName,
+            value: newValue
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Data saved successfully');
             element.classList.remove('editing');
-        });
+        } else {
+            console.error('Error saving data');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
     });
+}
+
+function checkEnter(event, element, projectId, fieldName) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        saveData(element, projectId, fieldName); // ส่งข้อมูลเมื่อกด Enter
+        element.blur(); // ทำให้ blur หลังจากส่งข้อมูล
+    }
+}
+
+// ติดตามการโฟกัสและ blur สำหรับการบันทึกข้อมูล
+document.querySelectorAll('.editable').forEach(element => {
+    element.addEventListener('focus', () => {
+        element.classList.add('editing');
+    });
+    element.addEventListener('blur', () => {
+        element.classList.remove('editing');
+        saveData(element, projectId, fieldName); // เมื่อ blur จะส่งข้อมูล
+    });
+});
+
+
 </script>
 
 

@@ -440,7 +440,7 @@ class ListProjectController extends Controller
          
     public function editProject(Request $request, $Id_Project)
     {
-        $project = ListProjectModel::with(['supProjects','sdgs', 'locations'])->findOrFail($Id_Project);
+        $project = ListProjectModel::findOrFail($Id_Project);
         $strategics = StrategicModel::all();
         $strategies = StrategyModel::where('Strategic_Id', $project->Strategic_Id)->get();
         $employees = EmployeeModel::all();
@@ -449,14 +449,29 @@ class ListProjectController extends Controller
         $strategicObjectives = StrategicObjectivesModel::all();
         $kpis = KpiModel::all();
         $sourcePage = $request->input('sourcePage', 'listProject');
-
-        if ($request->field == 'sdgs') {
-            $sdgs = $request->value ? explode(',', $request->value) : [];
-            $project->sdgs()->sync($sdgs);
-        }
     
         return view('Project.editProject', compact('project', 'strategics', 'strategies', 'employees', 'budgetSources', 'subtopBudgets', 'strategicObjectives', 'kpis', 'sourcePage'));
     }
+
+    private function createSupProjects($Id_Project, $supProjectNames)
+    {
+        if (!is_array($supProjectNames)) {
+            $supProjectNames = [$supProjectNames];
+        }
+    
+        foreach ($supProjectNames as $supProjectName) {
+            if (!empty($supProjectName)) {
+                if (is_array($supProjectName)) {
+                    $supProjectName = implode(', ', $supProjectName);
+                }
+                Sup_Project::create([
+                    'Project_Id_Project' => $Id_Project,
+                    'Name_Sup_Project' => $supProjectName
+                ]);
+            }
+        }
+    }
+
     
     public function updateProject(Request $request, $id)
     {
@@ -561,7 +576,7 @@ class ListProjectController extends Controller
 
     public function editAllProject($Id_Project, Request $request)
     {
-        $project = ListProjectModel::findOrFail($Id_Project);
+        $project = ListProjectModel::with('sdgs')->findOrFail($Id_Project);
         $strategics = StrategicModel::with(['strategies.kpis', 'strategies.strategicObjectives', 'projects'])->findOrFail($project->Strategic_Id);
         $strategies = $strategics->strategies;
         $projects = $strategics->projects; 
@@ -577,8 +592,8 @@ class ListProjectController extends Controller
         $strategicObjectives = StrategicObjectivesModel::all();
         $sourcePage = $request->input('sourcePage', 'listProject');
         
-        log::info($project);
-    
+        log::info($project);       
+        
         return view('Project.editBigFormProject', compact('project', 'strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets', 'kpis', 'strategicObjectives', 'sourcePage'));
     }
 
@@ -598,6 +613,22 @@ class ListProjectController extends Controller
         $value = $request->value;
 
         $project->$field = $value;
+
+        if ($field !== 'sdgs') {
+            $project->$field = $value;
+            $project->save(); // บันทึกการอัปเดตในฐานข้อมูล
+        }
+
+        if ($field == 'sdgs') {
+            if ($request->has('sdgs')) {
+                $project->sdgs()->detach(); 
+                $project->sdgs()->attach($request->sdgs); // เชื่อมโยง SDGs ที่เลือก
+            } else {
+                $project->sdgs()->detach(); // หากไม่ได้เลือก SDGs (uncheck) ให้ลบออกทั้งหมด
+            }
+        }
+    
+
         $project->save();
 
         return response()->json(['success' => true]);

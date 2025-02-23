@@ -174,12 +174,6 @@
   align-items: center;
 }
 
-.card .action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-
 .card .action-buttons a,
 .card .action-buttons button {
   color: #bd7ff9;

@@ -115,6 +115,9 @@ Carbon::setLocale('th');
     <div class="card mb-4 border-2">
         <div class="card-body">
             <h5 class="card-title">ปีงบประมาณ: {{ $fiscalYear }} ไตรมาส: {{ $quarterName }}</h5>
+            @php
+            $displayedStrategicPlans = [];
+            @endphp
             @foreach($strategics as $strategic)
             @foreach($strategic->quarterProjects as $quarterProject)
             @if($quarterProject->quarterProject->Fiscal_Year == $fiscalYear && $quarterProject->quarterProject->Quarter
@@ -147,7 +150,10 @@ Carbon::setLocale('th');
             }
             @endphp
 
-            @if($filteredProjectCount > 0)
+            @if($filteredProjectCount > 0 && !in_array($strategic->Name_Strategic_Plan, $displayedStrategicPlans))
+            @php
+            $displayedStrategicPlans[] = $strategic->Name_Strategic_Plan;
+            @endphp
             <details class="accordion">
                 <summary class="accordion-btn">
                     <b>
@@ -182,6 +188,15 @@ Carbon::setLocale('th');
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                            $displayedStrategicName = false;
+                            $totalRowCount = $strategic->strategies->sum(function($strategy) {
+                            return $strategy->projects->filter(function($project) {
+                            return $project->Count_Steps == 1;
+                            })->count();
+                            });
+                            @endphp
+
                             @foreach($strategic->strategies as $strategy)
                             @php
                             $strategyDisplayed = false;
@@ -190,6 +205,7 @@ Carbon::setLocale('th');
                             return $project->Count_Steps == 1;
                             });
                             @endphp
+
                             @if($filteredProjects->count() > 0)
                             @foreach($filteredProjects as $index => $project)
                             @php
@@ -198,11 +214,22 @@ Carbon::setLocale('th');
                             }
                             @endphp
                             <tr>
-                                <td rowspan="{{ $filteredProjects->count() }}">{{ $strategic->Name_Strategic_Plan }}
-                                </td>
+                                @if (!$displayedStrategicName)
+                                <td rowspan="{{ $totalRowCount }}">{{ $strategic->Name_Strategic_Plan }}</td>
+                                @php
+                                $displayedStrategicName = true;
+                                @endphp
+                                @endif
+
+                                @if (!$strategyDisplayed)
                                 <td rowspan="{{ $filteredProjects->count() }}"
-                                    class="{{ $allProjectsGray ? 'text-gray' : '' }}">{{ $strategy->Name_Strategy }}
+                                    class="{{ $allProjectsGray ? 'text-gray' : '' }}">
+                                    {{ $strategy->Name_Strategy }}
                                 </td>
+                                @php
+                                $strategyDisplayed = true;
+                                @endphp
+                                @endif
                                 <td class="{{ $project->approvals->first()->Status === 'N' ? 'text-gray' : '' }}">
                                     <b>{{ $project->Name_Project }}</b>
                                 </td>
@@ -350,6 +377,7 @@ Carbon::setLocale('th');
     </div>
     @endif
     @endforeach
+
 
     @foreach($approvals as $approval)
     @if($approval->Status !== 'Y' && $approval->Status !== 'N')

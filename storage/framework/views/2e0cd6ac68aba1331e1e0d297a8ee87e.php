@@ -113,6 +113,9 @@ Carbon::setLocale('th');
     <div class="card mb-4 border-2">
         <div class="card-body">
             <h5 class="card-title">ปีงบประมาณ: <?php echo e($fiscalYear); ?> ไตรมาส: <?php echo e($quarterName); ?></h5>
+            <?php
+            $displayedStrategicPlans = [];
+            ?>
             <?php $__currentLoopData = $strategics; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $strategic): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <?php $__currentLoopData = $strategic->quarterProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $quarterProject): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <?php if($quarterProject->quarterProject->Fiscal_Year == $fiscalYear && $quarterProject->quarterProject->Quarter
@@ -145,7 +148,10 @@ Carbon::setLocale('th');
             }
             ?>
 
-            <?php if($filteredProjectCount > 0): ?>
+            <?php if($filteredProjectCount > 0 && !in_array($strategic->Name_Strategic_Plan, $displayedStrategicPlans)): ?>
+            <?php
+            $displayedStrategicPlans[] = $strategic->Name_Strategic_Plan;
+            ?>
             <details class="accordion">
                 <summary class="accordion-btn">
                     <b>
@@ -180,6 +186,15 @@ Carbon::setLocale('th');
                             </tr>
                         </thead>
                         <tbody>
+                            <?php
+                            $displayedStrategicName = false;
+                            $totalRowCount = $strategic->strategies->sum(function($strategy) {
+                            return $strategy->projects->filter(function($project) {
+                            return $project->Count_Steps == 1;
+                            })->count();
+                            });
+                            ?>
+
                             <?php $__currentLoopData = $strategic->strategies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $strategy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <?php
                             $strategyDisplayed = false;
@@ -188,6 +203,7 @@ Carbon::setLocale('th');
                             return $project->Count_Steps == 1;
                             });
                             ?>
+
                             <?php if($filteredProjects->count() > 0): ?>
                             <?php $__currentLoopData = $filteredProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $project): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <?php
@@ -196,13 +212,23 @@ Carbon::setLocale('th');
                             }
                             ?>
                             <tr>
-                                <td rowspan="<?php echo e($filteredProjects->count()); ?>"><?php echo e($strategic->Name_Strategic_Plan); ?>
+                                <?php if(!$displayedStrategicName): ?>
+                                <td rowspan="<?php echo e($totalRowCount); ?>"><?php echo e($strategic->Name_Strategic_Plan); ?></td>
+                                <?php
+                                $displayedStrategicName = true;
+                                ?>
+                                <?php endif; ?>
 
-                                </td>
+                                <?php if(!$strategyDisplayed): ?>
                                 <td rowspan="<?php echo e($filteredProjects->count()); ?>"
-                                    class="<?php echo e($allProjectsGray ? 'text-gray' : ''); ?>"><?php echo e($strategy->Name_Strategy); ?>
+                                    class="<?php echo e($allProjectsGray ? 'text-gray' : ''); ?>">
+                                    <?php echo e($strategy->Name_Strategy); ?>
 
                                 </td>
+                                <?php
+                                $strategyDisplayed = true;
+                                ?>
+                                <?php endif; ?>
                                 <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
                                     <b><?php echo e($project->Name_Project); ?></b>
                                 </td>
@@ -355,6 +381,7 @@ Carbon::setLocale('th');
     </div>
     <?php endif; ?>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
 
     <?php $__currentLoopData = $approvals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $approval): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <?php if($approval->Status !== 'Y' && $approval->Status !== 'N'): ?>

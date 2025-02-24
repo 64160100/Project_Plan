@@ -402,7 +402,6 @@ Carbon::setLocale('th');
     $missingStrategies = [];
     $logDataIncompleteStrategies = [];
 
-    // Process logData to extract incomplete strategies and missing strategies for the specific fiscal year and quarter
     foreach ($logData as $logEntry) {
     if (strpos($logEntry, "Fiscal Year: $fiscalYear, Quarter: $quarter->Quarter") !== false) {
     if (strpos($logEntry, 'Status: No strategies created') !== false || strpos($logEntry, 'Status: No projects created')
@@ -461,30 +460,7 @@ Carbon::setLocale('th');
         <div class="card-body">
             <h5 class="card-title">เสนอหาผู้อำนวยการ ปีงบประมาณ <?php echo e($fiscalYear); ?> ไตรมาส <?php echo e($quarter->Quarter); ?></h5>
 
-            <?php if($hasIncompleteStrategies || !empty($missingStrategies) || !empty($logDataIncompleteStrategies) ||
-            $quarterProjects->contains(function($strategic) {
-            return $strategic->projects->contains(function($project) {
-            return $project->approvals->first()->Status !== 'I' && $project->Count_Steps !== 2;
-            });
-            }) ||
-            $quarterProjects->contains(function($strategic) {
-            $projectsWithCountStepsZero = $strategic->projects->filter(function($project) {
-            return $project->Count_Steps === 0;
-            });
-            $projectsWithStatusI = $projectsWithCountStepsZero->contains(function($project) {
-            return $project->approvals->first()->Status === 'I';
-            });
-            return !$projectsWithStatusI && $projectsWithCountStepsZero->isNotEmpty();
-            }) ||
-            $quarterProjects->contains(function($strategic) {
-            $projectsWithCountStepsOne = $strategic->projects->filter(function($project) {
-            return $project->Count_Steps === 1;
-            });
-            $projectsWithCountStepsZeroAndStatusN = $strategic->projects->filter(function($project) {
-            return $project->Count_Steps === 0 && $project->approvals->first()->Status === 'N';
-            });
-            return $projectsWithCountStepsOne->isNotEmpty() && $projectsWithCountStepsZeroAndStatusN->isNotEmpty();
-            })): ?>
+            <?php if($hasIncompleteStrategies || !empty($missingStrategies) || !empty($logDataIncompleteStrategies)): ?>
             <div class="alert alert-warning">
                 <strong>กลยุทธ์ยังไม่ครบสำหรับปีงบประมาณ <?php echo e($fiscalYear); ?> ไตรมาส <?php echo e($quarter->Quarter); ?></strong>
                 <ul>
@@ -498,15 +474,6 @@ Carbon::setLocale('th');
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     <?php $__currentLoopData = $logDataIncompleteStrategies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $logEntry): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <li><?php echo e($logEntry); ?></li>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    <?php $__currentLoopData = $quarterProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $strategic): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <?php if(!in_array($strategic->Name_Strategy, $missingStrategies)): ?>
-                    <?php $__currentLoopData = $strategic->projects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $project): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <?php if($project->approvals->first()->Status !== 'I' && $project->Count_Steps !== 2): ?>
-                    <li>โครงการ <?php echo e($project->Name_Project); ?> ยังไม่ได้ส่งไปหา ผู้อำนวยการ</li>
-                    <?php endif; ?>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    <?php endif; ?>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
             </div>

@@ -391,7 +391,6 @@ Carbon::setLocale('th');
     $missingStrategies = [];
     $logDataIncompleteStrategies = [];
 
-    // Process logData to extract incomplete strategies and missing strategies for the specific fiscal year and quarter
     foreach ($logData as $logEntry) {
     if (strpos($logEntry, "Fiscal Year: $fiscalYear, Quarter: $quarter->Quarter") !== false) {
     if (strpos($logEntry, 'Status: No strategies created') !== false || strpos($logEntry, 'Status: No projects created')
@@ -450,30 +449,7 @@ Carbon::setLocale('th');
         <div class="card-body">
             <h5 class="card-title">เสนอหาผู้อำนวยการ ปีงบประมาณ {{ $fiscalYear }} ไตรมาส {{ $quarter->Quarter }}</h5>
 
-            @if ($hasIncompleteStrategies || !empty($missingStrategies) || !empty($logDataIncompleteStrategies) ||
-            $quarterProjects->contains(function($strategic) {
-            return $strategic->projects->contains(function($project) {
-            return $project->approvals->first()->Status !== 'I' && $project->Count_Steps !== 2;
-            });
-            }) ||
-            $quarterProjects->contains(function($strategic) {
-            $projectsWithCountStepsZero = $strategic->projects->filter(function($project) {
-            return $project->Count_Steps === 0;
-            });
-            $projectsWithStatusI = $projectsWithCountStepsZero->contains(function($project) {
-            return $project->approvals->first()->Status === 'I';
-            });
-            return !$projectsWithStatusI && $projectsWithCountStepsZero->isNotEmpty();
-            }) ||
-            $quarterProjects->contains(function($strategic) {
-            $projectsWithCountStepsOne = $strategic->projects->filter(function($project) {
-            return $project->Count_Steps === 1;
-            });
-            $projectsWithCountStepsZeroAndStatusN = $strategic->projects->filter(function($project) {
-            return $project->Count_Steps === 0 && $project->approvals->first()->Status === 'N';
-            });
-            return $projectsWithCountStepsOne->isNotEmpty() && $projectsWithCountStepsZeroAndStatusN->isNotEmpty();
-            }))
+            @if ($hasIncompleteStrategies || !empty($missingStrategies) || !empty($logDataIncompleteStrategies))
             <div class="alert alert-warning">
                 <strong>กลยุทธ์ยังไม่ครบสำหรับปีงบประมาณ {{ $fiscalYear }} ไตรมาส {{ $quarter->Quarter }}</strong>
                 <ul>
@@ -487,15 +463,6 @@ Carbon::setLocale('th');
                     @endforeach
                     @foreach ($logDataIncompleteStrategies as $logEntry)
                     <li>{{ $logEntry }}</li>
-                    @endforeach
-                    @foreach ($quarterProjects as $strategic)
-                    @if (!in_array($strategic->Name_Strategy, $missingStrategies))
-                    @foreach ($strategic->projects as $project)
-                    @if ($project->approvals->first()->Status !== 'I' && $project->Count_Steps !== 2)
-                    <li>โครงการ {{ $project->Name_Project }} ยังไม่ได้ส่งไปหา ผู้อำนวยการ</li>
-                    @endif
-                    @endforeach
-                    @endif
                     @endforeach
                 </ul>
             </div>

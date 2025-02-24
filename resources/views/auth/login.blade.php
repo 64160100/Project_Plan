@@ -49,9 +49,9 @@
                                 @csrf
 
                                 <div class="form-group mb-3 position-relative">
-                                    <label for="email" class="form-label">ชื่อผู้ใช้</label>
-                                    <input id="email" class="form-control" placeholder="กรุณาใส่ชื่อผู้ใช้"
-                                        name="email" required>
+                                    <label for="username" class="form-label">ชื่อผู้ใช้</label>
+                                    <input id="username" class="form-control" placeholder="กรุณาใส่ชื่อผู้ใช้"
+                                        name="username" required>
                                 </div>
 
                                 <div class="form-group mb-3 position-relative">

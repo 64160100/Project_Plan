@@ -58,5 +58,7 @@ git config --global --unset https.proxy
 ตรวจสอบค่า
 git config --global -l
 
+25d55ad283aa400af464c76d713c07ad
+
 UPDATE Project SET Count_Steps = 0;
 UPDATE Approve SET Status = 'I';

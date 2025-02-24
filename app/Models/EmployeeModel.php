@@ -11,35 +11,30 @@ class EmployeeModel extends Model implements JWTSubject
     protected $table = 'Employee';
     protected $primaryKey = 'Id_Employee';
     protected $fillable = [
-        'Firstname_Employee',
-        'Lastname_Employee',
-        'Email',
+        'Username',
         'Password',
+        'Prefix_Name',
+        'Firstname',
+        'Lastname',
+        'Email',
+        'Phone',
+        'Department_Name',
+        'Position_Name',
+        'TypePersons',
+        'Agency',
+        'Status',
         'IsManager',
         'IsDirector',
-        'IsBoard',
         'IsFinance',
         'IsResponsible',
-        'IsAdmin',
-        'Department_Id',
-        'Position_Id',
+        'IsAdmin'
     ];
 
     public $timestamps = false; 
 
-    public function permissions()
+    public function managementPositions()
     {
-        return $this->belongsToMany(PermissionModel::class, 'Users', 'Employee_Id_Employee', 'Premission_Id_Permission');
-    }
-
-    public function department()
-    {
-        return $this->belongsTo(DepartmentModel::class, 'Department_Id', 'Id_Department');
-    }
-
-    public function position()
-    {
-        return $this->belongsTo(PositionModel::class, 'Position_Id');
+        return $this->hasMany(ManagementPosition::class, 'Employee_Id', 'Id_Employee');
     }
 
     public function getJWTIdentifier()
@@ -51,6 +46,4 @@ class EmployeeModel extends Model implements JWTSubject
     {
         return [];
     }
-
-    
 }

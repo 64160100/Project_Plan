@@ -28,9 +28,7 @@ Route::get('/listProject', [ListProjectController::class, 'project'])->name('pro
 Route::get('/createFirstForm/{Strategic_Id}', [ListProjectController::class, 'showCreateFirstForm'])->name('showCreateFirstForm');
 Route::get('/createProject/{Strategic_Id}', [ListProjectController::class, 'showCreateForm'])->name('showCreateProject');
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
-
 Route::put('/approvals/disapproveAll/{id}', [ListProjectController::class, 'disapproveAll'])->name('disapproveAll');
-
 Route::put('/approvals/updateAllStatus', [RequestApprovalController::class, 'updateAllStatus'])->name('updateAllStatus');
 
 

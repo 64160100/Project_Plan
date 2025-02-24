@@ -1,23 +1,24 @@
-<?php $__env->startSection('content'); ?>
 <div class="container">
     <h1>ยินดีต้อนรับสู่ระบบติดตามแผนงาน</h1>
 
-    <h1>Welcome, <?php echo e(session('employee') ? session('employee')->Firstname_Employee : 'Guest'); ?> <?php echo e(session('employee') ? session('employee')->Lastname_Employee : ''); ?></h1>
+    <h1>Welcome, <?php echo e(session('employee') ? session('employee')->Firstname : 'Guest'); ?> <?php echo e(session('employee') ? session('employee')->Lastname : ''); ?></h1>
     
     <h1><?php echo e($message); ?></h1>
 
     <p>Your permissions:</p>
     <ul>
-        <?php $__currentLoopData = session('permissions', []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-        <li><?php echo e($permission->Name_Permission); ?></li>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
     </ul>
 
     <!-- Button 1 -->
     <button id="button1" class="btn btn-primary">Show Popup</button>
     <!-- Button 2 -->
     <button id="button2" class="btn btn-secondary">Another Action</button>
-
+    <!-- Logout Button -->
+    <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display: inline;">
+        <?php echo csrf_field(); ?>
+        <button type="submit" class="btn btn-danger">Logout</button>
+    </form>
 </div>
 
 <!-- Popup Modal -->
@@ -50,6 +51,4 @@
             $('#popupModal').modal('show');
         });
     });
-</script>
-<?php $__env->stopSection(); ?>
-<?php echo $__env->make('navbar.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /var/www/resources/views/dashboard.blade.php ENDPATH**/ ?>
+</script><?php /**PATH /var/www/resources/views/dashboard.blade.php ENDPATH**/ ?>

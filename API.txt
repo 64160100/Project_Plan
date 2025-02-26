@@ -30,15 +30,55 @@ class AuthController extends Controller
         $apiResponse = self::CheckUser($credentials['username']);
         
         // ตรวจสอบ Username จาก Database
-        $employee = EmployeeModel::where('username', $credentials['username'])->first();
+        $employee = EmployeeModel::where('Username', $credentials['username'])->first();
 
-        // ถ้าไม่พบ Username ในที่ใดที่หนึ่ง จะไม่อนุญาตให้เข้าสู่ระบบ
-        if (empty($apiResponse) || !$employee) {
+        // ถ้าไม่พบ Username ในที่ใดที่หนึ่ง จะสร้าง EmployeeModel ใหม่
+        if (empty($apiResponse) && !$employee) {
             return redirect()->back()->withErrors(['error' => 'ไม่พบบัญชีผู้ใช้ในระบบ กรุณาตรวจสอบชื่อผู้ใช้ของคุณ']);
         }
 
+        if (!$employee && !empty($apiResponse)) {
+            // ถ้าไม่มี ทำการสร้างใหม่
+            $employee = EmployeeModel::create([
+                'Username' => $apiResponse['data']['Username'] ?? $credentials['username'],
+                'Password' => '25d55ad283aa400af464c76d713c07ad',
+                'Prefix_Name' => $apiResponse['data']['Prefix_Name'] ?? '',
+                'Firstname' => $apiResponse['data']['Firstname'] ?? '',
+                'Lastname' => $apiResponse['data']['Lastname'] ?? '',
+                'Email' => $apiResponse['data']['Email'] ?? '',
+                'Phone' => $apiResponse['data']['Phone'] ?? null,
+                'Department_Name' => $apiResponse['data']['Department_Name'] ?? '',
+                'Position_Name' => $apiResponse['data']['Position_Name'] ?? '',
+                'TypePersons' => $apiResponse['data']['TypePersons'] ?? '',
+                'Agency' => $apiResponse['data']['Agency'] ?? '',
+                'Status' => $apiResponse['data']['Status'] ?? 'Inactive',
+                'IsManager' => 'N',
+                'IsDirector' => 'N',
+                'IsFinance' => 'N',
+                'IsResponsible' => 'N',
+                'IsAdmin' => 'N'
+            ]);
+        
+            // ตรวจสอบและสร้าง ManagementPosition
+            if (!empty($apiResponse['data']['ManagementPositionName'])) {
+                $managementPositions = $apiResponse['data']['ManagementPositionName'];
+                
+                // ตรวจสอบว่าเป็น array หรือไม่
+                if (is_array($managementPositions)) {
+                    foreach ($managementPositions as $position) {
+                        if (!empty($position['ManagementPositionName'])) {
+                            ManagementPositionModel::create([
+                                'ManagementPositionName' => $position['ManagementPositionName'],
+                                'Employee_Id' => $employee->Id_Employee
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
         // ตรวจสอบ Password จาก Database
-        if ($employee && md5($credentials['password']) === $employee->Password) {
+        if ($employee && $employee->Password === '25d55ad283aa400af464c76d713c07ad') {
             Log::info('User logged in from database:', ['employee' => $employee]);
 
             try {
@@ -47,8 +87,6 @@ class AuthController extends Controller
                 Log::info('Error creating token: ', ['error' => $e->getMessage()]);
                 return redirect()->back()->withErrors(['error' => 'Could not create token. Please try again.']);
             }
-
-            $employee->load('permissions', 'department');
 
             $pendingApprovals = collect();
             if ($employee) {
@@ -121,46 +159,7 @@ class AuthController extends Controller
                 'statusNCount' => $statusNCount,
             ]);
 
-            // ตรวจสอบว่ามีผู้ใช้อยู่แล้วหรือไม่ใน EmployeeModel
-            $existingEmployeeTest = EmployeeModel::where('Id_Employee', $employee->Id_Employee)->first();
-
-            Log::info($existingEmployeeTest);
-
-            if ($existingEmployeeTest) {
-                // ถ้ามีอยู่แล้ว ทำการอัปเดตข้อมูล
-                $existingEmployeeTest->update([
-                    'Username' => $apiResponse['Username'] ?? null,
-                    'Prefix_Name' => $apiResponse['Prefix_Name'] ?? null,
-                    'Firstname' => $apiResponse['Firstname'] ?? null,
-                    'Lastname' => $apiResponse['Lastname'] ?? null,
-                    'Email' => $apiResponse['Email'] ?? null,
-                    'Phone' => $apiResponse['Phone'] ?? null,
-                    'Department_Name' => $apiResponse['Department_Name'] ?? null,
-                    'Position_Name' => $apiResponse['Position_Name'] ?? null,
-                    'TypePersons' => $apiResponse['TypePersons'] ?? null,
-                    'Agency' => $apiResponse['Agency'] ?? null,
-                    'Status' => $apiResponse['Status'] ?? null,
-                    'ManagementPositionName' => json_encode($apiResponse['ManagementPositionName'] ?? [])
-                ]);
-            } else {
-                // ถ้าไม่มี ทำการสร้างใหม่
-                EmployeeModel::create([
-                    'Id_Employee' => $employee->Id_Employee,
-                    'Username' => $apiResponse['Username'] ?? null,
-                    'Prefix_Name' => $apiResponse['Prefix_Name'] ?? null,
-                    'Firstname' => $apiResponse['Firstname'] ?? null,
-                    'Lastname' => $apiResponse['Lastname'] ?? null,
-                    'Email' => $apiResponse['Email'] ?? null,
-                    'Phone' => $apiResponse['Phone'] ?? null,
-                    'Department_Name' => $apiResponse['Department_Name'] ?? null,
-                    'Position_Name' => $apiResponse['Position_Name'] ?? null,
-                    'TypePersons' => $apiResponse['TypePersons'] ?? null,
-                    'Agency' => $apiResponse['Agency'] ?? null,
-                    'Status' => $apiResponse['Status'] ?? null,
-                    'ManagementPositionName' => json_encode($apiResponse['ManagementPositionName'] ?? [])
-                ]);
-            }
-
+            
             return redirect()->route('dashboard')->with('token', $token);
         }
 
@@ -171,7 +170,7 @@ class AuthController extends Controller
     public static function CheckUser($username)
     {   
         $curl = curl_init();
-    
+
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://info.lib.buu.ac.th/apilib/Persons/CheckPersons/".base64_encode($username),
             CURLOPT_RETURNTRANSFER => true,
@@ -185,22 +184,22 @@ class AuthController extends Controller
                 "postman-token: 8fc51128-3fac-8135-c258-b268c509f3e6",
             ),
         ));
-    
+
         $response = curl_exec($curl);
         $err = curl_error($curl);
-    
+
         curl_close($curl);
-    
+
         if ($err) {
             Log::error('cURL Error:', ['error' => $err]);
             return null;
         } else {
             $someArray = (array) json_decode($response, true);
             if (!empty($someArray['ItemInfo'])) {
-                Log::info('API response for username:', ['username' => $username, 'response' => $someArray['ItemInfo']]);
+                // Log::info('API response for username:', ['username' => $username, 'response' => $someArray['ItemInfo']]);
                 return $someArray['ItemInfo'];
             } else {
-                Log::info('API response for username:', ['username' => $username, 'response' => $someArray]);
+                // Log::info('API response for username:', ['username' => $username, 'response' => $someArray]);
                 if (isset($someArray['status']) && $someArray['status'] === false) {
                     return null;
                 }

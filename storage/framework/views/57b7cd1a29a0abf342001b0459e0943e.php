@@ -98,7 +98,7 @@
                     <!-- content in sidebar -->
                     <ul class="nav nav-secondary">
                         <?php
-                        $permissions = session('permissions', []);
+                        $employee = session('employee');
                         $projectManagement = false;
                         $approval = false;
                         $systemManagement = false;
@@ -113,16 +113,15 @@
                         'manage_users' => false,
                         'data_employee' => false,
                         'setup_system' => false,
+                        'propose_project' => false, // เพิ่มคีย์ propose_project
                         ];
                         ?>
 
                         <!-- Check for project management permissions -->
-                        <?php $__currentLoopData = $permissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php if($permission->Dashborad === 'Y' || $permission->List_Project === 'Y' ||
-                        $permission->Track_Status === 'Y'): ?>
+                        <?php if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y'): ?>
                         <?php $projectManagement = true; ?>
                         <?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                         <?php if($projectManagement): ?>
                         <li class="nav-section">
@@ -130,8 +129,9 @@
                         </li>
                         <?php endif; ?>
 
-                        <?php $__currentLoopData = $permissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php if($permission->Dashborad === 'Y' && !$renderedItems['dashboard']): ?>
+                        <?php if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y'): ?>
+                        <?php if(!$renderedItems['dashboard']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('dashboard')); ?>">
                                 <i class='bx bxs-grid-alt'></i>
@@ -140,7 +140,7 @@
                         </li>
                         <?php $renderedItems['dashboard'] = true; ?>
                         <?php endif; ?>
-                        <?php if($permission->List_Project === 'Y' && !$renderedItems['list_project']): ?>
+                        <?php if(!$renderedItems['list_project']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('project')); ?>">
                                 <i class='bx bx-folder bx-flip-horizontal'></i>
@@ -149,7 +149,7 @@
                         </li>
                         <?php $renderedItems['list_project'] = true; ?>
                         <?php endif; ?>
-                        <?php if($permission->Track_Status === 'Y' && !$renderedItems['track_status']): ?>
+                        <?php if(!$renderedItems['track_status']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('status.tracking')); ?>">
                                 <i class='bx bx-time-five bx-flip-horizontal'></i>
@@ -158,15 +158,13 @@
                         </li>
                         <?php $renderedItems['track_status'] = true; ?>
                         <?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
 
                         <!-- Check for approval permissions -->
-                        <?php $__currentLoopData = $permissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php if($permission->Documents_Project === 'Y' || $permission->Report_results === 'Y' ||
-                        $permission->Check_Budget === 'Y' || $permission->Approval_Project === 'Y'): ?>
+                        <?php if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y'): ?>
                         <?php $approval = true; ?>
                         <?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                         <?php if($approval): ?>
                         <li class="nav-section">
@@ -174,8 +172,9 @@
                         </li>
                         <?php endif; ?>
 
-                        <?php $__currentLoopData = $permissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php if($permission->Documents_Project === 'Y' && empty($renderedItems['documents_project'])): ?>
+                        <?php if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y'): ?>
+                        <?php if(!$renderedItems['documents_project']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('PlanDLC.allProject')); ?>">
                                 <i class='bx bx-file bx-flip-horizontal'></i>
@@ -185,7 +184,7 @@
                         <?php $renderedItems['documents_project'] = true; ?>
                         <?php endif; ?>
 
-                        <?php if($permission->Report_results === 'Y' && empty($renderedItems['report_results'])): ?>
+                        <?php if(!$renderedItems['report_results']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('PlanDLC.report')); ?>">
                                 <i class='bx bx-task'></i>
@@ -195,7 +194,7 @@
                         <?php $renderedItems['report_results'] = true; ?>
                         <?php endif; ?>
 
-                        <?php if($permission->Check_Budget === 'Y' && empty($renderedItems['check_budget'])): ?>
+                        <?php if(!$renderedItems['check_budget']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('PlanDLC.checkBudget')); ?>">
                                 <i class='bx bxs-calculator bx-flip-horizontal'></i>
@@ -205,7 +204,7 @@
                         <?php $renderedItems['check_budget'] = true; ?>
                         <?php endif; ?>
 
-                        <?php if($permission->Approval_Project === 'Y' && empty($renderedItems['approval_project'])): ?>
+                        <?php if(!$renderedItems['approval_project']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('requestApproval')); ?>">
                                 <i class='bx bx-select-multiple'></i>
@@ -218,7 +217,7 @@
                         <?php $renderedItems['approval_project'] = true; ?>
                         <?php endif; ?>
 
-                        <?php if($permission->Propose_Project === 'Y' && empty($renderedItems['propose_project'])): ?>
+                        <?php if(!$renderedItems['propose_project']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('proposeProject')); ?>">
                                 <i class='bx bx-food-menu'></i>
@@ -230,15 +229,13 @@
                         </li>
                         <?php $renderedItems['propose_project'] = true; ?>
                         <?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
 
                         <!-- Check for system management permissions -->
-                        <?php $__currentLoopData = $permissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php if($permission->Manage_Users === 'Y' || $permission->Data_Employee === 'Y' ||
-                        $permission->Setup_System === 'Y'): ?>
+                        <?php if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y'): ?>
                         <?php $systemManagement = true; ?>
                         <?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                         <?php if($systemManagement): ?>
                         <li class="nav-section">
@@ -246,17 +243,9 @@
                         </li>
                         <?php endif; ?>
 
-                        <?php $__currentLoopData = $permissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php if($permission->Manage_Users === 'Y' && !$renderedItems['manage_users']): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo e(route('account.user')); ?>">
-                                <i class='bx bx-group'></i>
-                                <p>จัดการผู้ใช้งาน</p>
-                            </a>
-                        </li>
-                        <?php $renderedItems['manage_users'] = true; ?>
-                        <?php endif; ?>
-                        <?php if($permission->Data_Employee === 'Y' && !$renderedItems['data_employee']): ?>
+                        <?php if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y'): ?>
+                        <?php if(!$renderedItems['data_employee']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('account.employee')); ?>">
                                 <i class='bx bx-group'></i>
@@ -265,7 +254,7 @@
                         </li>
                         <?php $renderedItems['data_employee'] = true; ?>
                         <?php endif; ?>
-                        <?php if($permission->Setup_System === 'Y' && !$renderedItems['setup_system']): ?>
+                        <?php if(!$renderedItems['setup_system']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('setting')); ?>">
                                 <i class='bx bx-cog'></i>
@@ -274,7 +263,7 @@
                         </li>
                         <?php $renderedItems['setup_system'] = true; ?>
                         <?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </div>
@@ -309,19 +298,6 @@
                 <!-- Navbar Header -->
                 <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
                     <div class="container-fluid">
-                        <nav
-                            class="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <button type="submit" class="btn btn-search pe-1">
-
-                                        <i class='bx bx-search-alt-2'></i>
-                                    </button>
-                                </div>
-                                <input type="text" placeholder="Search ..." class="form-control" />
-                            </div>
-                        </nav>
-
                         <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
                             <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
@@ -448,17 +424,23 @@
                                 <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#"
                                     aria-expanded="false">
                                     <div class="profile-container"
-                                        style="background: linear-gradient(180deg, #8729DA 0%, #AC2BDD 100%); border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; display: flex; align-items: center; color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); width: 250px; margin-left: auto; margin-right: -20px;">
+                                        style="background: linear-gradient(180deg, #8729DA 0%, #AC2BDD 100%); border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; display: flex; align-items: center; color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); width: auto; max-width: 300px; margin-left: auto; margin-right: -20px;">
                                         <div class="avatar-sm" style="margin-right: 10px;">
                                             <img src="<?php echo e(asset('images/profile.jpg')); ?>" alt="..."
                                                 class="avatar-img rounded-circle" />
                                         </div>
-                                        <span class="profile-username">
-                                            <span class="op-7">Hi,</span>
+                                        <span class="profile-username"
+                                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                             <span class="fw-bold">
-                                                <?php echo e(session('employee') ? session('employee')->Firstname_Employee . ' ' . session('employee')->Lastname_Employee : 'Guest'); ?><br>
-                                                <?php if(session('permissions')): ?>
-                                                (<?php echo e(implode(', ', session('permissions')->pluck('Name_Permission')->toArray())); ?>)
+                                                <?php if(session('employee')): ?>
+                                                <?php echo e(session('employee')->Prefix_Name); ?>
+
+                                                <?php echo e(session('employee')->Firstname); ?>
+
+                                                <?php echo e(session('employee')->Lastname); ?><br>
+                                                <small><?php echo e(session('employee')->Position_Name); ?></small>
+                                                <?php else: ?>
+                                                Guest
                                                 <?php endif; ?>
                                             </span>
                                         </span>

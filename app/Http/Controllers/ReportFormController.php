@@ -10,7 +10,7 @@ class ReportFormController extends Controller
 {
     public function showReportForm($id)
     {
-        $project = ListProjectModel::with(['strategic', 'strategy', 'employee', 'approvals', 'supProjects', 'storageFiles', 'sdgs', 'platforms', 'projectHasSDGs', 'projectHasIntegrationCategories', 'targets', 'locations', 'projectHasIndicators', 'pdca'])->findOrFail($id);
+        $project = ListProjectModel::with(['strategic', 'strategy', 'employee', 'approvals', 'subProjects', 'storageFiles', 'sdgs', 'platforms', 'projectHasSDGs', 'projectHasIntegrationCategories', 'targets', 'locations', 'projectHasIndicators', 'pdca'])->findOrFail($id);
         return view('ReportForm', compact('project'));
     }
 
@@ -35,9 +35,8 @@ class ReportFormController extends Controller
             $approval = $project->approvals->first();
 
             $employee = $request->session()->get('employee');
-            $permissions = $employee ? $employee->permissions : collect();
-            $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
-            $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
+            $nameResponsible = $employee ? $employee->Firstname . ' ' . $employee->Lastname : 'Unknown';
+            $roleCreator = $employee ? $employee->Position_Name : 'Unknown';
 
             $comment = "รายงานความคืบหน้าการดำเนินโครงการ";
 
@@ -48,7 +47,7 @@ class ReportFormController extends Controller
                 'Time_Record' => Carbon::now('Asia/Bangkok'),
                 'Status_Record' => $approval->Status,
                 'Name_Record' => $nameResponsible,
-                'Permission_Record' => $permissionName,
+                'Permission_Record' => $roleCreator,
             ]);
 
             $approval->Status = 'I';

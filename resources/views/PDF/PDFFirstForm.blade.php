@@ -155,8 +155,8 @@
                     <td>{{ $project->Name_Strategy ?? '-'}}</td>
                     <td>
                         {{ $project->Name_Project }}<br>
-                        @foreach($project->supProjects as $subProject)
-                        - {{ $subProject->Name_Sup_Project }}<br>
+                        @foreach($project->subProjects as $subProject)
+                        - {{ $subProject->Name_Sub_Project }}<br>
                         @endforeach
                     </td>
                     <td>{{ $project->Objective_Project ?? '-' }}</td>
@@ -196,8 +196,8 @@
                         @endif
                     </td>
                     <td>
-                        {{ $project->employee->Firstname_Employee ?? '-' }}
-                        {{ $project->employee->Lastname_Employee ?? '' }}
+                        {{ $project->employee->Firstname ?? '-' }}
+                        {{ $project->employee->Lastname ?? '' }}
                     </td>
                 </tr>
             </tbody>

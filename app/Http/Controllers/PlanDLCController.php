@@ -4,29 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ListProjectModel;
-use App\Models\DepartmentModel;
 use Illuminate\Support\Facades\Log;
 
 class PlanDLCController extends Controller
 {
-    public function report(){
-        $lastestProject = ListProjectModel::with(['employee.department', 'employee.position'])
-                        ->orderBy('Id_Project', 'DESC')
-                        ->paginate(5);
-        $department = DepartmentModel::all();
+    public function report()
+    {
+        $lastestProject = ListProjectModel::join('Employee', 'Project.Employee_Id', '=', 'Employee.Id_Employee')
+                            ->select('Project.*', 'Employee.Department_Name', 'Employee.Position_Name')
+                            ->orderBy('Id_Project', 'DESC')
+                            ->paginate(5);
 
-        foreach ($department as $departments) {
-            $departments->projects_count = ListProjectModel::join('Employee', 'Project.Employee_Id', '=', 'Employee.Id_Employee')
-                ->where('Employee.Department_Id', $departments->Id_Department)
-                ->count();
-        }
-        
-    
-        $data = [      
-            'lastestProject' => $lastestProject,
-            'department' => $department
+        $data = [
+            'lastestProject' => $lastestProject
         ];
-        
+
         return view('PlanDLC.report', $data);
     }
 
@@ -41,12 +33,16 @@ class PlanDLCController extends Controller
     }
 
     public function allProject(){
-
-        $allProject = ListProjectModel::with(['employee.department', 'employee.position'])
+        $allProject = ListProjectModel::join('Employee', 'Project.Employee_Id', '=', 'Employee.Id_Employee')
+                        ->select('Project.*', 'Employee.Department_Name', 'Employee.Position_Name')
                         ->orderBy('Id_Project', 'DESC')
                         ->paginate(5);
 
-        return view('PlanDLC.allProject', compact('allProject'));        
+        $data = [
+            'allProject' => $allProject
+        ];
+
+        return view('PlanDLC.allProject', $data);        
     }
 
     public function showProjectDepartment($Id_Department){

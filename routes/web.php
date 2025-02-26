@@ -11,6 +11,7 @@ use App\Http\Controllers\FiscalYearQuarterController;
 use App\Http\Controllers\ProposeProjectController;
 use App\Http\Controllers\RequestApprovalController;
 use App\Http\Controllers\ReportFormController;
+use App\Http\Controllers\SustainableDevelopmentGoalsController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -113,3 +114,9 @@ Route::post('/projects/update-field', [ListProjectController::class, 'updateFiel
 
 Route::get('/report-form/{id}', [ReportFormController::class, 'showReportForm'])->name('reportForm');
 Route::post('/projects/complete/{id}', [ReportFormController::class, 'completeProject'])->name('projects.complete');
+
+//Sdg
+Route::get('showSdg', [SustainableDevelopmentGoalsController::class, 'showSdg'])->name('showSdg');
+Route::post('/showSdg', [SustainableDevelopmentGoalsController::class, 'createSDG'])->name('createSDG');
+Route::put('/editSDG/{id_SDGs}', [SustainableDevelopmentGoalsController::class, 'editSDG'])->name('editSDG');
+Route::delete('/deleteSDG/{id_SDGs}', [SustainableDevelopmentGoalsController::class, 'deleteSDG'])->name('deleteSDG');

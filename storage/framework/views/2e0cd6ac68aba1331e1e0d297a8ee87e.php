@@ -254,9 +254,9 @@ Carbon::setLocale('th');
                                     <?php endif; ?>
                                 </td>
                                 <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
-                                    <?php echo e($project->employee->Firstname_Employee ?? '-'); ?>
+                                    <?php echo e($project->employee->Firstname ?? '-'); ?>
 
-                                    <?php echo e($project->employee->Lastname_Employee ?? '-'); ?>
+                                    <?php echo e($project->employee->Lastname ?? '-'); ?>
 
                                 </td>
                                 <td>

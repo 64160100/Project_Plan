@@ -562,8 +562,8 @@ Carbon::setLocale('th');
                                     <?php endif; ?>
                                     <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
                                         <b><?php echo e($Project->Name_Project); ?></b><br>
-                                        <?php $__currentLoopData = $Project->supProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $supProject): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        - <?php echo e($subProject->Name_Sup_Project); ?><br>
+                                        <?php $__currentLoopData = $Project->subProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subProject): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        - <?php echo e($subProject->Name_Sub_Project); ?><br> 
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </td>
                                     <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">

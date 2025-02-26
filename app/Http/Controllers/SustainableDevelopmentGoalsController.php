@@ -3,20 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\SustainableDevelopmentGoalsModel;
+use App\Models\SDGsModel;
+use Illuminate\Support\Facades\Log;
+
 
 class SustainableDevelopmentGoalsController extends Controller
 {
     public function showSdg()
     {
-        $sdg = SustainableDevelopmentGoalsModel::all();
+        $sdg = SDGsModel::all();
+
+        log::info($sdg);
         return view('SDG.Sdg', compact('sdg'));
         // return view('SDG.Sdg');
     }
 
     public function createSDG(Request $request)
     {
-            $sdg = new SustainableDevelopmentGoalsModel;
+            $sdg = new SDGsModel;
             $sdg->id_SDGs = $request->id_SDGs;
             $sdg->Name_SDGs = $request->Name_SDGs;
             $sdg->save();
@@ -27,7 +31,7 @@ class SustainableDevelopmentGoalsController extends Controller
    
     public function editSDG(Request $request, $id_SDGs)
     {
-        $sdg = SustainableDevelopmentGoalsModel::find($id_SDGs);
+        $sdg = SDGsModel::find($id_SDGs);
 
         if (!$sdg) {
             return redirect()->back()->with('error', 'ไม่พบข้อมูลเป้าหมายการพัฒนานี้');
@@ -45,7 +49,7 @@ class SustainableDevelopmentGoalsController extends Controller
 
     public function deleteSDG(Request $request, $id_SDGs)
     {
-        $sdg = SustainableDevelopmentGoalsModel::find($id_SDGs);
+        $sdg = SDGsModel::find($id_SDGs);
         if (!$sdg) {
             return redirect()->back()->with('error', 'ไม่พบเป้าหมายการพัฒนานี้');
         }

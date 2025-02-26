@@ -159,9 +159,8 @@ class ListProjectController extends Controller
         $strategyId = $strategy ? $strategy->Id_Strategy : null;
 
         $employee = $request->session()->get('employee');
-        $nameCreator = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
-        $permissions = $request->session()->get('permissions');
-        $roleCreator = $permissions->first()->Name_Permission ?? 'Unknown';
+        $nameCreator = $employee ? $employee->Firstname. ' ' . $employee->Lastname : 'Unknown';
+        $roleCreator = $employee ? $employee->Position_Name : 'Unknown';
 
         $project = new ListProjectModel;
         $project->Strategic_Id = $request->Strategic_Id;
@@ -435,29 +434,24 @@ class ListProjectController extends Controller
             }
 
             try {
-                // Define file size limits and allowed types
                 $maxFileSizeInMB = config('filesystems.max_upload_size', 20);
                 $maxFileSizeInBytes = $maxFileSizeInMB * 1024 * 1024;
             
-                // Create base directory if it doesn't exist
                 $baseDir = storage_path('app/public/uploads');
                 if (!file_exists($baseDir)) {
                     mkdir($baseDir, 0755, true);
                 }
             
-                // สร้างชื่อโฟลเดอร์ตาม project_id
                 $folderPath = 'uploads/project_' . $project->Id_Project;
             
-                // Ensure directory exists
                 if (!Storage::disk('public')->exists($folderPath)) {
                     Storage::disk('public')->makeDirectory($folderPath);
                     Log::info('Project directory created', ['path' => $folderPath]);
                 }
             
-                // Load project with relationships
                 $pdfData = [
                     'project' => $project->load([
-                        'supProjects',
+                        'subProjects',
                         'projectBudgetSources.budget_source',
                         'strategic',
                         'strategy',

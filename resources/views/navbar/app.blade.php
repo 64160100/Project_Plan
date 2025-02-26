@@ -98,7 +98,7 @@
                     <!-- content in sidebar -->
                     <ul class="nav nav-secondary">
                         @php
-                        $permissions = session('permissions', []);
+                        $employee = session('employee');
                         $projectManagement = false;
                         $approval = false;
                         $systemManagement = false;
@@ -113,16 +113,15 @@
                         'manage_users' => false,
                         'data_employee' => false,
                         'setup_system' => false,
+                        'propose_project' => false, // เพิ่มคีย์ propose_project
                         ];
                         @endphp
 
                         <!-- Check for project management permissions -->
-                        @foreach($permissions as $permission)
-                        @if($permission->Dashborad === 'Y' || $permission->List_Project === 'Y' ||
-                        $permission->Track_Status === 'Y')
+                        @if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y')
                         @php $projectManagement = true; @endphp
                         @endif
-                        @endforeach
 
                         @if($projectManagement)
                         <li class="nav-section">
@@ -130,8 +129,9 @@
                         </li>
                         @endif
 
-                        @foreach($permissions as $permission)
-                        @if($permission->Dashborad === 'Y' && !$renderedItems['dashboard'])
+                        @if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y')
+                        @if(!$renderedItems['dashboard'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('dashboard') }}">
                                 <i class='bx bxs-grid-alt'></i>
@@ -140,7 +140,7 @@
                         </li>
                         @php $renderedItems['dashboard'] = true; @endphp
                         @endif
-                        @if($permission->List_Project === 'Y' && !$renderedItems['list_project'])
+                        @if(!$renderedItems['list_project'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('project') }}">
                                 <i class='bx bx-folder bx-flip-horizontal'></i>
@@ -149,7 +149,7 @@
                         </li>
                         @php $renderedItems['list_project'] = true; @endphp
                         @endif
-                        @if($permission->Track_Status === 'Y' && !$renderedItems['track_status'])
+                        @if(!$renderedItems['track_status'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('status.tracking') }}">
                                 <i class='bx bx-time-five bx-flip-horizontal'></i>
@@ -158,15 +158,13 @@
                         </li>
                         @php $renderedItems['track_status'] = true; @endphp
                         @endif
-                        @endforeach
+                        @endif
 
                         <!-- Check for approval permissions -->
-                        @foreach($permissions as $permission)
-                        @if($permission->Documents_Project === 'Y' || $permission->Report_results === 'Y' ||
-                        $permission->Check_Budget === 'Y' || $permission->Approval_Project === 'Y')
+                        @if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y')
                         @php $approval = true; @endphp
                         @endif
-                        @endforeach
 
                         @if($approval)
                         <li class="nav-section">
@@ -174,8 +172,9 @@
                         </li>
                         @endif
 
-                        @foreach($permissions as $permission)
-                        @if($permission->Documents_Project === 'Y' && empty($renderedItems['documents_project']))
+                        @if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y')
+                        @if(!$renderedItems['documents_project'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('PlanDLC.allProject') }}">
                                 <i class='bx bx-file bx-flip-horizontal'></i>
@@ -185,7 +184,7 @@
                         @php $renderedItems['documents_project'] = true; @endphp
                         @endif
 
-                        @if($permission->Report_results === 'Y' && empty($renderedItems['report_results']))
+                        @if(!$renderedItems['report_results'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('PlanDLC.report') }}">
                                 <i class='bx bx-task'></i>
@@ -195,7 +194,7 @@
                         @php $renderedItems['report_results'] = true; @endphp
                         @endif
 
-                        @if($permission->Check_Budget === 'Y' && empty($renderedItems['check_budget']))
+                        @if(!$renderedItems['check_budget'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('PlanDLC.checkBudget') }}">
                                 <i class='bx bxs-calculator bx-flip-horizontal'></i>
@@ -205,7 +204,7 @@
                         @php $renderedItems['check_budget'] = true; @endphp
                         @endif
 
-                        @if($permission->Approval_Project === 'Y' && empty($renderedItems['approval_project']))
+                        @if(!$renderedItems['approval_project'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('requestApproval') }}">
                                 <i class='bx bx-select-multiple'></i>
@@ -218,7 +217,7 @@
                         @php $renderedItems['approval_project'] = true; @endphp
                         @endif
 
-                        @if($permission->Propose_Project === 'Y' && empty($renderedItems['propose_project']))
+                        @if(!$renderedItems['propose_project'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('proposeProject') }}">
                                 <i class='bx bx-food-menu'></i>
@@ -230,15 +229,13 @@
                         </li>
                         @php $renderedItems['propose_project'] = true; @endphp
                         @endif
-                        @endforeach
+                        @endif
 
                         <!-- Check for system management permissions -->
-                        @foreach($permissions as $permission)
-                        @if($permission->Manage_Users === 'Y' || $permission->Data_Employee === 'Y' ||
-                        $permission->Setup_System === 'Y')
+                        @if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y')
                         @php $systemManagement = true; @endphp
                         @endif
-                        @endforeach
 
                         @if($systemManagement)
                         <li class="nav-section">
@@ -246,17 +243,9 @@
                         </li>
                         @endif
 
-                        @foreach($permissions as $permission)
-                        @if($permission->Manage_Users === 'Y' && !$renderedItems['manage_users'])
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('account.user') }}">
-                                <i class='bx bx-group'></i>
-                                <p>จัดการผู้ใช้งาน</p>
-                            </a>
-                        </li>
-                        @php $renderedItems['manage_users'] = true; @endphp
-                        @endif
-                        @if($permission->Data_Employee === 'Y' && !$renderedItems['data_employee'])
+                        @if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y')
+                        @if(!$renderedItems['data_employee'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('account.employee') }}">
                                 <i class='bx bx-group'></i>
@@ -265,7 +254,7 @@
                         </li>
                         @php $renderedItems['data_employee'] = true; @endphp
                         @endif
-                        @if($permission->Setup_System === 'Y' && !$renderedItems['setup_system'])
+                        @if(!$renderedItems['setup_system'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('setting') }}">
                                 <i class='bx bx-cog'></i>
@@ -274,7 +263,7 @@
                         </li>
                         @php $renderedItems['setup_system'] = true; @endphp
                         @endif
-                        @endforeach
+                        @endif
                     </ul>
                 </div>
             </div>
@@ -309,19 +298,6 @@
                 <!-- Navbar Header -->
                 <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
                     <div class="container-fluid">
-                        <nav
-                            class="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <button type="submit" class="btn btn-search pe-1">
-
-                                        <i class='bx bx-search-alt-2'></i>
-                                    </button>
-                                </div>
-                                <input type="text" placeholder="Search ..." class="form-control" />
-                            </div>
-                        </nav>
-
                         <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
                             <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
@@ -444,17 +420,21 @@
                                 <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#"
                                     aria-expanded="false">
                                     <div class="profile-container"
-                                        style="background: linear-gradient(180deg, #8729DA 0%, #AC2BDD 100%); border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; display: flex; align-items: center; color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); width: 250px; margin-left: auto; margin-right: -20px;">
+                                        style="background: linear-gradient(180deg, #8729DA 0%, #AC2BDD 100%); border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; display: flex; align-items: center; color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); width: auto; max-width: 300px; margin-left: auto; margin-right: -20px;">
                                         <div class="avatar-sm" style="margin-right: 10px;">
                                             <img src="{{ asset('images/profile.jpg') }}" alt="..."
                                                 class="avatar-img rounded-circle" />
                                         </div>
-                                        <span class="profile-username">
-                                            <span class="op-7">Hi,</span>
+                                        <span class="profile-username"
+                                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                             <span class="fw-bold">
-                                                {{ session('employee') ? session('employee')->Firstname_Employee . ' ' . session('employee')->Lastname_Employee : 'Guest' }}<br>
-                                                @if(session('permissions'))
-                                                ({{ implode(', ', session('permissions')->pluck('Name_Permission')->toArray()) }})
+                                                @if(session('employee'))
+                                                {{ session('employee')->Prefix_Name }}
+                                                {{ session('employee')->Firstname }}
+                                                {{ session('employee')->Lastname }}<br>
+                                                <small>{{ session('employee')->Position_Name }}</small>
+                                                @else
+                                                Guest
                                                 @endif
                                             </span>
                                         </span>

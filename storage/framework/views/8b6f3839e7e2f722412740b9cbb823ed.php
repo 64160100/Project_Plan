@@ -31,19 +31,7 @@
         </div>
     </a>
 
-    <a href="#" class="link-style">
-        <div class="card-style">
-            <div class="icon-style">
-                <i class='bx bx-world'></i>
-            </div>
-            <div>
-                <h2>ตั้งค่าบริบทเชิงกลยุทธ์</h2>
-                <p class="text-style">กำหนดปัจจัยแวดล้อมที่เกี่ยวข้องกับการดำเนินกลยุทธ์</p>
-            </div>
-        </div>
-    </a>
-
-    <a href="#" class="link-style">
+    <a href="<?php echo e(route('showSdg')); ?>" class="link-style">
         <div class="card-style">
             <div class="icon-style">
                 <i class='bx bx-leaf'></i>
@@ -54,19 +42,6 @@
             </div>
         </div>
     </a>
-
-    <a href="#" class="link-style">
-        <div class="card-style">
-            <div class="icon-style">
-                <i class='bx bxs-school'></i>
-            </div>
-            <div>
-                <h2>ตั้งค่ายุทธศาสตร์มหาลัย</h2>
-                <p class="text-style">กำหนดยุทธศาสตร์ให้สอดคล้องกับแผนมหาวิทยาลัย</p>
-            </div>
-        </div>
-    </a>
-
 </div>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('navbar.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /var/www/resources/views/setting.blade.php ENDPATH**/ ?>

@@ -1,7 +1,6 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\ProjectModel;
 use App\Models\ListProjectModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -11,7 +10,6 @@ class StatusController extends Controller
     public function statusTracking(Request $request)
     {
         $employee = $request->session()->get('employee');
-        $permissions = $request->session()->get('permissions');
     
         if ($employee) {
             $projectsQuery = ListProjectModel::query();
@@ -21,15 +19,15 @@ class StatusController extends Controller
             }
 
             $projects = $projectsQuery->whereHas('approvals', function($query) {
-                    $query->whereIn('Status', ['I', 'N']);
+                    $query->whereIn('Status', ['I', 'N', 'Y']);
                 })
-                ->with(['approvals.recordHistory', 'employee.department', 'employee'])
+                ->with(['approvals.recordHistory', 'employee'])
                 ->get();
     
             foreach ($projects as $project) {
                 $employeeData = $project->employee;
-                $project->employeeName = $employeeData ? $employeeData->Firstname_Employee . ' ' . $employeeData->Lastname_Employee : '-';
-                $project->departmentName = $employeeData->department->Name_Department ?? 'No Department';
+                $project->employeeName = $employeeData ? $employeeData->Firstname . ' ' . $employeeData->Lastname : '-';
+                $project->departmentName = $employeeData->Department_Name ?? 'No Department';
     
                 if ($project->First_Time) {
                     $date = new \DateTime($project->First_Time);
@@ -77,9 +75,9 @@ class StatusController extends Controller
                 }
             }
 
-            Log::info('User ' . $projects);
+            log::info($projects);
             
-            return view('statusTracking', compact('projects'));
+            return view('status.statusTracking', compact('projects'));
         } else {
             return redirect()->back()->with('error', 'You are not authorized to view these projects.');
         }
@@ -87,7 +85,7 @@ class StatusController extends Controller
 
     public function showDetails($Id_Project)
     {
-        $project = ListProjectModel::with(['approvals.recordHistory', 'employee.department', 'employee'])
+        $project = ListProjectModel::with(['approvals.recordHistory', 'employee'])
             ->findOrFail($Id_Project);
     
         $stepTexts = [
@@ -118,6 +116,6 @@ class StatusController extends Controller
             10 => ['title' => 'สถานะพิเศษ: การดำเนินการล่าช้า', 'detail' => 'สถานะ: รอการพิจารณาจากผู้บริหาร']
         ];
     
-        return view('statusDetails', compact('project', 'stepTexts', 'statusMessages'));
+        return view('status.statusDetails', compact('project', 'stepTexts', 'statusMessages'));
     }
 }

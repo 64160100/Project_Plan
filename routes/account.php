@@ -6,7 +6,5 @@ Route::get('/employees/{Id_Employee}', [AccountController::class, 'showEmployees
 Route::post('/employees', [AccountController::class, 'store'])->name('account.store');
 Route::get('/employees/create', [AccountController::class, 'create'])->name('account.create');
 
-Route::get('/user', [AccountController::class, 'userAccount'])->name('account.user');
-Route::get('/user/edit/{Id_Employee}', [AccountController::class, 'editUser'])->name('account.editUser');
-Route::put('/user/update/{Id_Employee}', [AccountController::class, 'updateUserPermissions'])->name('account.updateUser');
-Route::delete('/user/delete/{Id_Employee}/{Id_Permission}', [AccountController::class, 'removePermission'])->name('account.removePermission');
+Route::get('/employees/edit/{Id_Employee}', [AccountController::class, 'editUser'])->name('account.editUser');
+Route::put('/account/updateUserPermissions/{Id_Employee}', [AccountController::class, 'updateUserPermissions'])->name('account.updateUserPermissions');

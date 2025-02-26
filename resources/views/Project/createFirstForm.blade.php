@@ -341,7 +341,7 @@
                                 <option value="" selected disabled>เลือกผู้รับผิดชอบ</option>
                                 @foreach($employees as $employee)
                                 <option value="{{ $employee->Id_Employee }}">
-                                    {{ $employee->Firstname_Employee }} {{ $employee->Lastname_Employee }}
+                                    {{ $employee->Firstname }} {{ $employee->Lastname }}
                                 </option>
                                 @endforeach
                             </select>

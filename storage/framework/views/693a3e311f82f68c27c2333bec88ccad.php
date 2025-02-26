@@ -1,11 +1,13 @@
+<?php $__env->startSection('content'); ?>
 <div class="container">
     <h1>ยินดีต้อนรับสู่ระบบติดตามแผนงาน</h1>
 
-    <h1>Welcome, <?php echo e(session('employee') ? session('employee')->Firstname : 'Guest'); ?> <?php echo e(session('employee') ? session('employee')->Lastname : ''); ?></h1>
-    
+    <h1>Welcome, <?php echo e(session('employee') ? session('employee')->Firstname : 'Guest'); ?>
+
+        <?php echo e(session('employee') ? session('employee')->Lastname : ''); ?></h1>
+
     <h1><?php echo e($message); ?></h1>
 
-    <p>Your permissions:</p>
     <ul>
 
     </ul>
@@ -46,9 +48,11 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        $('#button1').click(function() {
-            $('#popupModal').modal('show');
-        });
+$(document).ready(function() {
+    $('#button1').click(function() {
+        $('#popupModal').modal('show');
     });
-</script><?php /**PATH /var/www/resources/views/dashboard.blade.php ENDPATH**/ ?>
+});
+</script>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('navbar.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /var/www/resources/views/dashboard.blade.php ENDPATH**/ ?>

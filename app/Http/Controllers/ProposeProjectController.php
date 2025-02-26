@@ -30,7 +30,7 @@ class ProposeProjectController extends Controller
             }
     
             $projects = $projectsQuery->whereIn('Count_Steps', [0, 1, 2, 6, 9])
-                ->with(['approvals.recordHistory', 'employee.department', 'employee'])
+                ->with(['approvals.recordHistory', 'employee'])
                 ->get();
     
             $countStepsZero = $projects->where('Count_Steps', 0)->count();
@@ -268,10 +268,11 @@ class ProposeProjectController extends Controller
                 $approval->save();
     
                 $employee = $request->session()->get('employee');
-                $permissions = $employee ? $employee->permissions : collect();
-                $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
-                $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
-    
+                $nameResponsible = $employee ? $employee->Firstname . ' ' . $employee->Lastname : 'Unknown';
+                $roleCreator = $employee ? $employee->Position_Name : 'Unknown';
+                
+                log::info($roleCreator);
+
                 RecordHistory::create([
                     'Approve_Id' => $approval->Id_Approve,
                     'Approve_Project_Id' => $approval->Project_Id,
@@ -279,7 +280,7 @@ class ProposeProjectController extends Controller
                     'Time_Record' => Carbon::now('Asia/Bangkok'),
                     'Status_Record' => $approval->Status,
                     'Name_Record' => $nameResponsible,
-                    'Permission_Record' => $permissionName,
+                    'Permission_Record' => $roleCreator,
                 ]);
     
                 $project->Count_Steps = 1;
@@ -305,10 +306,8 @@ class ProposeProjectController extends Controller
                 $approval->save();
     
                 $employee = $request->session()->get('employee');
-                $permissions = $employee ? $employee->permissions : collect();
-    
-                $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
-                $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
+                $nameResponsible = $employee ? $employee->Firstname . ' ' . $employee->Lastname : 'Unknown';
+                $roleCreator = $employee ? $employee->Position_Name : 'Unknown';
     
                 RecordHistory::create([
                     'Approve_Id' => $approval->Id_Approve,
@@ -317,7 +316,7 @@ class ProposeProjectController extends Controller
                     'Time_Record' => Carbon::now('Asia/Bangkok'),
                     'Status_Record' => $approval->Status,
                     'Name_Record' => $nameResponsible,
-                    'Permission_Record' => $permissionName,
+                    'Permission_Record' => $roleCreator,
                 ]);
     
                 if ($project->Count_Steps == 2) {

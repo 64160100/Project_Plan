@@ -550,8 +550,8 @@ Carbon::setLocale('th');
                                     @endif
                                     <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
                                         <b>{{ $Project->Name_Project }}</b><br>
-                                        @foreach($Project->supProjects as $supProject)
-                                        - {{ $subProject->Name_Sup_Project }}<br>
+                                        @foreach($Project->subProjects as $subProject)
+                                        - {{ $subProject->Name_Sub_Project }}<br> 
                                         @endforeach
                                     </td>
                                     <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">

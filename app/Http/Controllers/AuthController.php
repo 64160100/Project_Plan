@@ -26,50 +26,15 @@ class AuthController extends Controller
     {
         $credentials = $request->only('username', 'password');
 
-        // ตรวจสอบ Username จาก API
         $apiResponse = self::CheckUser($credentials['username']);
         
-        // ตรวจสอบ Username จาก Database
-        $employee = EmployeeModel::where('Username', $credentials['username'])->first();
+        $employee = EmployeeModel::where('username', $credentials['username'])->first();
 
-        // ถ้าไม่พบ Username ในที่ใดที่หนึ่ง จะสร้าง EmployeeModel ใหม่
-        if (empty($apiResponse) && !$employee) {
+        if (empty($apiResponse) || !$employee) {
             return redirect()->back()->withErrors(['error' => 'ไม่พบบัญชีผู้ใช้ในระบบ กรุณาตรวจสอบชื่อผู้ใช้ของคุณ']);
         }
 
-        if (!$employee && !empty($apiResponse)) {
-            // ถ้าไม่มี ทำการสร้างใหม่
-            $employee = EmployeeModel::create([
-                'Username' => $apiResponse['data']['Username'] ?? $credentials['username'],
-                'Password' => '25d55ad283aa400af464c76d713c07ad', // ใช้รหัสผ่านที่กำหนด
-                'Prefix_Name' => $apiResponse['data']['Prefix_Name'] ?? '',
-                'Firstname' => $apiResponse['data']['Firstname'] ?? '',
-                'Lastname' => $apiResponse['data']['Lastname'] ?? '',
-                'Email' => $apiResponse['data']['Email'] ?? '',
-                'Phone' => $apiResponse['data']['Phone'] ?? null, // กำหนดค่าเริ่มต้นเป็น null
-                'Department_Name' => $apiResponse['data']['Department_Name'] ?? '',
-                'Position_Name' => $apiResponse['data']['Position_Name'] ?? '',
-                'TypePersons' => $apiResponse['data']['TypePersons'] ?? '',
-                'Agency' => $apiResponse['data']['Agency'] ?? '',
-                'Status' => $apiResponse['data']['Status'] ?? 'Inactive',
-                'IsManager' => 'N',
-                'IsDirector' => 'N',
-                'IsFinance' => 'N',
-                'IsResponsible' => 'N',
-                'IsAdmin' => 'N'
-            ]);
-
-            // ถ้ามี ManagementPositionName ให้สร้าง ManagementPositionModel
-            if (!empty($apiResponse['data']['ManagementPositionName'])) {
-                ManagementPositionModel::create([
-                    'ManagementPositionName' => $apiResponse['data']['ManagementPositionName'],
-                    'Employee_Id' => $employee->Id_Employee
-                ]);
-            }
-        }
-
-        // ตรวจสอบ Password จาก Database
-        if ($employee && $employee->Password === '25d55ad283aa400af464c76d713c07ad') {
+        if ($employee && md5($credentials['password']) === $employee->Password) {
             Log::info('User logged in from database:', ['employee' => $employee]);
 
             try {
@@ -142,26 +107,22 @@ class AuthController extends Controller
 
             session([
                 'employee' => $employee,
-                'permissions' => $employee->permissions,
-                'department' => $employee->department,
                 'pendingApprovalsCountForEmployee' => $pendingApprovalsCountForEmployee ?? 0,  
                 'pendingApprovalsCount' => $pendingApprovalsCount,
                 'recordHistories' => $recordHistories,  
                 'statusNCount' => $statusNCount,
             ]);
 
-            
             return redirect()->route('dashboard')->with('token', $token);
         }
 
-        // ถ้า Password ไม่ถูกต้อง จะส่ง error กลับไป
         return redirect()->back()->withErrors(['error' => 'รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบรหัสผ่านของคุณ']);
     }
 
     public static function CheckUser($username)
     {   
         $curl = curl_init();
-
+    
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://info.lib.buu.ac.th/apilib/Persons/CheckPersons/".base64_encode($username),
             CURLOPT_RETURNTRANSFER => true,
@@ -175,12 +136,12 @@ class AuthController extends Controller
                 "postman-token: 8fc51128-3fac-8135-c258-b268c509f3e6",
             ),
         ));
-
+    
         $response = curl_exec($curl);
         $err = curl_error($curl);
-
+    
         curl_close($curl);
-
+    
         if ($err) {
             Log::error('cURL Error:', ['error' => $err]);
             return null;

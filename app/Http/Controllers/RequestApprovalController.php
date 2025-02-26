@@ -44,27 +44,27 @@ class RequestApprovalController extends Controller
     
         if ($employee) {
             if ($employee->IsAdmin === 'Y') {
-                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
+                $approvals = ApproveModel::with(['project.employee', 'recordHistory'])
                     ->whereHas('project', function ($query) {
                         $query->whereNotIn('Count_Steps', [0, 2, 6, 9]);
                     })->get();
             } elseif ($employee->IsManager === 'Y') {
-                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
+                $approvals = ApproveModel::with(['project.employee', 'recordHistory'])
                     ->whereHas('project', function ($query) {
                         $query->whereIn('Count_Steps', [4, 7]);
                     })->get();
             } elseif ($employee->IsDirector === 'Y') {
-                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
+                $approvals = ApproveModel::with(['project.employee', 'recordHistory'])
                     ->whereHas('project', function ($query) {
                         $query->whereIn('Count_Steps', [5, 8, 11]);
                     })->get();
             } elseif ($employee->IsFinance === 'Y') {
-                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
+                $approvals = ApproveModel::with(['project.employee', 'recordHistory'])
                     ->whereHas('project', function ($query) {
                         $query->whereIn('Count_Steps', [3]);
                     })->get();
             } else {
-                $approvals = ApproveModel::with(['project.employee.department', 'recordHistory'])
+                $approvals = ApproveModel::with(['project.employee', 'recordHistory'])
                     ->whereHas('project', function ($query) use ($employee) {
                         $query->whereIn('Count_Steps', [0, 2, 6, 9])
                             ->where('Employee_Id', $employee->Id_Employee);
@@ -167,7 +167,6 @@ class RequestApprovalController extends Controller
                     $logData[$fiscalYear . '-' . $quarterName] = !empty($quarterLogData) ? $quarterLogData : null;
                 }
     
-                // Add fiscal year and quarter to each strategic item
                 if ($strategics) {
                     foreach ($strategics as $strategic) {
                         foreach ($strategic->quarterProjects as $quarterProject) {
@@ -181,8 +180,6 @@ class RequestApprovalController extends Controller
                 $logData = collect();
             }
 
-            log::info($logData);
-
         } else {
             Log::warning('No employee data found in session.');
         }
@@ -191,16 +188,22 @@ class RequestApprovalController extends Controller
     }
 
     public function updateAllStatus(Request $request)
-    {
+    {   
         $approvals = $request->input('approvals', []);
         $comment = $request->input('comment', '');
         $fiscalQuarter = $request->input('fiscalQuarter', '');
 
         foreach ($approvals as $approvalData) {
-            $id = $approvalData['id'];
+            $projectId = $approvalData['id'];
             $status = $approvalData['status'];
 
-            $approval = ApproveModel::find($id);
+            $approval = ApproveModel::where('Project_Id', $projectId)->first();
+
+            if ($approval) {
+                Log::info('Approval found: ' . $approval->Id_Approve);
+            } else {
+                Log::warning('Approval not found for Project ID: ' . $projectId);
+            }
 
             if ($approval) {
                 $project = ListProjectModel::find($approval->Project_Id);
@@ -218,9 +221,8 @@ class RequestApprovalController extends Controller
                     $approval->save();
 
                     $employee = $request->session()->get('employee');
-                    $permissions = $employee ? $employee->permissions : collect();
-                    $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
-                    $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
+                    $nameResponsible = $employee ? $employee->Firstname . ' ' . $employee->Lastname : 'Unknown';
+                    $roleCreator = $employee ? $employee->Position_Name : 'Unknown';
 
                     switch ($project->Count_Steps) {
                         case 0:
@@ -240,7 +242,7 @@ class RequestApprovalController extends Controller
                         'Time_Record' => Carbon::now('Asia/Bangkok'),
                         'Status_Record' => $approval->Status,
                         'Name_Record' => $nameResponsible,
-                        'Permission_Record' => $permissionName,
+                        'Permission_Record' => $roleCreator,
                     ]);
 
                     if ($project) {
@@ -277,10 +279,9 @@ class RequestApprovalController extends Controller
                     $approval->Status = $status;
                     $approval->save();
 
-                    $employee = $request->session()->get('employee');
-                    $permissions = $employee ? $employee->permissions : collect();
-                    $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
-                    $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
+                    $employee = $request->session()->get('employee');                 
+                    $nameResponsible = $employee ? $employee->Firstname . ' ' . $employee->Lastname : 'Unknown';
+                    $roleCreator = $employee ? $employee->Position_Name : 'Unknown';
 
                     if ($project) {
                         $project->Count_Steps = 0;
@@ -294,7 +295,7 @@ class RequestApprovalController extends Controller
                         'Time_Record' => Carbon::now('Asia/Bangkok'),
                         'Status_Record' => $approval->Status,
                         'Name_Record' => $nameResponsible,
-                        'Permission_Record' => $permissionName,
+                        'Permission_Record' => $roleCreator,
                     ]);
                 }
             }
@@ -311,10 +312,9 @@ class RequestApprovalController extends Controller
             $approval->Status = $status;
             $approval->save();
 
-            $employee = $request->session()->get('employee');
-            $permissions = $employee ? $employee->permissions : collect();
-            $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
-            $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
+            $employee = $request->session()->get('employee'); 
+            $nameResponsible = $employee ? $employee->Firstname . ' ' . $employee->Lastname : 'Unknown';
+            $roleCreator = $employee ? $employee->Position_Name : 'Unknown';
 
             $project = ListProjectModel::find($approval->Project_Id);
             
@@ -367,9 +367,9 @@ class RequestApprovalController extends Controller
                 'Time_Record' => Carbon::now('Asia/Bangkok'),
                 'Status_Record' => $approval->Status,
                 'Name_Record' => $nameResponsible,
-                'Permission_Record' => $permissionName,
+                'Permission_Record' => $roleCreator,
             ]);
-
+            
             if ($status === 'Y') {
                 if ($project) {
                     switch ($project->Count_Steps) {
@@ -466,11 +466,9 @@ class RequestApprovalController extends Controller
         $approval->Status = 'N';
         $approval->save();
     
-        $employee = $request->session()->get('employee');
-        $permissions = $employee ? $employee->permissions : collect();
-    
-        $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
-        $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
+        $employee = $request->session()->get('employee');    
+        $nameResponsible = $employee ? $employee->Firstname . ' ' . $employee->Lastname : 'Unknown';
+        $roleCreator = $employee ? $employee->Position_Name : 'Unknown';
     
         RecordHistory::create([
             'Approve_Id' => $approval->Id_Approve,
@@ -479,7 +477,7 @@ class RequestApprovalController extends Controller
             'Time_Record' => Carbon::now('Asia/Bangkok'),
             'Status_Record' => $approval->Status,
             'Name_Record' => $nameResponsible,
-            'Permission_Record' => $permissionName,
+            'Permission_Record' => $roleCreator,
         ]);
     
         return redirect()->back()->with('success', 'Project disapproved successfully.');
@@ -502,10 +500,9 @@ class RequestApprovalController extends Controller
                 $approval->Status = 'Y';
                 $approval->save();
     
-                $employee = $request->session()->get('employee');
-                $permissions = $employee ? $employee->permissions : collect();
-                $nameResponsible = $employee ? $employee->Firstname_Employee . ' ' . $employee->Lastname_Employee : 'Unknown';
-                $permissionName = $permissions->first()->Name_Permission ?? 'Unknown';
+                $employee = $request->session()->get('employee');           
+                $nameResponsible = $employee ? $employee->Firstname. ' ' . $employee->Lastname : 'Unknown';
+                $roleCreator = $employee ? $employee->Position_Name : 'Unknown';
     
                 RecordHistory::create([
                     'Approve_Id' => $approval->Id_Approve,
@@ -514,7 +511,7 @@ class RequestApprovalController extends Controller
                     'Time_Record' => Carbon::now('Asia/Bangkok'),
                     'Status_Record' => $approval->Status,
                     'Name_Record' => $nameResponsible,
-                    'Permission_Record' => $permissionName,
+                    'Permission_Record' => $roleCreator,
                 ]);
     
                 $project->Count_Steps = 1;

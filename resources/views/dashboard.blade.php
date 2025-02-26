@@ -1,11 +1,14 @@
+@extends('navbar.app')
+
+@section('content')
 <div class="container">
     <h1>ยินดีต้อนรับสู่ระบบติดตามแผนงาน</h1>
 
-    <h1>Welcome, {{ session('employee') ? session('employee')->Firstname : 'Guest' }} {{ session('employee') ? session('employee')->Lastname : '' }}</h1>
-    
+    <h1>Welcome, {{ session('employee') ? session('employee')->Firstname : 'Guest' }}
+        {{ session('employee') ? session('employee')->Lastname : '' }}</h1>
+
     <h1>{{ $message }}</h1>
 
-    <p>Your permissions:</p>
     <ul>
 
     </ul>
@@ -46,9 +49,10 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        $('#button1').click(function() {
-            $('#popupModal').modal('show');
-        });
+$(document).ready(function() {
+    $('#button1').click(function() {
+        $('#popupModal').modal('show');
     });
+});
 </script>
+@endsection

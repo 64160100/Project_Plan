@@ -109,7 +109,7 @@ class PDFController extends Controller
     public function ctrlpPDFProject($Id_Project)
     {
         $project = ListProjectModel::with([
-            'supProjects',
+            'subProjects',
             'projectHasIntegrationCategories',
             'targets.targetDetails',
         ])->where('Id_Project', $Id_Project)->firstOrFail();

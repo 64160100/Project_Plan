@@ -31,8 +31,4 @@ class ApproveModel extends Model
         return $this->belongsTo(EmployeeModel::class, 'Employee_Id', 'Id_Employee');
     }
 
-    public function department()
-    {
-        return $this->belongsTo(DepartmentModel::class, 'Department_Id', 'Id_Department');
-    }
 }

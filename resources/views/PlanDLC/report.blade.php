@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>report</title>
     <link rel="stylesheet" href="{{ asset('css/report.css') }}">
-
 </head>
 <body>
 @section('content')
@@ -39,25 +38,6 @@
             <br>
         </div>
         <br>
-
-        
-        <div class="content-box">
-            <h4>ผลการดำเนินงานแยกตามฝ่าย</h4>
-            @foreach($department as $Department)
-            <a href="{{ route('showProjectDepartment',$Department->Id_Department) }}" class="progress-container mt-2">
-                <div class="progress-group">
-                    <div class="progress-info">
-                        <div>{{ $Department->Name_Department }}</div>
-                    </div>
-                    <div class="progress-stats" >
-                        <div id="total">โครงการ : {{ $Department->projects_count }} </div>
-                        <div id="done">เสร็จสิ้น : 0</div>
-                    </div>
-                </div>
-            </a>
-            @endforeach
-        </div>
-        
     </div>
 
     <div class="menu-footer">

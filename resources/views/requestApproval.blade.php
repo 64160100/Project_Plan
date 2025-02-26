@@ -252,8 +252,8 @@ Carbon::setLocale('th');
                                     @endif
                                 </td>
                                 <td class="{{ $project->approvals->first()->Status === 'N' ? 'text-gray' : '' }}">
-                                    {{ $project->employee->Firstname_Employee ?? '-' }}
-                                    {{ $project->employee->Lastname_Employee ?? '-' }}
+                                    {{ $project->employee->Firstname ?? '-' }}
+                                    {{ $project->employee->Lastname ?? '-' }}
                                 </td>
                                 <td>
                                     @if($project->approvals->first()->Status !== 'N')

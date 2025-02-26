@@ -12,6 +12,7 @@ use App\Models\StrategicModel;
 use App\Models\StrategyModel;
 use App\Models\ApproveModel;
 use App\Models\EmployeeModel;
+use App\Models\RecordHistory;
 use App\Models\SDGsModel;
 use App\Models\IntegrationModel;
 use App\Models\SupProjectModel;
@@ -43,7 +44,6 @@ use App\Models\KpiModel;
 use App\Models\FiscalYearQuarterModel;
 use App\Models\StorageFileModel;
 use Carbon\Carbon;
-
 class ListProjectController extends Controller
 {
     public function project()
@@ -68,11 +68,11 @@ class ListProjectController extends Controller
             'locations',
             'projectHasIndicators'
         ])->findOrFail($projectId);
-    
+
         $strategics = StrategicModel::with(['strategies'])->findOrFail($project->Strategic_Id);
         $strategies = $strategics->strategies;
         $employees = EmployeeModel::all();
-    
+
         $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
         $pdcaStages = PdcaModel::all();
         $pdcaDetails = PdcaDetailsModel::where('Project_Id', $projectId)->get();

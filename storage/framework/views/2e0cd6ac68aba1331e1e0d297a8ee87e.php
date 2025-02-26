@@ -2,8 +2,14 @@
 use Carbon\Carbon;
 Carbon::setLocale('th');
 ?>
+<!DOCTYPE html>
+<html>
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Index</title>
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="<?php echo e(asset('css/requestApproval.css')); ?>">
     <style>
     @font-face {
@@ -166,86 +172,88 @@ Carbon::setLocale('th');
                     </b>
                 </summary>
                 <div class="accordion-content">
-                    <table class="summary-table">
-                        <thead>
-                            <tr>
-                                <th style="width:10%; text-align: center;">ยุทธศาสตร์ สำนักหอสมุด</th>
-                                <th style="width:10%; text-align: center;">กลยุทธ์ สำนักหอสมุด</th>
-                                <th style="width:14%; text-align: center;">โครงการ</th>
-                                <th style="width:14%; text-align: center;">ตัวชี้วัดความสำเร็จ<br>ของโครงการ</th>
-                                <th style="width:12%; text-align: center;">ค่าเป้าหมาย</th>
-                                <th style="width:10%; text-align: center;">งบประมาณ (บาท)</th>
-                                <th style="width:12%; text-align: center;">ผู้รับผิดชอบ</th>
-                                <th style="width:10%; text-align: center;">การจัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $__currentLoopData = $strategic->strategies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $strategy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <?php
-                            $strategyDisplayed = false;
-                            $allProjectsGray = true;
-                            $filteredProjects = $strategy->projects->filter(function($project) {
-                            return $project->Count_Steps == 1;
-                            });
-                            ?>
-                            <?php if($filteredProjects->count() > 0): ?>
-                            <?php $__currentLoopData = $filteredProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $project): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <?php
-                            if ($project->approvals->first()->Status !== 'N') {
-                            $allProjectsGray = false;
-                            }
-                            ?>
-                            <tr>
-                                <td rowspan="<?php echo e($filteredProjects->count()); ?>"><?php echo e($strategic->Name_Strategic_Plan); ?>
+                    <div class="table-responsive">
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:10%; text-align: center;">ยุทธศาสตร์ สำนักหอสมุด</th>
+                                    <th style="width:10%; text-align: center;">กลยุทธ์ สำนักหอสมุด</th>
+                                    <th style="width:14%; text-align: center;">โครงการ</th>
+                                    <th style="width:14%; text-align: center;">ตัวชี้วัดความสำเร็จ<br>ของโครงการ</th>
+                                    <th style="width:12%; text-align: center;">ค่าเป้าหมาย</th>
+                                    <th style="width:10%; text-align: center;">งบประมาณ (บาท)</th>
+                                    <th style="width:12%; text-align: center;">ผู้รับผิดชอบ</th>
+                                    <th style="width:10%; text-align: center;">การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $__currentLoopData = $strategic->strategies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $strategy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
+                                $strategyDisplayed = false;
+                                $allProjectsGray = true;
+                                $filteredProjects = $strategy->projects->filter(function($project) {
+                                return $project->Count_Steps == 1;
+                                });
+                                ?>
+                                <?php if($filteredProjects->count() > 0): ?>
+                                <?php $__currentLoopData = $filteredProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $project): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
+                                if ($project->approvals->first()->Status !== 'N') {
+                                $allProjectsGray = false;
+                                }
+                                ?>
+                                <tr>
+                                    <td rowspan="<?php echo e($filteredProjects->count()); ?>"><?php echo e($strategic->Name_Strategic_Plan); ?>
 
-                                </td>
-                                <td rowspan="<?php echo e($filteredProjects->count()); ?>"
-                                    class="<?php echo e($allProjectsGray ? 'text-gray' : ''); ?>"><?php echo e($strategy->Name_Strategy); ?>
+                                    </td>
+                                    <td rowspan="<?php echo e($filteredProjects->count()); ?>"
+                                        class="<?php echo e($allProjectsGray ? 'text-gray' : ''); ?>"><?php echo e($strategy->Name_Strategy); ?>
 
-                                </td>
-                                <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
-                                    <b><?php echo e($project->Name_Project); ?></b>
-                                </td>
-                                <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
-                                    <?php echo e($project->Success_Indicators ?? '-'); ?>
+                                    </td>
+                                    <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
+                                        <b><?php echo e($project->Name_Project); ?></b>
+                                    </td>
+                                    <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
+                                        <?php echo e($project->Success_Indicators ?? '-'); ?>
 
-                                </td>
-                                <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
-                                    <?php echo e($project->Value_Target ?? '-'); ?>
+                                    </td>
+                                    <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
+                                        <?php echo e($project->Value_Target ?? '-'); ?>
 
-                                </td>
-                                <td class="<?php echo e($project->Status_Budget === 'N' ? 'text-gray' : ''); ?>"
-                                    style="text-align: center;">
-                                    <?php if($project->Status_Budget === 'N'): ?>
-                                    ไม่ใช้งบประมาณ
-                                    <?php else: ?>
-                                    <?php
-                                    $totalBudget = $project->projectBudgetSources ?
-                                    $project->projectBudgetSources->sum('Amount_Total') : 0;
-                                    ?>
-                                    <?php echo e(number_format($totalBudget, 2)); ?>
+                                    </td>
+                                    <td class="<?php echo e($project->Status_Budget === 'N' ? 'text-gray' : ''); ?>"
+                                        style="text-align: center;">
+                                        <?php if($project->Status_Budget === 'N'): ?>
+                                        ไม่ใช้งบประมาณ
+                                        <?php else: ?>
+                                        <?php
+                                        $totalBudget = $project->projectBudgetSources ?
+                                        $project->projectBudgetSources->sum('Amount_Total') : 0;
+                                        ?>
+                                        <?php echo e(number_format($totalBudget, 2)); ?>
 
-                                    <?php endif; ?>
-                                </td>
-                                <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
-                                    <?php echo e($project->employee->Firstname_Employee ?? '-'); ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
+                                        <?php echo e($project->employee->Firstname_Employee ?? '-'); ?>
 
-                                    <?php echo e($project->employee->Lastname_Employee ?? '-'); ?>
+                                        <?php echo e($project->employee->Lastname_Employee ?? '-'); ?>
 
-                                </td>
-                                <td>
-                                    <?php if($project->approvals->first()->Status !== 'N'): ?>
-                                    <button type="button" class="btn btn-danger btn-sm custom-disapprove-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#commentModal-<?php echo e($project->Id_Project); ?>">ไม่อนุมัติ</button>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            <?php endif; ?>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </tbody>
-                    </table>
+                                    </td>
+                                    <td>
+                                        <?php if($project->approvals->first()->Status !== 'N'): ?>
+                                        <button type="button" class="btn btn-danger btn-sm custom-disapprove-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#commentModal-<?php echo e($project->Id_Project); ?>">ไม่อนุมัติ</button>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php endif; ?>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </details>
             <?php endif; ?>
@@ -359,55 +367,58 @@ Carbon::setLocale('th');
     <?php $__currentLoopData = $approvals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $approval): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <?php if($approval->Status !== 'Y' && $approval->Status !== 'N'): ?>
     <?php if($approval->project->Count_Steps != 1): ?>
-    <div class="outer-container">
+    <div class="outer-container" id="<?php echo e($approval->project->Id_Project); ?>">
         <div class="container">
             <div class="header">
                 <div class="project-title"><?php echo e($approval->project->Name_Project); ?></div>
                 <p><?php echo e($approval->project->employee->department->Name_Department ?? 'ยังไม่มีผู้รับผิดชอบโครงการ'); ?></p>
                 <div class="project-info">
                     <div class="info-item">
-                        <div class="info-top">
+                        <span class="info-icon">
                             <i class='bx bx-calendar' style="width: 20px; height: 0px;"></i>
-                            <span class="info-label">วันที่เริ่ม</span>
-                        </div>
-                        <span class="info-value">
-                            <?php echo e($approval->project->formattedFirstTime ?? '-'); ?>
-
                         </span>
+                        <div>
+                            <div class="info-label">วันที่เริ่ม</div>
+                            <div class="info-value"><?php echo e($approval->project->formattedFirstTime ?? '-'); ?></div>
+                        </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-top">
+                        <span class="info-icon">
                             <i class='bx bx-user' style="width: 20px; height: 0px;"></i>
-                            <span class="info-label">ผู้รับผิดชอบ</span>
-                        </div>
-                        <span class="info-value">
-                            <?php if($approval->project->employee && ($approval->project->employee->Firstname_Employee ||
-                            $approval->project->employee->Lastname_Employee)): ?>
-                            <?php echo e($approval->project->employee->Firstname_Employee ?? ''); ?>
-
-                            <?php echo e($approval->project->employee->Lastname_Employee ?? ''); ?>
-
-                            <?php else: ?>
-                            -
-                            <?php endif; ?>
                         </span>
+                        <div>
+                            <div class="info-label">ผู้รับผิดชอบ</div>
+                            <div class="info-value">
+                                <?php if($approval->project->employee && ($approval->project->employee->Firstname_Employee ||
+                                    $approval->project->employee->Lastname_Employee)): ?>
+                                    <?php echo e($approval->project->employee->Firstname_Employee ?? ''); ?>
 
+                                    <?php echo e($approval->project->employee->Lastname_Employee ?? ''); ?>
+
+                                <?php else: ?>
+                                -
+                                <?php endif; ?>
+                            </div>
+                        </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-top">
+                        <span class="info-icon">
                             <i class='bx bx-wallet-alt' style="width: 20px; height: 0px;"></i>
-                            <span class="info-label">งบประมาณ</span>
+                        </span>
+                        <div>
+                            <div class="info-label">งบประมาณ</div>
+                            <div class="info-value">-</div>
                         </div>
-                        <span class="info-value">-</span>
                     </div>
                 </div>
 
                 <div class="project-actions">
-                    <a href="<?php echo e(route('StorageFiles.index')); ?>" class="action-link">
-                        <i class='bx bx-info-circle'></i>
-                        ดูรายละเอียดโครงการ
-                    </a>
-
+                    <div>
+                        <a href="<?php echo e(route('StorageFiles.index')); ?>" class="action-link">
+                            <i class='bx bx-info-circle'></i>
+                            ดูรายละเอียดโครงการ
+                        </a>
+                    </div>
                     <div class="dropdown">
                         <a href="#" class="action-link dropdown-toggle"
                             id="commentsDropdown-<?php echo e($approval->Id_Approve); ?>" data-bs-toggle="dropdown"
@@ -435,11 +446,12 @@ Carbon::setLocale('th');
                             <?php endif; ?>
                         </ul>
                     </div>
-
-                    <a href="#" class="action-link">
-                        <i class='bx bx-error warning-icon'></i>
-                        แจ้งเตือน
-                    </a>
+                    <div>
+                        <a href="#" class="action-link">
+                            <i class='bx bx-error warning-icon'></i>
+                            แจ้งเตือน
+                        </a>
+                    </div>
                 </div>
 
                 <div class="status-section">
@@ -447,7 +459,7 @@ Carbon::setLocale('th');
                     <div class="status-card">
                         <div class="status-left">
                             <div class="status-text">
-                                รออนุมัติ: <?php echo e(floor($approval->recordHistory->last()->daysSinceTimeRecord ?? 0)); ?> วัน
+                                รออนุมัติ: <?php echo e(floor($approval->recordHistory->last()->daysSinceTimeRecord ?? 0)); ?> วัน 
                             </div>
                         </div>
                         <div class="status-right">

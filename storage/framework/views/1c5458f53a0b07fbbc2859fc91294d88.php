@@ -46,23 +46,25 @@ Carbon::setLocale('th');
                         </div>
                         <span class="info-value"><?php echo e($project->formattedFirstTime); ?></span>
                     </div>
+                    
                     <div class="info-item">
                         <div class="info-top">
                             <i class='bx bx-group' style="width: 20px; height: 0px;"></i>
                             <span class="info-label">ผู้รับผิดชอบ</span>
                         </div>
                         <span class="info-value">
-                            <?php if($project->employee && ($project->employee->Firstname_Employee ||
-                            $project->employee->Lastname_Employee)): ?>
-                            <?php echo e($project->employee->Firstname_Employee ?? ''); ?>
+                            <?php if($project->employee && ($project->employee->Firstname ||
+                            $project->employee->Lastname)): ?>
+                            <?php echo e($project->employee->Firstname ?? ''); ?>
 
-                            <?php echo e($project->employee->Lastname_Employee ?? ''); ?>
+                            <?php echo e($project->employee->Lastname ?? ''); ?>
 
                             <?php else: ?>
                             -
                             <?php endif; ?>
                         </span>
                     </div>
+
                     <div class="info-item">
                         <div class="info-top">
                             <i class='bx bx-wallet-alt' style="width: 20px; height: 0px;"></i>
@@ -71,7 +73,17 @@ Carbon::setLocale('th');
                         <span class="info-value">
                             <?php if($project->Status_Budget === 'Y'): ?>
                             <?php
-                            $totalBudget = $project->projectBudgetSources->sum('Amount_Total');
+                            $totalBudget = 0;
+                            // หากมี projectBudgetSources
+                            if ($project->projectBudgetSources) {
+                            // วนลูปแต่ละ budget source
+                            foreach ($project->projectBudgetSources as $budgetSource) {
+                            // ดึงค่าจาก relationship budgetSourceTotal และเพิ่มเข้าไปใน totalBudget
+                            if ($budgetSource->budgetSourceTotal) {
+                            $totalBudget += $budgetSource->budgetSourceTotal->Amount_Total;
+                            }
+                            }
+                            }
                             ?>
                             <?php echo e(number_format($totalBudget, 2)); ?> บาท
                             <?php else: ?>
@@ -284,7 +296,7 @@ Carbon::setLocale('th');
                                 </div>
                                 <?php if($project->Count_Steps === 6 || $project->Count_Steps === 11): ?>
                                 <div class="status-text">
-                                    วันที่สิ้นสุด: <?php echo e($project->End_Time); ?>
+                                    วันที่สิ้นสุด: <?php echo e($project->formattedEndTime); ?>
 
                                 </div>
                                 <?php endif; ?>
@@ -382,12 +394,6 @@ Carbon::setLocale('th');
     </div>
     <?php endif; ?>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
-    <!-- <div class="mb-3">
-        <a href="<?php echo e(route('createSetProject')); ?>" class="btn btn-primary">
-            <i class='bx bx-plus'></i> สร้างชุดโครงการ (<?php echo e($countStepsZero); ?> โครงการ)
-        </a>
-    </div> -->
 
     <?php $__currentLoopData = $quartersByFiscalYear; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $fiscalYear => $yearQuarters): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <?php $__currentLoopData = $yearQuarters->sortBy('Quarter'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $quarter): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -497,7 +503,14 @@ Carbon::setLocale('th');
                 $hasProjects = $filteredProjectCount > 0;
 
                 $totalStrategicBudget = $filteredProjects->sum(function($project) {
-                return $project->projectBudgetSources ? $project->projectBudgetSources->sum('Amount_Total') : 0;
+                $projectTotal = 0;
+                if($project->projectBudgetSources) {
+                foreach($project->projectBudgetSources as $budgetSource) {
+                $projectTotal += $budgetSource->budgetSourceTotal ?
+                $budgetSource->budgetSourceTotal->Amount_Total : 0;
+                }
+                }
+                return $projectTotal;
                 });
                 $projectsByStrategy = $filteredProjects->groupBy('Name_Strategy');
                 ?>
@@ -563,7 +576,7 @@ Carbon::setLocale('th');
                                     <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
                                         <b><?php echo e($Project->Name_Project); ?></b><br>
                                         <?php $__currentLoopData = $Project->subProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subProject): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        - <?php echo e($subProject->Name_Sub_Project); ?><br> 
+                                        - <?php echo e($subProject->Name_Sub_Project); ?><br>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </td>
                                     <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
@@ -580,17 +593,22 @@ Carbon::setLocale('th');
                                         ไม่ใช้งบประมาณ
                                         <?php else: ?>
                                         <?php
-                                        $totalBudget = $Project->projectBudgetSources ?
-                                        $Project->projectBudgetSources->sum('Amount_Total') : 0;
+                                        $totalBudget = 0;
+                                        if($Project->projectBudgetSources) {
+                                        foreach($Project->projectBudgetSources as $budgetSource) {
+                                        $totalBudget += $budgetSource->budgetSourceTotal ?
+                                        $budgetSource->budgetSourceTotal->Amount_Total : 0;
+                                        }
+                                        }
                                         ?>
                                         <?php echo e(number_format($totalBudget, 2)); ?>
 
                                         <?php endif; ?>
                                     </td>
                                     <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
-                                        <?php echo e($Project->employee->Firstname_Employee ?? '-'); ?>
+                                        <?php echo e($Project->employee->Firstname ?? '-'); ?>
 
-                                        <?php echo e($Project->employee->Lastname_Employee ?? ''); ?>
+                                        <?php echo e($Project->employee->Lastname ?? ''); ?>
 
                                     </td>
                                     <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>"
@@ -611,7 +629,8 @@ Carbon::setLocale('th');
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 <tr class="summary-row">
-                                    <td colspan="2" style="text-align: left; font-weight: bold;">รวมรายได้ทั้งหมด:</td>
+                                    <td colspan="2" style="text-align: left; font-weight: bold;">รวมงบประมาณทั้งหมด:
+                                    </td>
                                     <td colspan="6" style="text-align: center; font-weight: bold;">
                                         <?php echo e(number_format($totalStrategicBudget, 2)); ?> บาท
                                     </td>

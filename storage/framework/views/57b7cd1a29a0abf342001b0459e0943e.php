@@ -113,13 +113,14 @@
                         'manage_users' => false,
                         'data_employee' => false,
                         'setup_system' => false,
-                        'propose_project' => false, // เพิ่มคีย์ propose_project
+                        'propose_project' => false,
                         ];
                         ?>
 
                         <!-- Check for project management permissions -->
                         <?php if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
-                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y'): ?>
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y' ||
+                        $employee->IsGeneralEmployees === 'Y'): ?>
                         <?php $projectManagement = true; ?>
                         <?php endif; ?>
 
@@ -129,8 +130,7 @@
                         </li>
                         <?php endif; ?>
 
-                        <?php if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
-                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y'): ?>
+                        <?php if($projectManagement): ?>
                         <?php if(!$renderedItems['dashboard']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('dashboard')); ?>">
@@ -193,7 +193,9 @@
                         </li>
                         <?php $renderedItems['report_results'] = true; ?>
                         <?php endif; ?>
+                        <?php endif; ?>
 
+                        <?php if($employee->IsFinance === 'Y' || $employee->IsAdmin === 'Y'): ?>
                         <?php if(!$renderedItems['check_budget']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('PlanDLC.checkBudget')); ?>">
@@ -203,7 +205,10 @@
                         </li>
                         <?php $renderedItems['check_budget'] = true; ?>
                         <?php endif; ?>
+                        <?php endif; ?>
 
+                        <?php if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y'): ?>
                         <?php if(!$renderedItems['approval_project']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('requestApproval')); ?>">
@@ -216,7 +221,9 @@
                         </li>
                         <?php $renderedItems['approval_project'] = true; ?>
                         <?php endif; ?>
+                        <?php endif; ?>
 
+                        <?php if($employee->IsAdmin === 'Y' || $employee->IsManager === 'Y'): ?>
                         <?php if(!$renderedItems['propose_project']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('proposeProject')); ?>">
@@ -232,8 +239,7 @@
                         <?php endif; ?>
 
                         <!-- Check for system management permissions -->
-                        <?php if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
-                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y'): ?>
+                        <?php if($employee->IsAdmin === 'Y'): ?>
                         <?php $systemManagement = true; ?>
                         <?php endif; ?>
 
@@ -243,8 +249,7 @@
                         </li>
                         <?php endif; ?>
 
-                        <?php if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
-                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y'): ?>
+                        <?php if($employee->IsAdmin === 'Y'): ?>
                         <?php if(!$renderedItems['data_employee']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('account.employee')); ?>">
@@ -267,6 +272,7 @@
                     </ul>
                 </div>
             </div>
+
         </div>
         <!-- End Sidebar -->
 

@@ -113,13 +113,14 @@
                         'manage_users' => false,
                         'data_employee' => false,
                         'setup_system' => false,
-                        'propose_project' => false, // เพิ่มคีย์ propose_project
+                        'propose_project' => false,
                         ];
                         @endphp
 
                         <!-- Check for project management permissions -->
                         @if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
-                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y')
+                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y' ||
+                        $employee->IsGeneralEmployees === 'Y')
                         @php $projectManagement = true; @endphp
                         @endif
 
@@ -129,8 +130,7 @@
                         </li>
                         @endif
 
-                        @if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
-                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y')
+                        @if($projectManagement)
                         @if(!$renderedItems['dashboard'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('dashboard') }}">
@@ -193,7 +193,9 @@
                         </li>
                         @php $renderedItems['report_results'] = true; @endphp
                         @endif
+                        @endif
 
+                        @if($employee->IsFinance === 'Y' || $employee->IsAdmin === 'Y')
                         @if(!$renderedItems['check_budget'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('PlanDLC.checkBudget') }}">
@@ -203,7 +205,10 @@
                         </li>
                         @php $renderedItems['check_budget'] = true; @endphp
                         @endif
+                        @endif
 
+                        @if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
+                        'Y')
                         @if(!$renderedItems['approval_project'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('requestApproval') }}">
@@ -216,7 +221,9 @@
                         </li>
                         @php $renderedItems['approval_project'] = true; @endphp
                         @endif
+                        @endif
 
+                        @if($employee->IsAdmin === 'Y' || $employee->IsManager === 'Y')
                         @if(!$renderedItems['propose_project'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('proposeProject') }}">
@@ -232,8 +239,7 @@
                         @endif
 
                         <!-- Check for system management permissions -->
-                        @if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
-                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y')
+                        @if($employee->IsAdmin === 'Y')
                         @php $systemManagement = true; @endphp
                         @endif
 
@@ -243,8 +249,7 @@
                         </li>
                         @endif
 
-                        @if($employee->IsManager === 'Y' || $employee->IsDirector === 'Y' || $employee->IsFinance ===
-                        'Y' || $employee->IsResponsible === 'Y' || $employee->IsAdmin === 'Y')
+                        @if($employee->IsAdmin === 'Y')
                         @if(!$renderedItems['data_employee'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('account.employee') }}">
@@ -267,6 +272,7 @@
                     </ul>
                 </div>
             </div>
+
         </div>
         <!-- End Sidebar -->
 

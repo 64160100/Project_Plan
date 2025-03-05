@@ -57,7 +57,7 @@ class AccountController extends Controller
         $field = $request->input('field');
         $value = $request->input('value') === 'true' ? 'Y' : 'N';
 
-        if (in_array($field, ['IsManager', 'IsDirector', 'IsFinance', 'IsResponsible', 'IsAdmin'])) {
+        if (in_array($field, ['IsManager', 'IsDirector', 'IsFinance', 'IsResponsible', 'IsAdmin', 'IsGeneralEmployees'])) {
             $employee->$field = $value;
             $employee->save();
         }

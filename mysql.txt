@@ -1,41 +1,63 @@
-INSERT INTO `Department` (`Id_Department`, `Name_Department`) VALUES
-(1, 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา'),
-(2, 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล');
+INSERT INTO `Employee` (`Id_Employee`, `Username`, `Password`, `Prefix_Name`, `Firstname`, `Lastname`, `Email`, `Phone`, `Department_Name`, `Position_Name`, `TypePersons`, `Agency`, `Status`, `IsManager`, `IsDirector`, `IsFinance`, `IsResponsible`, `IsAdmin`, `IsGeneralEmployees`) VALUES
+(1, 'aranya', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'อรัญญา', 'บำเพ็ญแพทย์', 'aranya@go.buu.ac.th', '038102495', 'สำนักงานผู้อำนวยการ', 'เจ้าหน้าที่บริหารงานทั่วไป', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(2, 'arunees', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'อรุณี', 'สังข์นวม', 'arunees@go.buu.ac.th', '038102491', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'พนักงานเข้าและเย็บเล่ม', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(3, 'augsurat.ra', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'อังศุรัตน์', 'ระยา', 'augsurat.ra@go.buu.ac.th', '0-3810-249', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'นักเอกสารสารสนเทศ', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(4, 'aunchasa', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'อัญชสา', 'ขำอยู่', 'aunchasa@go.buu.ac.th', '038102495', 'สำนักงานผู้อำนวยการ', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(5, 'beejaruwan', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'จารุวรรณ', 'นาคสุริวงษ์', 'beejaruwan@go.buu.ac.th', '038102474', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(6, 'chalermkiat', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'เฉลิมเกียรติ', 'ดีสม', 'chalermkiat@go.buu.ac.th', '038102487', 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'นักวิชาการคอมพิวเตอร์', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(7, 'chompunuch', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'ชมพูนุช', 'นาคสุริวงษ์', 'chompunuch@go.buu.ac.th', '038102468', 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(8, 'comvutic', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'นิตยา', 'ปานเพชร', 'comvutic@go.buu.ac.th', '038102483', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'บรรณารักษ์ชำนาญการพิเศษ', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(9, 'hemmarat', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'เหมรัศมิ์', 'วชิรหัตถพงศ์', 'hemmarat@go.buu.ac.th', '0897853999', 'สำนักงานผู้อำนวยการ', 'อาจารย์', 'People', 'Library', 'Active', 'N', 'Y', 'N', 'N', 'N', 'N'),
+(10, 'jakkaphan', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'จักรพันธุ์', 'ชื่นภิรมย์', 'jakkaphan@go.buu.ac.th', '038102482', 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'ผู้ปฏิบัติงานโสตทัศนศึกษา', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(11, 'jittimap', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'จิตติมา', 'พลิคามินทร์', 'jittimap@go.buu.ac.th', '038102494', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'แม่บ้าน', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(12, 'kamonnate', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'กมลเนตร', 'รัตนอัมพรโสภณ', 'kamonnate@go.buu.ac.th', '038102466', 'สำนักงานผู้อำนวยการ', 'นักวิชาการเงินและบัญชี', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(13, 'kunphisit', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'กุญช์พิสิฎฐ์', 'นาคสุวรรณ', 'kunphisit@go.buu.ac.th', '038102482', 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'นักวิชาการโสตทัศนศึกษา', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(14, 'kwantas', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'ขวัญตา', 'สันติกูล', 'kwantas@go.buu.ac.th', '038102488', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'พนักงานเข้าและเย็บเล่ม', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(15, 'napassanun', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'นภัสนันท์', 'เปลี่ยนขำ', 'napassanun@go.buu.ac.th', '038102476', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(16, 'nilubonr', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'นิลุบล', 'โรจน์สัตตรัตน์', 'nilubonr@go.buu.ac.th', '038102492', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'บรรณารักษ์', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(17, 'orathai_na', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'อรทัย', 'นาสวน', 'orathai_na@go.buu.ac.th', '038102463', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(18, 'ornsris', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'อ่อนศรี', 'แสนโคก', 'ornsris@go.buu.ac.th', '038102482', 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(19, 'paisri', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'ไพรศรี', 'อารมณ์ชื่น', 'paisri@go.buu.ac.th', '038102479', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'แม่บ้าน', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(20, 'parkpoom', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'ภาคภูมิ', 'มาตรทอง', 'parkpoom@go.buu.ac.th', '038102463', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(21, 'pawaresn', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'ปวเรศ', 'นวลแก้ว', 'pawaresn@go.buu.ac.th', '038102468', 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'นักวิชาการโสตทัศนศึกษา', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(22, 'pinit.ho', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'พินิจ', 'หงษ์ศิริมงคล', 'pinit.ho@go.buu.ac.th', '038102494', 'สำนักงานผู้อำนวยการ', 'พนักงานขับรถยนต์', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(23, 'pitchaporn.th', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'พิชชาพร', 'โทณวรรณากร', 'pitchaporn.th@go.buu.ac.th', '038102492', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'บรรณารักษ์', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(24, 'prapasri', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'ประภาศรี', 'เสือหลง', 'prapasri@go.buu.ac.th', '038102463', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(25, 'ratchaesingthong', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'รัชนี', 'เจริญวารี', 'ratchaesingthong@go.buu.ac.th', '038102466', 'สำนักงานผู้อำนวยการ', 'นักวิชาการเงินและบัญชี', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(26, 'rattaya', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'รัตยา', 'จรสมาน', 'rattaya@go.buu.ac.th', '038102476', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'ผู้ช่วยปฏิบัติงานบริหาร', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(27, 'ratticha.se', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'รัชธิชา', 'เศรษฐีพ่อค้า', 'ratticha.se@go.buu.ac.th', '0382012490', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'นักเอกสารสารสนเทศ', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(28, 'rossukon', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'รสสุคนธ์', 'บุญมาก', 'rossukon@go.buu.ac.th', '038102493', 'สำนักงานผู้อำนวยการ', 'นักวิชาการพัสดุ', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(29, 'russamee', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'รัศมี', 'ปานดิษฐ์', 'russamee@go.buu.ac.th', '038102478', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'บรรณารักษ์', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(30, 'saipin', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'สายพิณ', 'ธนกุลชน', 'saipin@go.buu.ac.th', '038102491', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'พนักงานเข้าและเย็บเล่ม', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(31, 'saksing', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'ศักดิ์สิงห์', 'งามสง่า', 'saksing@go.buu.ac.th', '038102491', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(32, 'sawai', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'ไสว', 'ไชยศรี', 'sawai@go.buu.ac.th', '038102473', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(33, 'sirigorn', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'สิริกร', 'งามสำเร็จ', 'sirigorn@go.buu.ac.th', '038102483', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'บรรณารักษ์', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(34, 'somboons', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'สมบูรณ์', 'ศรีพรหม', 'somboons@go.buu.ac.th', '038102491', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(35, 'sommay', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'สมหมาย', 'ลิ้มปิติพานิชย์', 'sommay@go.buu.ac.th', '038102460', 'สำนักงานผู้อำนวยการ', 'นักวิชาการศึกษา', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(36, 'somying', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'สมหญิง', 'เจียสารัมย์', 'somying@go.buu.ac.th', '038102482', 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'บรรณารักษ์', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(37, 'suchapa', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'สุชาภา(ทดสอบ)', 'โชติวีระวุฒิกุล', 'suchapa@go.buu.ac.th', '038102460', 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'นักวิชาการคอมพิวเตอร์', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'Y', 'N'),
+(38, 'suchapa.ch', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'สุชาภา', 'โชติวีระวุฒิกุล', 'suchapa.ch@go.buu.ac.th', '038102460', 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'นักวิชาการคอมพิวเตอร์', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'Y', 'N'),
+(39, 'sukanda', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'สุกานดา', 'ปลื้มจิตต์', 'sukanda@go.buu.ac.th', '038102466', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(40, 'sunun', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'สุนันท์', 'วิหครัตน์', 'sunun@go.buu.ac.th', '038102485', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(41, 'supawadeep', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'สุภาวดี', 'เพชรชื่นสกุล', 'supawadeep@go.buu.ac.th', '038102490', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'บรรณารักษ์', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(42, 'thanakorn.ji', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'ธนกรณ์', 'จินดารักษ์', 'thanakorn.ji@go.buu.ac.th', '038102460', 'สำนักงานผู้อำนวยการ', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(43, 'thitichaya', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'ฐิติชญาน์', 'ทวนดิลก', 'thitichaya@go.buu.ac.th', '038102490', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'บรรณารักษ์', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(44, 'thunyaluck', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'ธัญลักษณ์', 'ธนประสิทธิ์พัฒนา', 'thunyaluck@go.buu.ac.th', '038102490', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'บรรณารักษ์', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N'),
+(45, 'urarin', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'อุฬาริน', 'เฉยศิริ', 'urarin@go.buu.ac.th', '038102490', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'บรรณารักษ์ชำนาญการพิเศษ', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(46, 'wanidasr', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'วนิดา', 'ศรีนามาตย์', 'wanidasr@go.buu.ac.th', '038102474', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(47, 'weeraya', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'ตุลญา', 'รวิชญานนท์', 'weeraya@go.buu.ac.th', '038102485', 'ฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 'ผู้ปฏิบัติงานห้องสมุด', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(48, 'wongduen', '25d55ad283aa400af464c76d713c07ad', 'นาง', 'วงเดือน', 'เจริญ', 'wongduen@go.buu.ac.th', '038102490', 'ฝ่ายบริการสารสนเทศและนวัตกรรมการเรียนรู้', 'บรรณารักษ์ชำนาญการพิเศษ', 'People', 'Library', 'Inactive', 'N', 'N', 'N', 'N', 'N', 'N'),
+(49, '64160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'นาย', 'มาลี', 'สวยพี่ สวย', '64160100@go.buu.ac.th', '0123456789', 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'นักวิชาการคอมพิวเตอร์', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N', 'N')
 
-INSERT INTO `Position` (`Id_Position`, `Name_Position`) VALUES
-(1, 'บรรณารักษ์ชำนาญการพิเศษ'),
-(2, 'บรรณารักษ์ชำนาญการ');
 
-INSERT INTO `Premission` (`Id_Permission`, `Name_Permission`, `Dashborad`, `List_Project`, `Track_Status`, `Documents_Project`, `Report_results`, `Check_Budget`, `Approval_Project`, `Propose_Project`, `Manage_Users`, `Data_Employee`, `Setup_System`) VALUES
-(1, 'หัวหน้าฝ่าย', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
-(2, 'ผู้อำนวยการ', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N'),
-(3, 'ผู้บริหาร', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
-(4, 'การเงิน', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'),
-(5, 'ผู้ดูแลระบบ', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y'),
-(6, 'ผู้รับผิดชอบโครงการ', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'N', 'N', 'N');
-
-INSERT INTO `Employee` (`Id_Employee`, `Firstname_Employee`, `Lastname_Employee`, `Email`, `Password`, `IsManager`, `IsDirector`, `IsBoard`, `IsFinance`, `IsAdmin`, `Department_Id`, `Position_Id`) VALUES
-(1, 'Is', 'Manager', '44160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'Y', 'N', 'N', 'N', 'N', 1, 2),
-(2, 'Is', 'Director', '54160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'Y', 'N', 'N', 'N', 1, 2),
-(3, 'Is', 'Board', '64160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 'Y', 'N', 'N', 1, 1),
-(4, 'Is', 'Finance', '74160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 'N', 'Y', 'N', 1, 2),
-(5, 'Is', 'Admin', '84160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 'N', 'N', 'Y', 1, 2),
-(6, 'สมหญิง', 'ศรีสมร', '94160100@go.buu.ac.th', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 'N', 'N', 'N', 2, 2);
-(7, 'สุชาภา', 'โชติวีระวุฒิกุล",', 'suchapa.ch', '25d55ad283aa400af464c76d713c07ad', 'N', 'N', 'N', 'N', 'N', 2, 2);
-
-INSERT INTO `Employee` (`Id_Employee`, `Username`, `Password`, `Prefix_Name`, `Firstname`, `Lastname`, `Email`, `Phone`, `Department_Name`, `Position_Name`, `TypePersons`, `Agency`, `Status`, `IsManager`, `IsDirector`, `IsFinance`, `IsResponsible`, `IsAdmin`) VALUES
-(1, 'suchapa.ch', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'สุชาภา', 'โชติวีระวุฒิกุล', 'suchapa.ch@go.buu.ac.th', 38102460, 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'นักวิชาการคอมพิวเตอร์', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N');
-
-INSERT INTO `Employee` (`Id_Employee`, `Username`, `Password`, `Prefix_Name`, `Firstname`, `Lastname`, `Email`, `Phone`, `Department_Name`, `Position_Name`, `TypePersons`, `Agency`, `Status`, `IsManager`, `IsDirector`, `IsFinance`, `IsResponsible`, `IsAdmin`) VALUES ('1', 'suchapa.ch', '25d55ad283aa400af464c76d713c07ad', 'นางสาว', 'สุชาภา', 'โชติวีระวุฒิกุล', 'suchapa.ch@go.buu.ac.th', '038102460', 'ฝ่ายเทคโนโลยีสารสนเทศและนวัตกรรมดิจิทัล', 'นักวิชาการคอมพิวเตอร์', 'People', 'Library', 'Active', 'N', 'N', 'N', 'N', 'N');
-
-
-INSERT INTO `Users` (`Employee_Id_Employee`, `Premission_Id_Permission`) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5),
-(6, 6);
+INSERT INTO `ManagementPosition` (`Id_ManagementPosition`, `ManagementPositionName`, `Employee_Id`) VALUES
+(1, 'ผู้รักษาการแทนหัวหน้าสำนักงานผู้อำนวยการ', 1),
+(2, 'รองผู้อำนวยการฝ่ายแผนยุทธศาสตร์และพัฒนาองค์กร', 8),
+(3, 'ผู้รักษาการแทนหัวหน้าฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 8),
+(4, 'ผู้อำนวยการ', 9),
+(5, 'ผู้ช่วยผู้อำนวยการฝ่ายพัฒนาคุณภาพการศึกษา', 35),
+(6, 'ผู้ช่วยผู้อำนวยการฝ่ายบริหารภาพลักษณ์องค์กร', 41),
+(7, 'ผู้รักษาการแทนหัวหน้าฝ่ายบริหารจัดการทรัพยากรสารสนเทศและคลังปัญญา', 48);
 
 INSERT INTO `Strategic` (`Id_Strategic`, `Name_Strategic_Plan`, `Goals_Strategic`) VALUES
 (1, 'ยุทธศาสตร์ที่ 1 การพัฒนาความเป็นเลิศด้านบริการด้วยมาตรฐ', 'มีกระบวนการบริหารจัดการในการพัฒนาคุณภาพการให้บริการตามมาตรฐานการเพื่อให้ส านักหอสมุดให้มีประสิทธิภาพมากขึ้น'),
@@ -115,7 +137,6 @@ INSERT INTO `Kpi` (`Id_Kpi`, `Strategy_Id`, `Name_Kpi`, `Target_Value`) VALUES
 (19, 12, 'KPI 19 จ านวนโครงการ/กิจกรรม\r\nการให้บริการวิชาการร่วมกับชุมชนสอด\r\nคล้องกับผลลัพธ์ด้าน Quality Education', '≥ 1 งาน'),
 (20, 13, 'KPI 20 จ านวนโครงการ/กิจกรรม', '≥2 กิจกรรม/ โครงการ');
 
-
 INSERT INTO `Integration_Category` (`Id_Integration_Category`, `Name_Integration_Category`) VALUES
 (1, 'การบริการสารสนเทศ'),
 (2, 'การวิจัย (ระบุโครงการวิจัย)'),
@@ -188,3 +209,4 @@ INSERT INTO `Strategic_has_Quarter_Project` (`Strategic_Id`, `Quarter_Project_Id
 <?php
 $password = '12345678';
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+

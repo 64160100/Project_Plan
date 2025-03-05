@@ -6,13 +6,11 @@ use App\Http\Controllers\StorageFileController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\PlanDLCController;
 use App\Http\Controllers\PDFController;
-use App\Http\Controllers\ProjectBatchController;
 use App\Http\Controllers\FiscalYearQuarterController;
 use App\Http\Controllers\ProposeProjectController;
 use App\Http\Controllers\RequestApprovalController;
 use App\Http\Controllers\ReportFormController;
 use App\Http\Controllers\SustainableDevelopmentGoalsController;
-
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 require __DIR__.'/account.php';
@@ -32,8 +30,8 @@ Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'cre
 Route::put('/approvals/disapproveAll/{id}', [ListProjectController::class, 'disapproveAll'])->name('disapproveAll');
 Route::put('/approvals/updateAllStatus', [RequestApprovalController::class, 'updateAllStatus'])->name('updateAllStatus');
 
+Route::get('/search-projects', [ListProjectController::class, 'searchProjects'])->name('search.projects');// การเสนอโครงการ
 
-// การเสนอโครงการ
 Route::get('/proposeProject', [ProposeProjectController::class, 'proposeProject'])->name('proposeProject');
 Route::post('/projects/submit-for-approval/{id}', [ProposeProjectController::class, 'submitForApproval'])->name('projects.submitForApproval');
 
@@ -45,19 +43,7 @@ Route::get('/project/{id}/edit', [ListProjectController::class, 'editAllProject'
 
 Route::post('/projects/reset-status/{id}', [ListProjectController::class, 'resetStatus'])->name('projects.resetStatus');
 
-// สร้างชุดโครงการ
-Route::get('/createSetProject', [ProjectBatchController::class, 'createSetProject'])->name('createSetProject');
-Route::post('/project-batches', [ProjectBatchController::class, 'storeProjectBatch'])->name('project-batches.store');
-Route::get('/project-batches/submit/{id}', [ProjectBatchController::class, 'submitProjectBatch'])->name('project-batches.submit');
-Route::delete('/project-batches/{batch_id}', [ProjectBatchController::class, 'removeBatch'])->name('project-batches.removeBatch');
-Route::delete('/project-batches/{batch_id}/projects/{project_id}', [ProjectBatchController::class, 'removeProjectFromBatch'])->name('project-batches.removeProject');
-Route::post('/project-batches/add-projects', [ProjectBatchController::class, 'addProjectsToBatch'])->name('project-batches.addProjects');
-Route::put('/approvals/batch/{id}/status/{status}', [ProjectBatchController::class, 'updateBatchApprovalStatus'])->name('approvals.updateBatchStatus');
-
-// แสดง PDF
-Route::get('/projects/{id}', [ProjectBatchController::class, 'showBatchesProject'])->name('projects.showBatchesProject');
-Route::get('/projects/batch/{batch_id}/all', [ProjectBatchController::class, 'showBatchAll'])->name('projects.showBatchAll');
-
+Route::post('/projects/{id}/update-responsible', 'App\Http\Controllers\ProposeProjectController@updateResponsible')->name('projects.updateResponsible');
 // แก้ไขโครงการ
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
 Route::match(['get', 'post'],'/editProject/{Id_Project}', [ListProjectController::class, 'editProject'])->name('editProject');

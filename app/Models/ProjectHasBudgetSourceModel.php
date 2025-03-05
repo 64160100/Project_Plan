@@ -12,12 +12,10 @@ class ProjectHasBudgetSourceModel extends Model
     protected $fillable = [
         'Project_Id',
         'Budget_Source_Id',
-        'Amount_Total',
-        'Details_Expense',
+        'Details_Expense'
     ];
 
     public $timestamps = false;
-
 
     public function project()
     {
@@ -29,4 +27,13 @@ class ProjectHasBudgetSourceModel extends Model
         return $this->belongsTo(BudgetSourceModel::class, 'Budget_Source_Id', 'Id_Budget_Source');
     }
     
+    public function budget_source()
+    {
+        return $this->belongsTo(BudgetSourceModel::class, 'Budget_Source_Id', 'Id_Budget_Source');
+    }
+    
+    public function budgetSourceTotal()
+    {
+        return $this->hasOne(BudgetSourceTotalModel::class, 'Project_has_Budget_Source_Id', 'Id_Project_has_Budget_Source');
+    }
 }

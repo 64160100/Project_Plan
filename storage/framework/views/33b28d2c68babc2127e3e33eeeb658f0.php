@@ -1,7 +1,5 @@
-@extends('navbar.app')
-
 <hade>
-    <link rel="stylesheet" href="{{ asset('css/createFirstForm.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('css/createFirstForm.css')); ?>">
     <style>
     /* Project Search List Styling */
     #project-list {
@@ -43,15 +41,15 @@
     </style>
 
 </hade>
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container py-4">
     <div class="card">
         <h3 class="card-header">กรอกข้อมูลโครงการ</h3>
 
         <div class="card-body">
-            <form action="{{ route('createProject', ['Strategic_Id' => $strategics->Id_Strategic]) }}" method="POST"
+            <form action="<?php echo e(route('createProject', ['Strategic_Id' => $strategics->Id_Strategic])); ?>" method="POST"
                 class="needs-validation" novalidate>
-                @csrf
+                <?php echo csrf_field(); ?>
 
                 <!-- ความสอดคล้องกับยุทธศาสตร์ส่วนงาน -->
                 <div class="content-box">
@@ -65,28 +63,43 @@
                             <div class="mb-3">
                                 <label for="Name_Strategic_Plan" class="form-label">ชื่อแผนยุทธศาสตร์</label>
                                 <input type="text" class="form-control" id="Name_Strategic_Plan"
-                                    name="Name_Strategic_Plan" value="{{ $nameStrategicPlan }}" readonly>
+                                    name="Name_Strategic_Plan" value="<?php echo e($nameStrategicPlan); ?>" readonly>
                             </div>
                             <div class="mb-3">
                                 <label for="Name_Strategy" class="form-label">ชื่อกลยุทธ์<span class="text-danger">
                                         *</span></label>
-                                <select class="form-select @error('Name_Strategy') is-invalid @enderror"
+                                <select class="form-select <?php $__errorArgs = ['Name_Strategy'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                     name="Name_Strategy" id="Name_Strategy" required>
                                     <option value="" selected disabled>เลือกกลยุทธ์</option>
-                                    @if($strategies->isNotEmpty())
-                                    @foreach($strategies as $strategy)
-                                    <option value="{{ $strategy->Id_Strategy }}"
-                                        {{ isset($project) && $project->Name_Strategy == $strategy->Id_Strategy ? 'selected' : '' }}>
-                                        {{ $strategy->Name_Strategy }}
+                                    <?php if($strategies->isNotEmpty()): ?>
+                                    <?php $__currentLoopData = $strategies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $strategy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($strategy->Id_Strategy); ?>"
+                                        <?php echo e(isset($project) && $project->Name_Strategy == $strategy->Id_Strategy ? 'selected' : ''); ?>>
+                                        <?php echo e($strategy->Name_Strategy); ?>
+
                                     </option>
-                                    @endforeach
-                                    @else
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php else: ?>
                                     <option value="" disabled>ไม่มีกลยุทธ์ที่เกี่ยวข้อง</option>
-                                    @endif
+                                    <?php endif; ?>
                                 </select>
-                                @error('Name_Strategy')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <?php $__errorArgs = ['Name_Strategy'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
                     </div>
@@ -130,17 +143,31 @@
                         <div class="form-group">
                             <label for="Name_Project" class="form-label">สร้างชื่อโครงการ <span
                                     class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('Name_Project') is-invalid @enderror"
+                            <input type="text" class="form-control <?php $__errorArgs = ['Name_Project'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                 id="Name_Project" name="Name_Project" placeholder="กรอกชื่อโครงการ" required
-                                value="{{ old('Name_Project') }}" title="กรุณากรอกชื่อโครงการ">
-                            @error('Name_Project')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @else
+                                value="<?php echo e(old('Name_Project')); ?>" title="กรุณากรอกชื่อโครงการ">
+                            <?php $__errorArgs = ['Name_Project'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php else: ?>
                             <div class="invalid-feedback">กรุณากรอกชื่อโครงการ</div>
-                            @enderror
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                         <div id="projectContainer">
-                            @csrf
+                            <?php echo csrf_field(); ?>
                         </div>
                         <div>
                             <button type="button" class="btn-addlist"
@@ -161,15 +188,23 @@
                     <div id="successIndicatorsDetails">
                         <div class="form-group">
                             <div class="d-flex align-items-center">
-                                <select class="form-control @error('Success_Indicators') is-invalid @enderror"
+                                <select class="form-control <?php $__errorArgs = ['Success_Indicators'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                     id="Success_Indicators" name="Success_Indicators">
                                     <option value="" disabled selected>กรอกตัวชี้วัดความสำเร็จของโครงการ</option>
-                                    @foreach($kpis as $kpi)
-                                    <option value="{{ $kpi->Name_Kpi }}" data-strategy-id="{{ $kpi->Strategy_Id }}"
-                                        data-target-value="{{ $kpi->Target_Value }}">
-                                        {{ $kpi->Name_Kpi }}
+                                    <?php $__currentLoopData = $kpis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kpi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($kpi->Name_Kpi); ?>" data-strategy-id="<?php echo e($kpi->Strategy_Id); ?>"
+                                        data-target-value="<?php echo e($kpi->Target_Value); ?>">
+                                        <?php echo e($kpi->Name_Kpi); ?>
+
                                     </option>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                                 <div class="form-check ms-2 d-flex align-items-center">
                                     <input class="form-check-input" type="checkbox"
@@ -182,9 +217,16 @@
                             <textarea class="form-control mt-2" id="Success_Indicators_Other"
                                 name="Success_Indicators_Other" placeholder="กรอกตัวชี้วัดความสำเร็จอื่น ๆ"
                                 style="display: none;"></textarea>
-                            @error('Success_Indicators')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['Success_Indicators'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
                 </div>
@@ -199,7 +241,14 @@
                     <div id="valueTargetDetails">
                         <div class="form-group">
                             <div class="d-flex align-items-center">
-                                <select class="form-control @error('Value_Target') is-invalid @enderror"
+                                <select class="form-control <?php $__errorArgs = ['Value_Target'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                     id="Value_Target" name="Value_Target">
                                     <option value="" disabled selected>กรอกค่าเป้าหมาย</option>
                                     <!-- Add options here if needed -->
@@ -213,9 +262,16 @@
                             </div>
                             <textarea class="form-control mt-2" id="Value_Target_Other" name="Value_Target_Other"
                                 placeholder="กรอกค่าเป้าหมายอื่น ๆ" style="display: none;"></textarea>
-                            @error('Value_Target')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['Value_Target'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
                 </div>
@@ -246,24 +302,24 @@
                                 <label class="form-label fw-bold">แหล่งที่มาของงบประมาณ:</label>
                                 <div class="card mb-3">
                                     <div class="card-body">
-                                        @foreach($budgetSources as $source)
+                                        <?php $__currentLoopData = $budgetSources; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $source): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <div class="form-check mb-2 d-flex align-items-center">
-                                            <input type="checkbox" id="{{ $source->Id_Budget_Source }}"
-                                                name="budget_source[]" value="{{ $source->Id_Budget_Source }}"
-                                                class="form-check-input" data-id="{{ $source->Id_Budget_Source }}"
+                                            <input type="checkbox" id="<?php echo e($source->Id_Budget_Source); ?>"
+                                                name="budget_source[]" value="<?php echo e($source->Id_Budget_Source); ?>"
+                                                class="form-check-input" data-id="<?php echo e($source->Id_Budget_Source); ?>"
                                                 onchange="handleSourceCheckbox(this)">
                                             <label class="form-check-label d-flex align-items-center w-100"
-                                                for="{{ $source->Id_Budget_Source }}">
-                                                <span class="label-text me-2">{{ $source->Name_Budget_Source }}</span>
+                                                for="<?php echo e($source->Id_Budget_Source); ?>">
+                                                <span class="label-text me-2"><?php echo e($source->Name_Budget_Source); ?></span>
                                                 <div class="input-group" style="max-width: 200px;">
-                                                    <input type="number" name="amount_{{ $source->Id_Budget_Source }}"
+                                                    <input type="number" name="amount_<?php echo e($source->Id_Budget_Source); ?>"
                                                         class="form-control form-control-sm" placeholder="จำนวนเงิน"
                                                         disabled>
                                                     <span class="input-group-text">บาท</span>
                                                 </div>
                                             </label>
                                         </div>
-                                        @endforeach
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </div>
                                 </div>
                             </div>
@@ -346,11 +402,11 @@
                                                                             onchange="handleCategorySelect(this)">
                                                                             <option value="" selected disabled>
                                                                                 เลือกหมวดหมู่</option>
-                                                                            @foreach($mainCategories as $index =>
-                                                                            $categoryName)
-                                                                            <option value="{{ $index }}">
-                                                                                {{ $categoryName }}</option>
-                                                                            @endforeach
+                                                                            <?php $__currentLoopData = $mainCategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index =>
+                                                                            $categoryName): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                            <option value="<?php echo e($index); ?>">
+                                                                                <?php echo e($categoryName); ?></option>
+                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                         </select>
                                                                     </td>
 
@@ -420,18 +476,33 @@
                     <div id="responsibleDetails">
                         <div class="form-group">
                             <label for="employee_id" class="form-label">เลือกผู้รับผิดชอบ</label>
-                            <select class="form-select @error('employee_id') is-invalid @enderror" id="employee_id"
+                            <select class="form-select <?php $__errorArgs = ['employee_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="employee_id"
                                 name="employee_id">
                                 <option value="" selected disabled>เลือกผู้รับผิดชอบ</option>
-                                @foreach($employees as $employee)
-                                <option value="{{ $employee->Id_Employee }}">
-                                    {{ $employee->Firstname }} {{ $employee->Lastname }}
+                                <?php $__currentLoopData = $employees; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $employee): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($employee->Id_Employee); ?>">
+                                    <?php echo e($employee->Firstname); ?> <?php echo e($employee->Lastname); ?>
+
                                 </option>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
-                            @error('employee_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['employee_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
                 </div>
@@ -448,7 +519,7 @@
 </div>
 
 
-<script src="{{ asset('js/createFirstForm.js') }}"></script>
+<script src="<?php echo e(asset('js/createFirstForm.js')); ?>"></script>
 
 <!-- Script สำหรับจัดการฟอร์ม -->
 <script>
@@ -1573,4 +1644,5 @@ function formatNumber(number) {
 }
 </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('navbar.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /var/www/resources/views/Project/createFirstForm.blade.php ENDPATH**/ ?>

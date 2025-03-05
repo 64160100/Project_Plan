@@ -27,7 +27,8 @@ class EmployeeModel extends Model implements JWTSubject
         'IsDirector',
         'IsFinance',
         'IsResponsible',
-        'IsAdmin'
+        'IsAdmin',
+        'IsGeneralEmployees'
     ];
 
     public $timestamps = false; 

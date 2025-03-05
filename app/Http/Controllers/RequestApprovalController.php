@@ -383,7 +383,11 @@ class RequestApprovalController extends Controller
                             $project->Count_Steps = 3;
                             break;
                         case 3:
-                            $project->Count_Steps = 4;
+                            if ($project->Role_Creator === 'IsManager') {
+                                $project->Count_Steps = 5;  
+                            } else {
+                                $project->Count_Steps = 4;
+                            }
                             break;
                         case 4:
                             $project->Count_Steps = 5;
@@ -392,7 +396,11 @@ class RequestApprovalController extends Controller
                             $project->Count_Steps = 6;
                             break;
                         case 6:
-                            $project->Count_Steps = 7;
+                            if ($project->Role_Creator === 'IsManager') {
+                                $project->Count_Steps = 8;  
+                            } else {
+                                $project->Count_Steps = 7; 
+                            }
                             break;
                         case 7:
                             $project->Count_Steps = 8;

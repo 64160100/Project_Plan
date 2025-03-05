@@ -64,3 +64,5 @@
 
 3.`forceDelete()`:
 ใช้สำหรับลบข้อมูลถาวรในกรณีที่ใช้ Soft Deletes
+
+inline Editing

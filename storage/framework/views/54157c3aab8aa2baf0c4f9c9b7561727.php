@@ -1,10 +1,9 @@
-@extends('navbar.app')
 <!DOCTYPE html>
 <html>
 
 <head>
     <title>แก้ไขข้อมูลผู้ใช้งาน</title>
-    <link rel="stylesheet" href="{{ asset('css/editUser.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('css/editUser.css')); ?>">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
     .header-container {
@@ -48,9 +47,9 @@
 </head>
 
 <body>
-    @section('content')
+    <?php $__env->startSection('content'); ?>
     <div class="header-container">
-        <a href="{{ route('account.employee') }}" class="back-btn">
+        <a href="<?php echo e(route('account.employee')); ?>" class="back-btn">
             <i class='bx bxs-left-arrow-square'></i>
         </a>
         <h1>แก้ไขข้อมูลผู้ใช้งาน</h1>
@@ -62,13 +61,13 @@
             <div class="form-group">
                 <label for="Id_Employee">รหัสพนักงาน:</label>
                 <input type="text" class="form-control" id="Id_Employee" name="Id_Employee"
-                    value="{{ $employee->Id_Employee }}" disabled>
+                    value="<?php echo e($employee->Id_Employee); ?>" disabled>
             </div>
 
             <div class="form-group">
                 <label for="Fullname_Employee">ชื่อ-นามสกุล:</label>
                 <input type="text" class="form-control" id="Fullname_Employee" name="Fullname_Employee"
-                    value="{{ $employee->Prefix_Name . ' ' . $employee->Firstname . ' ' . $employee->Lastname }}"
+                    value="<?php echo e($employee->Prefix_Name . ' ' . $employee->Firstname . ' ' . $employee->Lastname); ?>"
                     disabled>
             </div>
         </div>
@@ -77,24 +76,24 @@
             <div class="form-group">
                 <label for="Position_Name">ตำแหน่ง:</label>
                 <input type="text" class="form-control" id="Position_Name" name="Position_Name"
-                    value="{{ $employee->Position_Name }}" disabled>
+                    value="<?php echo e($employee->Position_Name); ?>" disabled>
             </div>
             <div class="form-group">
                 <label for="Department_Name">ฝ่าย:</label>
                 <input type="text" class="form-control" id="Department_Name" name="Department_Name"
-                    value="{{ $employee->Department_Name }}" disabled>
+                    value="<?php echo e($employee->Department_Name); ?>" disabled>
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group">
                 <label for="Email">อีเมล:</label>
-                <input type="email" class="form-control" id="Email" name="Email" value="{{ $employee->Email }}"
+                <input type="email" class="form-control" id="Email" name="Email" value="<?php echo e($employee->Email); ?>"
                     disabled>
             </div>
             <div class="form-group">
                 <label for="Phone">เบอร์โทร:</label>
-                <input type="text" class="form-control" id="Phone" name="Phone" value="{{ $employee->Phone }}" disabled>
+                <input type="text" class="form-control" id="Phone" name="Phone" value="<?php echo e($employee->Phone); ?>" disabled>
             </div>
         </div>
 
@@ -104,37 +103,43 @@
                 <ul style="list-style-type: none; padding-left: 0;">
                     <li>
                         <input type="checkbox" id="IsManager" name="IsManager" value="Y"
-                            {{ $employee->IsManager === 'Y' ? 'checked' : '' }}
+                            <?php echo e($employee->IsManager === 'Y' ? 'checked' : ''); ?>
+
                             onchange="updatePermission('IsManager', this.checked)">
                         <label for="IsManager">หัวหน้าฝ่าย</label>
                     </li>
                     <li>
                         <input type="checkbox" id="IsDirector" name="IsDirector" value="Y"
-                            {{ $employee->IsDirector === 'Y' ? 'checked' : '' }}
+                            <?php echo e($employee->IsDirector === 'Y' ? 'checked' : ''); ?>
+
                             onchange="updatePermission('IsDirector', this.checked)">
                         <label for="IsDirector">ผู้อำนวยการ</label>
                     </li>
                     <li>
                         <input type="checkbox" id="IsFinance" name="IsFinance" value="Y"
-                            {{ $employee->IsFinance === 'Y' ? 'checked' : '' }}
+                            <?php echo e($employee->IsFinance === 'Y' ? 'checked' : ''); ?>
+
                             onchange="updatePermission('IsFinance', this.checked)">
                         <label for="IsFinance">การเงิน</label>
                     </li>
                     <li>
                         <input type="checkbox" id="IsResponsible" name="IsResponsible" value="Y"
-                            {{ $employee->IsResponsible === 'Y' ? 'checked' : '' }}
+                            <?php echo e($employee->IsResponsible === 'Y' ? 'checked' : ''); ?>
+
                             onchange="updatePermission('IsResponsible', this.checked)">
                         <label for="IsResponsible">ผู้รับผิดชอบ</label>
                     </li>
                     <li>
                         <input type="checkbox" id="IsAdmin" name="IsAdmin" value="Y"
-                            {{ $employee->IsAdmin === 'Y' ? 'checked' : '' }}
+                            <?php echo e($employee->IsAdmin === 'Y' ? 'checked' : ''); ?>
+
                             onchange="updatePermission('IsAdmin', this.checked)">
                         <label for="IsAdmin">ผู้ดูแลระบบ</label>
                     </li>
                     <li>
                         <input type="checkbox" id="IsGeneralEmployees" name="IsGeneralEmployees" value="Y"
-                            {{ $employee->IsGeneralEmployees === 'Y' ? 'checked' : '' }}
+                            <?php echo e($employee->IsGeneralEmployees === 'Y' ? 'checked' : ''); ?>
+
                             onchange="updatePermission('IsGeneralEmployees', this.checked)">
                         <label for="IsGeneralEmployees">พนักงานทั่วไป</label>
                     </li>
@@ -146,10 +151,10 @@
     <script>
     function updatePermission(field, value) {
         $.ajax({
-            url: '{{ route("account.updateUserPermissions", $employee->Id_Employee) }}',
+            url: '<?php echo e(route("account.updateUserPermissions", $employee->Id_Employee)); ?>',
             type: 'PUT',
             data: {
-                _token: '{{ csrf_token() }}',
+                _token: '<?php echo e(csrf_token()); ?>',
                 field: field,
                 value: value
             },
@@ -162,7 +167,8 @@
         });
     }
     </script>
-    @endsection
+    <?php $__env->stopSection(); ?>
 </body>
 
 </html>
+<?php echo $__env->make('navbar.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /var/www/resources/views/account/editUser.blade.php ENDPATH**/ ?>

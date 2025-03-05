@@ -1,19 +1,17 @@
-@extends('navbar.app')
-
 <hade>
-    <link rel="stylesheet" href="{{ asset('css/createFirstForm.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('css/createFirstForm.css')); ?>">
 </hade>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container py-4">
     <div class="card">
         <h3 class="card-header">แก้ไขข้อมูลโครงการ</h3>
 
         <div class="card-body">
-            <form action="{{ route('updateProject', ['Id_Project' => $project->Id_Project]) }}" method="POST"
+            <form action="<?php echo e(route('updateProject', ['Id_Project' => $project->Id_Project])); ?>" method="POST"
                 class="needs-validation" novalidate>
-                @csrf
-                @method('PUT')
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('PUT'); ?>
 
                 <!-- ความสอดคล้องกับยุทธศาสตร์ส่วนงาน -->
                 <div class="content-box">
@@ -28,28 +26,43 @@
                                 <label for="Name_Strategic" class="form-label">ชื่อแผนยุทธศาสตร์</label>
                                 <select class="form-control" id="Name_Strategic" name="Name_Strategic"
                                     onchange="filterStrategies()">
-                                    @foreach($strategics as $strategic)
-                                    <option value="{{ $strategic->Id_Strategic }}"
-                                        {{ $project->Strategic_Id == $strategic->Id_Strategic ? 'selected' : '' }}>
-                                        {{ $strategic->Name_Strategic_Plan }}
+                                    <?php $__currentLoopData = $strategics; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $strategic): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($strategic->Id_Strategic); ?>"
+                                        <?php echo e($project->Strategic_Id == $strategic->Id_Strategic ? 'selected' : ''); ?>>
+                                        <?php echo e($strategic->Name_Strategic_Plan); ?>
+
                                     </option>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </div>
                             <div class="mb-3">
                                 <label for="Name_Strategy" class="form-label">กลยุทธ์</label>
-                                <select class="form-select @error('Name_Strategy') is-invalid @enderror"
+                                <select class="form-select <?php $__errorArgs = ['Name_Strategy'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                     name="Name_Strategy" id="Name_Strategy" required>
                                     <option value="" disabled>เลือกกลยุทธ์</option>
-                                    @foreach($strategies as $strategy)
-                                    <option value="{{ $strategy->Id_Strategy }}"
-                                        {{ $project->Strategy_Id == $strategy->Id_Strategy ? 'selected' : '' }}>
-                                        {{ $strategy->Name_Strategy }}</option>
-                                    @endforeach
+                                    <?php $__currentLoopData = $strategies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $strategy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($strategy->Id_Strategy); ?>"
+                                        <?php echo e($project->Strategy_Id == $strategy->Id_Strategy ? 'selected' : ''); ?>>
+                                        <?php echo e($strategy->Name_Strategy); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
-                                @error('Name_Strategy')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <?php $__errorArgs = ['Name_Strategy'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
                     </div>
@@ -66,20 +79,20 @@
                         <div class="radio-item">
                             <input type="radio" name="Description_Project" value="N" id="newProject"
                                 onchange="toggleTextbox(this, 'textbox-projectType-')"
-                                {{ $project->Description_Project == 'N' ? 'checked' : '' }}>
+                                <?php echo e($project->Description_Project == 'N' ? 'checked' : ''); ?>>
                             <label for="newProject">โครงการใหม่</label>
                         </div>
                         <div class="radio-item">
                             <input type="radio" name="Description_Project" value="C" id="continuousProject"
                                 onchange="toggleTextbox(this, 'textbox-projectType-')"
-                                {{ $project->Description_Project == 'C' ? 'checked' : '' }}>
+                                <?php echo e($project->Description_Project == 'C' ? 'checked' : ''); ?>>
                             <label for="continuousProject">โครงการต่อเนื่อง</label>
                         </div>
                     </div>
                     <div class="form-group"
-                        style="{{ $project->Description_Project == 'C' ? 'display: block;' : 'display: none;' }}">
+                        style="<?php echo e($project->Description_Project == 'C' ? 'display: block;' : 'display: none;'); ?>">
                         <input type="text" id="textbox-projectType-2" class="form-control" data-group="projectType"
-                            placeholder="กรอกชื่อโครงการเดิม" value="{{ $project->oldProjectName }}">
+                            placeholder="กรอกชื่อโครงการเดิม" value="<?php echo e($project->oldProjectName); ?>">
                     </div>
                 </div>
 
@@ -93,15 +106,29 @@
                     <div id="projectDetails">
                         <div class="form-group">
                             <label for="Name_Project" class="form-label">สร้างชื่อโครงการ</label>
-                            <input type="text" class="form-control @error('Name_Project') is-invalid @enderror"
+                            <input type="text" class="form-control <?php $__errorArgs = ['Name_Project'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                 id="Name_Project" name="Name_Project" placeholder="กรอกชื่อโครงการ"
-                                value="{{ $project->Name_Project }}" required>
-                            @error('Name_Project')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                                value="<?php echo e($project->Name_Project); ?>" required>
+                            <?php $__errorArgs = ['Name_Project'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                         <div id="projectContainer">
-                            @csrf
+                            <?php echo csrf_field(); ?>
                         </div>
                         <div>
                             <button type="button" class="btn-addlist"
@@ -121,21 +148,35 @@
                     </div>
                     <div id="objectiveDetails">
                         <div class="form-group">
-                            <select class="form-control @error('Objective_Project') is-invalid @enderror"
+                            <select class="form-control <?php $__errorArgs = ['Objective_Project'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                 id="Objective_Project" name="Objective_Project" required>
                                 <option value="" disabled>กรอกข้อมูลวัตถุประสงค์</option>
-                                @foreach($strategicObjectives as $objective)
-                                <option value="{{ $objective->Details_Strategic_Objectives }}"
-                                    data-strategy-id="{{ $objective->Strategy_Id_Strategy }}"
-                                    {{ $project->Objective_Project == $objective->Details_Strategic_Objectives ? 'selected' : '' }}>
-                                    {{ $objective->Details_Strategic_Objectives }}</option>
-                                @endforeach
+                                <?php $__currentLoopData = $strategicObjectives; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $objective): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($objective->Details_Strategic_Objectives); ?>"
+                                    data-strategy-id="<?php echo e($objective->Strategy_Id_Strategy); ?>"
+                                    <?php echo e($project->Objective_Project == $objective->Details_Strategic_Objectives ? 'selected' : ''); ?>>
+                                    <?php echo e($objective->Details_Strategic_Objectives); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
-                            @error('Objective_Project')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['Objective_Project'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
-                        @include('Project.App.ProjectObjective')
+                        <?php echo $__env->make('Project.App.ProjectObjective', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                     </div>
                 </div>
 
@@ -149,19 +190,33 @@
                     <div id="successIndicatorsDetails">
                         <div class="form-group">
                             <label for="Success_Indicators"></label>
-                            <select class="form-control @error('Success_Indicators') is-invalid @enderror"
+                            <select class="form-control <?php $__errorArgs = ['Success_Indicators'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                 id="Success_Indicators" name="Success_Indicators">
                                 <option value="" disabled>กรอกตัวชี้วัดความสำเร็จของโครงการ</option>
-                                @foreach($kpis as $kpi)
-                                <option value="{{ $kpi->Name_Kpi }}" data-strategy-id="{{ $kpi->Strategy_Id }}"
-                                    data-target-value="{{ $kpi->Target_Value }}"
-                                    {{ $project->Success_Indicators == $kpi->Name_Kpi ? 'selected' : '' }}>
-                                    {{ $kpi->Name_Kpi }}</option>
-                                @endforeach
+                                <?php $__currentLoopData = $kpis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kpi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($kpi->Name_Kpi); ?>" data-strategy-id="<?php echo e($kpi->Strategy_Id); ?>"
+                                    data-target-value="<?php echo e($kpi->Target_Value); ?>"
+                                    <?php echo e($project->Success_Indicators == $kpi->Name_Kpi ? 'selected' : ''); ?>>
+                                    <?php echo e($kpi->Name_Kpi); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
-                            @error('Success_Indicators')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['Success_Indicators'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
                 </div>
@@ -176,15 +231,30 @@
                     <div id="valueTargetDetails">
                         <div class="form-group">
                             <label for="Value_Target"></label>
-                            <select class="form-control @error('Value_Target') is-invalid @enderror" id="Value_Target"
+                            <select class="form-control <?php $__errorArgs = ['Value_Target'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="Value_Target"
                                 name="Value_Target">
                                 <option value="" disabled>กรอกค่าเป้าหมาย</option>
-                                <option value="{{ $project->Value_Target }}" selected>{{ $project->Value_Target }}
+                                <option value="<?php echo e($project->Value_Target); ?>" selected><?php echo e($project->Value_Target); ?>
+
                                 </option>
                             </select>
-                            @error('Value_Target')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['Value_Target'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
                 </div>
@@ -202,14 +272,14 @@
                                 <div class="form-group">
                                     <label for="First_Time">วันที่เริ่มต้น:</label>
                                     <input type="date" class="form-control" id="First_Time" name="First_Time"
-                                        value="{{ $project->First_Time }}" required>
+                                        value="<?php echo e($project->First_Time); ?>" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="End_Time">วันที่สิ้นสุด:</label>
                                     <input type="date" class="form-control" id="End_Time" name="End_Time"
-                                        value="{{ $project->End_Time }}" required>
+                                        value="<?php echo e($project->End_Time); ?>" required>
                                 </div>
                             </div>
                         </div>
@@ -228,39 +298,40 @@
                             <div class="radio-group">
                                 <input type="radio" name="Status_Budget" value="N" id="non_income"
                                     onchange="toggleIncomeForm(this)"
-                                    {{ $project->Status_Budget == 'N' ? 'checked' : '' }}>
+                                    <?php echo e($project->Status_Budget == 'N' ? 'checked' : ''); ?>>
                                 <label for="non_income">ไม่ใช้งบประมาณ</label>
 
                                 <input type="radio" name="Status_Budget" value="Y" id="income_seeking"
                                     onchange="toggleIncomeForm(this)"
-                                    {{ $project->Status_Budget == 'Y' ? 'checked' : '' }}>
+                                    <?php echo e($project->Status_Budget == 'Y' ? 'checked' : ''); ?>>
                                 <label for="income_seeking">ใช้งบประมาณ</label>
                             </div>
                         </div>
 
                         <div id="incomeForm" class="income-form"
-                            style="{{ $project->Status_Budget == 'Y' ? 'display: block;' : 'display: none;' }}">
+                            style="<?php echo e($project->Status_Budget == 'Y' ? 'display: block;' : 'display: none;'); ?>">
                             <div class="form-group">
                                 <label>แหล่งงบประมาณ</label>
                                 <div class="mb-4">
-                                    @foreach($budgetSources ?? collect() as $source)
+                                    <?php $__currentLoopData = $budgetSources ?? collect(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $source): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="form-check mb-2 d-flex align-items-center">
-                                        <input type="radio" id="{{ $source->Id_Budget_Source }}" name="budget_source"
-                                            value="{{ $source->Id_Budget_Source }}" class="form-check-input"
-                                            data-id="{{ $source->Id_Budget_Source }}"
-                                            {{ $project->budget_source == $source->Id_Budget_Source ? 'checked' : '' }}
+                                        <input type="radio" id="<?php echo e($source->Id_Budget_Source); ?>" name="budget_source"
+                                            value="<?php echo e($source->Id_Budget_Source); ?>" class="form-check-input"
+                                            data-id="<?php echo e($source->Id_Budget_Source); ?>"
+                                            <?php echo e($project->budget_source == $source->Id_Budget_Source ? 'checked' : ''); ?>
+
                                             onchange="handleSourceSelect(this)">
                                         <label class="form-check-label d-flex align-items-center w-100"
-                                            for="{{ $source->Id_Budget_Source }}">
-                                            <span class="label-text">{{ $source->Name_Budget_Source }}</span>
-                                            <input type="number" name="amount_{{ $source->Id_Budget_Source }}"
+                                            for="<?php echo e($source->Id_Budget_Source); ?>">
+                                            <span class="label-text"><?php echo e($source->Name_Budget_Source); ?></span>
+                                            <input type="number" name="amount_<?php echo e($source->Id_Budget_Source); ?>"
                                                 class="form-control form-control-sm w-25 ml-2" placeholder="จำนวนเงิน"
-                                                value="{{ $project->{'amount_'.$source->Id_Budget_Source} }}"
-                                                {{ $project->budget_source == $source->Id_Budget_Source ? '' : 'disabled' }}>
+                                                value="<?php echo e($project->{'amount_'.$source->Id_Budget_Source}); ?>"
+                                                <?php echo e($project->budget_source == $source->Id_Budget_Source ? '' : 'disabled'); ?>>
                                             <span class="ml-2">บาท</span>
                                         </label>
                                     </div>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
 
                                 <!-- รายละเอียดการเบิกจ่าย -->
@@ -268,7 +339,7 @@
                                     <div class="mb-3">
                                         <label class="form-label">รายละเอียดค่าใช้จ่าย</label>
                                         <textarea name="source_detail" class="form-control"
-                                            placeholder="ระบุรายละเอียดค่าใช้จ่าย">{{ $project->source_detail }}</textarea>
+                                            placeholder="ระบุรายละเอียดค่าใช้จ่าย"><?php echo e($project->source_detail); ?></textarea>
                                     </div>
                                 </div>
 
@@ -277,12 +348,12 @@
                                     <div class="radio-group">
                                         <input type="radio" name="date_type" value="single" id="single_day"
                                             onchange="toggleDateForm(this)"
-                                            {{ $project->date_type == 'single' ? 'checked' : '' }}>
+                                            <?php echo e($project->date_type == 'single' ? 'checked' : ''); ?>>
                                         <label for="single_day">วันเดียว</label>
 
                                         <input type="radio" name="date_type" value="multiple" id="multiple_days"
                                             onchange="toggleDateForm(this)"
-                                            {{ $project->date_type == 'multiple' ? 'checked' : '' }}>
+                                            <?php echo e($project->date_type == 'multiple' ? 'checked' : ''); ?>>
                                         <label for="multiple_days">หลายวัน</label>
                                     </div>
                                 </div>
@@ -303,19 +374,34 @@
                     <div id="responsibleDetails">
                         <div class="form-group">
                             <label for="employee_id" class="form-label">เลือกผู้รับผิดชอบ</label>
-                            <select class="form-select @error('employee_id') is-invalid @enderror" id="employee_id"
+                            <select class="form-select <?php $__errorArgs = ['employee_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="employee_id"
                                 name="employee_id">
                                 <option value="" disabled>เลือกผู้รับผิดชอบ</option>
-                                @foreach($employees as $employee)
-                                <option value="{{ $employee->Id_Employee }}"
-                                    {{ $project->employee_id == $employee->Id_Employee ? 'selected' : '' }}>
-                                    {{ $employee->Firstname }} {{ $employee->Lastname }}
+                                <?php $__currentLoopData = $employees; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $employee): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($employee->Id_Employee); ?>"
+                                    <?php echo e($project->employee_id == $employee->Id_Employee ? 'selected' : ''); ?>>
+                                    <?php echo e($employee->Firstname); ?> <?php echo e($employee->Lastname); ?>
+
                                 </option>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
-                            @error('employee_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['employee_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
                 </div>
@@ -733,4 +819,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('navbar.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /var/www/resources/views/Project/editProject.blade.php ENDPATH**/ ?>

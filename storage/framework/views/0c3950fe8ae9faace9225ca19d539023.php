@@ -1,9 +1,7 @@
-@extends('navbar.app')
-
-@php
+<?php
 use Carbon\Carbon;
 Carbon::setLocale('th');
-@endphp
+?>
 
 <head>
     <meta charset="UTF-8">
@@ -162,11 +160,11 @@ Carbon::setLocale('th');
     </style>
 </head>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container">
     <div class="report-container">
         <div class="header">
-            <img src="{{asset('images/logo_BUU_LIB.png')}}" alt="มหาวิทยาลัยบูรพา">
+            <img src="<?php echo e(asset('images/logo_BUU_LIB.png')); ?>" alt="มหาวิทยาลัยบูรพา">
             <h1>แบบรายงานผลการดำเนินงานโครงการ</h1>
             <h2>สำนักหอสมุด มหาวิทยาลัยบูรพา</h2>
         </div>
@@ -175,12 +173,12 @@ Carbon::setLocale('th');
             <div class="section-title">1. ข้อมูลโครงการ</div>
             <div class="form-group">
                 <label>ชื่อโครงการ:</label>
-                <input type="text" class="form-control" value="{{ $project->Name_Project }}">
+                <input type="text" class="form-control" value="<?php echo e($project->Name_Project); ?>">
             </div>
             <div class="form-group">
                 <label>ผู้รับผิดชอบโครงการ:</label>
                 <input type="text" class="form-control"
-                    value="{{ $project->employee ? $project->employee->Firstname . ' ' . $project->employee->Lastname : '' }}">
+                    value="<?php echo e($project->employee ? $project->employee->Firstname . ' ' . $project->employee->Lastname : ''); ?>">
             </div>
         </div>
 
@@ -188,7 +186,7 @@ Carbon::setLocale('th');
             <div class="section-title">2. วัตถุประสงค์</div>
             <div class="form-group">
                 <textarea class="form-control"
-                    placeholder="ระบุวัตถุประสงค์ของโครงการ">{{ $project->Objective_Project }}</textarea>
+                    placeholder="ระบุวัตถุประสงค์ของโครงการ"><?php echo e($project->Objective_Project); ?></textarea>
             </div>
         </div>
 
@@ -196,19 +194,19 @@ Carbon::setLocale('th');
             <div class="section-title">3. รายละเอียดการดำเนินงาน</div>
             <div class="form-group">
                 <label>กลุ่มเป้าหมาย:</label>
-                <input type="text" class="form-control" value="{{ $project->Target_Group }}">
+                <input type="text" class="form-control" value="<?php echo e($project->Target_Group); ?>">
             </div>
             <div class="form-group">
                 <label>ระยะเวลาดำเนินงาน:</label>
-                <input type="text" class="form-control" value="{{ $project->Duration }}">
+                <input type="text" class="form-control" value="<?php echo e($project->Duration); ?>">
             </div>
             <div class="form-group">
                 <label>สถานที่ดำเนินงาน:</label>
-                <input type="text" class="form-control" value="{{ $project->Location }}">
+                <input type="text" class="form-control" value="<?php echo e($project->Location); ?>">
             </div>
             <div class="form-group">
                 <label>วิทยากร:</label>
-                <input type="text" class="form-control" value="{{ $project->Speaker }}">
+                <input type="text" class="form-control" value="<?php echo e($project->Speaker); ?>">
             </div>
         </div>
 
@@ -216,18 +214,18 @@ Carbon::setLocale('th');
             <div class="section-title">4. ตัวชี้วัดความสำเร็จ</div>
             <div class="subsection">
                 <h4>ตัวชี้วัดเชิงปริมาณ</h4>
-                <textarea class="form-control">{{ $project->Quantitative_Indicators }}</textarea>
+                <textarea class="form-control"><?php echo e($project->Quantitative_Indicators); ?></textarea>
             </div>
             <div class="subsection">
                 <h4>ตัวชี้วัดเชิงคุณภาพ</h4>
-                <textarea class="form-control">{{ $project->Qualitative_Indicators }}</textarea>
+                <textarea class="form-control"><?php echo e($project->Qualitative_Indicators); ?></textarea>
             </div>
         </div>
 
         <div class="section">
             <div class="section-title">5. สรุปผลการดำเนินงาน</div>
             <div class="form-group">
-                <textarea class="form-control" rows="6">{{ $project->Summary }}</textarea>
+                <textarea class="form-control" rows="6"><?php echo e($project->Summary); ?></textarea>
             </div>
             <div class="table-container">
                 <table>
@@ -240,20 +238,20 @@ Carbon::setLocale('th');
                         </tr>
                     </thead>
                     <tbody>
-                        @if($project->supProjects)
-                        @foreach($project->supProjects as $activity)
+                        <?php if($project->supProjects): ?>
+                        <?php $__currentLoopData = $project->supProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $activity): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr>
-                            <td>{{ $activity->Name }}</td>
-                            <td>{{ $activity->Date }}</td>
-                            <td>{{ $activity->Location }}</td>
-                            <td>{{ $activity->Participants }}</td>
+                            <td><?php echo e($activity->Name); ?></td>
+                            <td><?php echo e($activity->Date); ?></td>
+                            <td><?php echo e($activity->Location); ?></td>
+                            <td><?php echo e($activity->Participants); ?></td>
                         </tr>
-                        @endforeach
-                        @else
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php else: ?>
                         <tr>
                             <td colspan="4">No activities found.</td>
                         </tr>
-                        @endif
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -262,7 +260,7 @@ Carbon::setLocale('th');
         <div class="section">
             <div class="section-title">6. การมีส่วนร่วมของหน่วยงานภายนอก/ชุมชน</div>
             <div class="form-group">
-                <textarea class="form-control">{{ $project->External_Participation }}</textarea>
+                <textarea class="form-control"><?php echo e($project->External_Participation); ?></textarea>
             </div>
         </div>
 
@@ -270,32 +268,32 @@ Carbon::setLocale('th');
             <div class="section-title">7. งบประมาณ</div>
             <div class="form-group">
                 <label>งบประมาณที่ใช้ทั้งสิ้น:</label>
-                <input type="text" class="form-control" value="{{ $project->Budget }}">
+                <input type="text" class="form-control" value="<?php echo e($project->Budget); ?>">
             </div>
         </div>
 
         <div class="section">
             <div class="section-title">8. ข้อเสนอแนะ</div>
             <div class="form-group">
-                <textarea class="form-control">{{ $project->Suggestions }}</textarea>
+                <textarea class="form-control"><?php echo e($project->Suggestions); ?></textarea>
             </div>
         </div>
 
         <div class="step-buttons">
-            <form id="complete-form" action="{{ route('projects.complete', ['id' => $project->Id_Project]) }}"
+            <form id="complete-form" action="<?php echo e(route('projects.complete', ['id' => $project->Id_Project])); ?>"
                 method="POST">
-                @csrf
+                <?php echo csrf_field(); ?>
                 <button type="submit" class="step-button primary" id="complete-button" data-step="ขั้นตอนที่ 1"
-                    {{ $project->approvals->first()->Status == 'Y' ? 'disabled' : '' }}>
+                    <?php echo e($project->approvals->first()->Status == 'Y' ? 'disabled' : ''); ?>>
                     <i class='bx bx-check-circle'></i> เสร็จสิ้น
                 </button>
             </form>
-            <form id="submit-form" action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
+            <form id="submit-form" action="<?php echo e(route('projects.submitForApproval', ['id' => $project->Id_Project])); ?>"
                 method="POST">
-                @csrf
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="status" value="Y">
                 <button type="submit" class="step-button secondary" id="submit-button" data-step="ขั้นตอนที่ 2"
-                    {{ $project->approvals->first()->Status == 'Y' ? '' : 'disabled' }}>
+                    <?php echo e($project->approvals->first()->Status == 'Y' ? '' : 'disabled'); ?>>
                     <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
                 </button>
             </form>
@@ -311,4 +309,5 @@ document.getElementById('complete-form').addEventListener('submit', function() {
     submitButton.classList.add('active'); // เพิ่ม class active เมื่อปุ่มแรกถูกกด
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('navbar.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /var/www/resources/views/ReportForm.blade.php ENDPATH**/ ?>

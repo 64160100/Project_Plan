@@ -45,21 +45,23 @@ Carbon::setLocale('th');
                         </div>
                         <span class="info-value">{{ $project->formattedFirstTime }}</span>
                     </div>
+                    
                     <div class="info-item">
                         <div class="info-top">
                             <i class='bx bx-group' style="width: 20px; height: 0px;"></i>
                             <span class="info-label">ผู้รับผิดชอบ</span>
                         </div>
                         <span class="info-value">
-                            @if($project->employee && ($project->employee->Firstname_Employee ||
-                            $project->employee->Lastname_Employee))
-                            {{ $project->employee->Firstname_Employee ?? '' }}
-                            {{ $project->employee->Lastname_Employee ?? '' }}
+                            @if($project->employee && ($project->employee->Firstname ||
+                            $project->employee->Lastname))
+                            {{ $project->employee->Firstname ?? '' }}
+                            {{ $project->employee->Lastname ?? '' }}
                             @else
                             -
                             @endif
                         </span>
                     </div>
+
                     <div class="info-item">
                         <div class="info-top">
                             <i class='bx bx-wallet-alt' style="width: 20px; height: 0px;"></i>
@@ -68,7 +70,17 @@ Carbon::setLocale('th');
                         <span class="info-value">
                             @if($project->Status_Budget === 'Y')
                             @php
-                            $totalBudget = $project->projectBudgetSources->sum('Amount_Total');
+                            $totalBudget = 0;
+                            // หากมี projectBudgetSources
+                            if ($project->projectBudgetSources) {
+                            // วนลูปแต่ละ budget source
+                            foreach ($project->projectBudgetSources as $budgetSource) {
+                            // ดึงค่าจาก relationship budgetSourceTotal และเพิ่มเข้าไปใน totalBudget
+                            if ($budgetSource->budgetSourceTotal) {
+                            $totalBudget += $budgetSource->budgetSourceTotal->Amount_Total;
+                            }
+                            }
+                            }
                             @endphp
                             {{ number_format($totalBudget, 2) }} บาท
                             @else
@@ -276,7 +288,7 @@ Carbon::setLocale('th');
                                 </div>
                                 @if($project->Count_Steps === 6 || $project->Count_Steps === 11)
                                 <div class="status-text">
-                                    วันที่สิ้นสุด: {{ $project->End_Time }}
+                                    วันที่สิ้นสุด: {{ $project->formattedEndTime }}
                                 </div>
                                 @endif
                             </div>
@@ -371,12 +383,6 @@ Carbon::setLocale('th');
     </div>
     @endif
     @endforeach
-
-    <!-- <div class="mb-3">
-        <a href="{{ route('createSetProject') }}" class="btn btn-primary">
-            <i class='bx bx-plus'></i> สร้างชุดโครงการ ({{ $countStepsZero }} โครงการ)
-        </a>
-    </div> -->
 
     @foreach ($quartersByFiscalYear as $fiscalYear => $yearQuarters)
     @foreach ($yearQuarters->sortBy('Quarter') as $quarter)
@@ -486,7 +492,14 @@ Carbon::setLocale('th');
                 $hasProjects = $filteredProjectCount > 0;
 
                 $totalStrategicBudget = $filteredProjects->sum(function($project) {
-                return $project->projectBudgetSources ? $project->projectBudgetSources->sum('Amount_Total') : 0;
+                $projectTotal = 0;
+                if($project->projectBudgetSources) {
+                foreach($project->projectBudgetSources as $budgetSource) {
+                $projectTotal += $budgetSource->budgetSourceTotal ?
+                $budgetSource->budgetSourceTotal->Amount_Total : 0;
+                }
+                }
+                return $projectTotal;
                 });
                 $projectsByStrategy = $filteredProjects->groupBy('Name_Strategy');
                 @endphp
@@ -551,7 +564,7 @@ Carbon::setLocale('th');
                                     <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
                                         <b>{{ $Project->Name_Project }}</b><br>
                                         @foreach($Project->subProjects as $subProject)
-                                        - {{ $subProject->Name_Sub_Project }}<br> 
+                                        - {{ $subProject->Name_Sub_Project }}<br>
                                         @endforeach
                                     </td>
                                     <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
@@ -567,15 +580,20 @@ Carbon::setLocale('th');
                                         ไม่ใช้งบประมาณ
                                         @else
                                         @php
-                                        $totalBudget = $Project->projectBudgetSources ?
-                                        $Project->projectBudgetSources->sum('Amount_Total') : 0;
+                                        $totalBudget = 0;
+                                        if($Project->projectBudgetSources) {
+                                        foreach($Project->projectBudgetSources as $budgetSource) {
+                                        $totalBudget += $budgetSource->budgetSourceTotal ?
+                                        $budgetSource->budgetSourceTotal->Amount_Total : 0;
+                                        }
+                                        }
                                         @endphp
                                         {{ number_format($totalBudget, 2) }}
                                         @endif
                                     </td>
                                     <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        {{ $Project->employee->Firstname_Employee ?? '-' }}
-                                        {{ $Project->employee->Lastname_Employee ?? '' }}
+                                        {{ $Project->employee->Firstname ?? '-' }}
+                                        {{ $Project->employee->Lastname ?? '' }}
                                     </td>
                                     <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
                                         style="text-align: center;">
@@ -595,7 +613,8 @@ Carbon::setLocale('th');
                                 @endforeach
                                 @endforeach
                                 <tr class="summary-row">
-                                    <td colspan="2" style="text-align: left; font-weight: bold;">รวมรายได้ทั้งหมด:</td>
+                                    <td colspan="2" style="text-align: left; font-weight: bold;">รวมงบประมาณทั้งหมด:
+                                    </td>
                                     <td colspan="6" style="text-align: center; font-weight: bold;">
                                         {{ number_format($totalStrategicBudget, 2) }} บาท
                                     </td>

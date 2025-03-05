@@ -8,28 +8,28 @@
         font-family: 'THSarabunNew';
         font-style: normal;
         font-weight: normal;
-        src: url('{{ public_path('fonts/THSarabunNew.ttf') }}') format('truetype');
+        src: url('<?php echo e(public_path('fonts/THSarabunNew.ttf')); ?>') format('truetype');
     }
 
     @font-face {
         font-family: 'THSarabunNew';
         font-style: normal;
         font-weight: bold;
-        src: url('{{ public_path('fonts/THSarabunNew Bold.ttf') }}') format('truetype');
+        src: url('<?php echo e(public_path('fonts/THSarabunNew Bold.ttf')); ?>') format('truetype');
     }
 
     @font-face {
         font-family: 'THSarabunNew';
         font-style: italic;
         font-weight: normal;
-        src: url('{{ public_path('fonts/THSarabunNew Italic.ttf') }}') format('truetype');
+        src: url('<?php echo e(public_path('fonts/THSarabunNew Italic.ttf')); ?>') format('truetype');
     }
 
     @font-face {
         font-family: 'THSarabunNew';
         font-style: italic;
         font-weight: bold;
-        src: url('{{ public_path('fonts/THSarabunNew BoldItalic.ttf') }}') format('truetype');
+        src: url('<?php echo e(public_path('fonts/THSarabunNew BoldItalic.ttf')); ?>') format('truetype');
     }
 
     @page {
@@ -144,7 +144,7 @@
                 </tr>
             </thead>
             <tbody>
-                @php
+                <?php
                 use Carbon\Carbon;
                 Carbon::setLocale('th');
 
@@ -160,41 +160,46 @@
                 $totalBudget += (float)$bst->Amount_Total;
                 }
                 }
-                @endphp
+                ?>
                 <tr>
-                    <td>{{ $project->strategic->Name_Strategic_Plan }}</td>
-                    <td>{{ $project->Name_Strategy ?? '-'}}</td>
+                    <td><?php echo e($project->strategic->Name_Strategic_Plan); ?></td>
+                    <td><?php echo e($project->Name_Strategy ?? '-'); ?></td>
                     <td>
-                        {{ $project->Name_Project }}<br>
-                        @foreach($project->subProjects as $subProject)
-                        - {{ $subProject->Name_Sub_Project }}<br>
-                        @endforeach
+                        <?php echo e($project->Name_Project); ?><br>
+                        <?php $__currentLoopData = $project->subProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subProject): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        - <?php echo e($subProject->Name_Sub_Project); ?><br>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </td>
 
                     <td>
-                        @if($project->Success_Indicators)
-                        {!! nl2br(e($project->Success_Indicators)) !!}
-                        @else
+                        <?php if($project->Success_Indicators): ?>
+                        <?php echo nl2br(e($project->Success_Indicators)); ?>
+
+                        <?php else: ?>
                         -
-                        @endif
+                        <?php endif; ?>
                     </td>
                     <td>
-                        @if($project->Value_Target)
-                        {!! nl2br(e($project->Value_Target)) !!}
-                        @else
+                        <?php if($project->Value_Target): ?>
+                        <?php echo nl2br(e($project->Value_Target)); ?>
+
+                        <?php else: ?>
                         -
-                        @endif
+                        <?php endif; ?>
                     </td>
                     <td style="text-align: center;">
-                        @if($project->Status_Budget == 'N' || $totalBudget == 0)
+                        <?php if($project->Status_Budget == 'N' || $totalBudget == 0): ?>
                         ไม่ใช้งบประมาณ
-                        @else
-                        {{ number_format($totalBudget, 0) }}
-                        @endif
+                        <?php else: ?>
+                        <?php echo e(number_format($totalBudget, 0)); ?>
+
+                        <?php endif; ?>
                     </td>
                     <td>
-                        {{ $project->employee->Firstname ?? '-' }}
-                        {{ $project->employee->Lastname ?? '' }}
+                        <?php echo e($project->employee->Firstname ?? '-'); ?>
+
+                        <?php echo e($project->employee->Lastname ?? ''); ?>
+
                     </td>
                 </tr>
             </tbody>
@@ -202,4 +207,4 @@
     </div>
 </body>
 
-</html>
+</html><?php /**PATH /var/www/resources/views/PDF/PDFFirstForm.blade.php ENDPATH**/ ?>

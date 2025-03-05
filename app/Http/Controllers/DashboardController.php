@@ -10,9 +10,9 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $employee = $request->session()->get('employee');
+        
+        log:info($employee);
     
-        $message = "Hello";
-    
-        return view('dashboard', ['employee' => $employee, 'message' => $message]);
+        return view('dashboard', ['employee' => $employee]);
     }
 }

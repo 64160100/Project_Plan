@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ListProjectModel;
 use App\Models\RecordHistory;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class ReportFormController extends Controller
@@ -25,35 +26,4 @@ class ReportFormController extends Controller
         return redirect()->back()->with('success', 'Project marked as complete.');
     }
 
-    public function submitForApproval(Request $request, $id)
-    {
-        $project = ListProjectModel::with('approvals')->findOrFail($id);
-        if ($project->Count_Steps == 6) {
-            $project->Count_Steps = 7;
-            $project->save();
-
-            $approval = $project->approvals->first();
-
-            $employee = $request->session()->get('employee');
-            $nameResponsible = $employee ? $employee->Firstname . ' ' . $employee->Lastname : 'Unknown';
-            $roleCreator = $employee ? $employee->Position_Name : 'Unknown';
-
-            $comment = "รายงานความคืบหน้าการดำเนินโครงการ";
-
-            RecordHistory::create([
-                'Approve_Id' => $approval->Id_Approve,
-                'Approve_Project_Id' => $approval->Project_Id,
-                'Comment' => $comment,
-                'Time_Record' => Carbon::now('Asia/Bangkok'),
-                'Status_Record' => $approval->Status,
-                'Name_Record' => $nameResponsible,
-                'Permission_Record' => $roleCreator,
-            ]);
-
-            $approval->Status = 'I';
-            $approval->save();
-        }
-
-        return redirect()->route('proposeProject')->with('success', 'Project submitted for approval.');
-    }
 }

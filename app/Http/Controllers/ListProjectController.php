@@ -14,7 +14,7 @@ use App\Models\ApproveModel;
 use App\Models\EmployeeModel;
 use App\Models\SDGsModel;
 use App\Models\IntegrationModel;
-use App\Models\SupProjectModel;
+use App\Models\SubProjectModel;
 use App\Models\PlatformModel;
 use App\Models\ProgramModel;
 use App\Models\Kpi_ProgramModel;
@@ -42,6 +42,10 @@ use App\Models\StrategicObjectivesModel;
 use App\Models\KpiModel;
 use App\Models\FiscalYearQuarterModel;
 use App\Models\StorageFileModel;
+use App\Models\BudgetSourceTotalModel;
+use App\Models\ExpenseTypesModel;
+use App\Models\ExpenseModel;
+use App\Models\ExpenHasSubtopicBudgetModel;
 use Carbon\Carbon;
 
 class ListProjectController extends Controller
@@ -120,11 +124,54 @@ class ListProjectController extends Controller
         $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
         $pdcaStages = PdcaModel::all();
         $budgetSources = BudgetSourceModel::all();
-        $subtopBudgets = SubtopBudgetModel::all();
+        
+        $subtopBudgets = SubtopBudgetModel::orderBy('Name_Subtopic_Budget', 'asc')->get();
         $kpis = KpiModel::all();
         $strategicObjectives = StrategicObjectivesModel::all();
 
-        return view('Project.createFirstForm', compact('strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets', 'kpis', 'strategicObjectives'));
+        $mainCategories = [];
+        $categoryIds = [];
+        
+        foreach ($subtopBudgets as $subtop) {
+            $parts = explode(' / ', $subtop->Name_Subtopic_Budget);
+            $mainCategory = trim($parts[0]);
+            
+            if (!isset($categoryIds[$mainCategory])) {
+                $categoryIds[$mainCategory] = $subtop->Id_Subtopic_Budget;
+                $mainCategories[$subtop->Id_Subtopic_Budget] = $mainCategory;
+            }
+        }
+
+        return view('Project.createFirstForm', compact(
+            'strategics', 'strategies', 'projects', 'employees', 'sdgs', 
+            'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 
+            'budgetSources', 'subtopBudgets', 'kpis', 'strategicObjectives', 
+            'mainCategories',
+        ));
+    }
+
+    public function searchProjects(Request $request)
+    {
+        $query = $request->input('query');
+        $strategicId = $request->input('strategic_id');
+        
+        Log::info('Project search query:', ['query' => $query, 'strategicId' => $strategicId]);
+        
+        $projects = ListProjectModel::where('Strategic_Id', $strategicId)
+            ->where('Name_Project', 'LIKE', "%{$query}%")
+            ->select([
+                'Id_Project', 
+                'Name_Project', 
+                'Strategy_Id', 
+                'Employee_Id', 
+                'Objective_Project', 
+                'Principles_Reasons'
+            ])
+            ->get();
+        
+        Log::info('Search projects results:', ['count' => $projects->count()]);
+        
+        return response()->json($projects);
     }
 
     public function showCreateForm($Strategic_Id)
@@ -145,12 +192,19 @@ class ListProjectController extends Controller
     }
 
     public function createProject(Request $request, $Strategic_Id)
-    {
+    {   
+
+        log::info($request->all());
+
         $strategics = StrategicModel::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
         $strategies = $strategics->strategies;
     
         $request->validate([
             'Name_Strategy' => 'required',
+            'Name_Project' => 'required|string|max:255',
+        ], [
+            'Name_Strategy.required' => 'กรุณาเลือกกลยุทธ์',
+            'Name_Project.required' => 'กรุณากรอกชื่อของโครงการ'
         ]);
 
         $strategy = StrategyModel::find($request->input('Name_Strategy'));
@@ -159,8 +213,8 @@ class ListProjectController extends Controller
         $strategyId = $strategy ? $strategy->Id_Strategy : null;
 
         $employee = $request->session()->get('employee');
-        $nameCreator = $employee ? $employee->Firstname. ' ' . $employee->Lastname : 'Unknown';
-        $roleCreator = $employee ? $employee->Position_Name : 'Unknown';
+        $nameCreator = $employee ? $employee->Firstname . ' ' . $employee->Lastname : 'Unknown';
+        $roleCreator = $employee ? ($employee->IsManager === 'Y' ? 'IsManager' : $employee->Position_Name) : 'Unknown';
 
         $project = new ListProjectModel;
         $project->Strategic_Id = $request->Strategic_Id;
@@ -188,13 +242,13 @@ class ListProjectController extends Controller
             $approval->save();
             // Log::info('Approval record created for project ID: ' . $project->Id_Project);
     
-            if ($request->has('Name_Sup_Project')) {
-                foreach ($request->Name_Sup_Project as $supProjectName) {
-                    $supProject = new SupProjectModel;
-                    $supProject->Project_Id = $project->Id_Project;
-                    $supProject->Name_Sup_Project = $supProjectName;
-                    $supProject->save();
-                    Log::info('Sub-project created with name: ' . $supProjectName);
+            if ($request->has('Name_Sub_Project')) {
+                foreach ($request->Name_Sub_Project as $subProjectName) {
+                    $Sub_Project = new SubProjectModel;
+                    $Sub_Project->Project_Id = $project->Id_Project;
+                    $Sub_Project->Name_Sub_Project = $subProjectName;
+                    $Sub_Project->save();
+                    Log::info('Sub-project created with name: ' . $subProjectName);
                 }
             }
     
@@ -369,34 +423,335 @@ class ListProjectController extends Controller
     
             if ($request->Status_Budget !== 'N') {
                 if ($request->has('budget_source')) {
-                    $projectBudgetSource = new ProjectHasBudgetSourceModel;
-                    $projectBudgetSource->Project_Id = $project->Id_Project;
-                    $projectBudgetSource->Budget_Source_Id = $request->budget_source;
-                    $projectBudgetSource->Amount_Total = $request->input('amount_' . $request->budget_source) ?? null;
-                    $projectBudgetSource->Details_Expense = $request->source_detail ?? null;
-                    $projectBudgetSource->save();
-                    Log::info('Project budget source created with ID: ' . $request->budget_source);
-                }
-            
-                if ($request->has('activity')) {
-                    foreach ($request->activity as $index => $activity) {
-                        $budgetForm = new BudgetFormModel;
-                        $budgetForm->Budget_Source_Id = $request->budget_source;
-                        $budgetForm->Project_Id = $project->Id_Project;
-                        $budgetForm->Big_Topic = $activity ?? null;
-                        $budgetForm->Amount_Big = $request->total_amount[$index] ?? null;
-                        $budgetForm->save();
-                        Log::info('Budget form created with big topic: ' . $activity);
-            
-                        if ($request->has('subActivity')) {
-                            foreach ($request->subActivity[$index] as $subIndex => $subActivity) {
-                                $subtopicBudgetForm = new SubtopicBudgetHasBudgetFormModel;
-                                $subtopicBudgetForm->Subtopic_Budget_Id = $subActivity ?? null;
-                                $subtopicBudgetForm->Budget_Form_Id = $budgetForm->Id_Budget_Form;
-                                $subtopicBudgetForm->Details_Subtopic_Form = $request->description[$index][$subIndex] ?? null;
-                                $subtopicBudgetForm->Amount_Sub = $request->amount[$index][$subIndex] ?? null;
-                                $subtopicBudgetForm->save();
-                                Log::info('Subtopic budget form created with subtopic ID: ' . $subActivity);
+                    foreach ($request->budget_source as $sourceId) {
+                        $projectBudgetSource = new ProjectHasBudgetSourceModel;
+                        $projectBudgetSource->Project_Id = $project->Id_Project;
+                        $projectBudgetSource->Budget_Source_Id = $sourceId;
+                        $projectBudgetSource->Details_Expense = $request->source_detail ?? null;
+                        $projectBudgetSource->save();
+                        
+                        $amountKey = 'amount_' . $sourceId;
+                        $amount = $request->input($amountKey);
+                        
+                        if ($amount) {
+                            $budgetSourceTotal = new BudgetSourceTotalModel;
+                            $budgetSourceTotal->Amount_Total = $amount;
+                            $budgetSourceTotal->Project_has_Budget_Source_Id = $projectBudgetSource->Id_Project_has_Budget_Source;
+                            $budgetSourceTotal->save();
+                        }
+                    }
+                    
+                    $expenseType = new ExpenseTypesModel;
+                    $expenseType->Project_Id = $project->Id_Project;
+                    $expenseType->Expense_Status = $request->date_type; 
+                    $expenseType->save();
+                    
+                    Log::info('Expense type created', [
+                        'project_id' => $project->Id_Project,
+                        'expense_status' => $expenseType->Expense_Status
+                    ]);
+                    
+                    if ($request->has('date')) {
+                        foreach ($request->date as $index => $date) {
+                            if (!empty($date)) {
+                                $expense = new ExpenseModel;
+                                $expense->Expense_Types_Id = $expenseType->Id_Expense_Types;
+                                $expense->Date_Expense = $date;
+                                $expense->Details_Expense = $request->budget_details[$index] ?? null;
+                                $expense->save();
+                    
+                                Log::info('Expense created', [
+                                    'expense_id' => $expense->Id_Expense,
+                                    'date' => $date,
+                                    'details' => $expense->Details_Expense
+                                ]);
+                                
+                                // STANDARD DAY PROCESSING (using budget_category, item_desc, item_amount)
+                                if (isset($request->budget_category[$index]) && is_array($request->budget_category[$index])) {
+                                    Log::info('Budget categories for date ' . $date . ':', $request->budget_category[$index]);
+                                    
+                                    foreach ($request->budget_category[$index] as $subIndex => $categoryId) {
+                                        Log::info('Processing Category ID: ' . $categoryId . ' at subIndex: ' . $subIndex . ' for day: ' . $index);
+                                        
+                                        // Initialize variables
+                                        $descriptions = null;
+                                        $amounts = null;
+                                        
+                                        // Try to find descriptions in various possible locations
+                                        if (isset($request->item_desc[$categoryId][$subIndex])) {
+                                            $descriptions = $request->item_desc[$categoryId][$subIndex];
+                                            Log::info('Found descriptions in structure 1');
+                                        } else if (isset($request->item_desc[$subIndex][$categoryId])) {
+                                            $descriptions = $request->item_desc[$subIndex][$categoryId];
+                                            Log::info('Found descriptions in structure 2');
+                                        } else if (isset($request->item_desc[$index][$categoryId])) {
+                                            $descriptions = $request->item_desc[$index][$categoryId];
+                                            Log::info('Found descriptions in structure 3');
+                                        } else {
+                                            // If we didn't find descriptions in standard format, check if there's an indexed version
+                                            $itemDescKey = "item_desc_{$index}";
+                                            if ($request->has($itemDescKey) && isset($request->$itemDescKey[$categoryId])) {
+                                                $descriptions = $request->$itemDescKey[$categoryId];
+                                                Log::info("Found descriptions in indexed structure: {$itemDescKey}");
+                                            } else {
+                                                Log::warning('No descriptions found for category ID: ' . $categoryId);
+                                                continue; // Skip this category if no descriptions found
+                                            }
+                                        }
+                                        
+                                        // Try to find amounts in various possible locations
+                                        if (isset($request->item_amount[$categoryId][$subIndex])) {
+                                            $amounts = $request->item_amount[$categoryId][$subIndex];
+                                            Log::info('Found amounts in structure 1');
+                                        } else if (isset($request->item_amount[$subIndex][$categoryId])) {
+                                            $amounts = $request->item_amount[$subIndex][$categoryId];
+                                            Log::info('Found amounts in structure 2');
+                                        } else if (isset($request->item_amount[$index][$categoryId])) {
+                                            $amounts = $request->item_amount[$index][$categoryId];
+                                            Log::info('Found amounts in structure 3');
+                                        } else {
+                                            // If we didn't find amounts in standard format, check if there's an indexed version
+                                            $itemAmountKey = "item_amount_{$index}";
+                                            if ($request->has($itemAmountKey) && isset($request->$itemAmountKey[$categoryId])) {
+                                                $amounts = $request->$itemAmountKey[$categoryId];
+                                                Log::info("Found amounts in indexed structure: {$itemAmountKey}");
+                                            } else {
+                                                Log::warning('No amounts found for category ID: ' . $categoryId);
+                                                continue; // Skip this category if no amounts found
+                                            }
+                                        }
+                    
+                                        if ($categoryId !== null && $categoryId !== '' && is_numeric($categoryId)) {
+                                            // Handle nested descriptions and amounts
+                                            $processedDescriptions = [];
+                                            $processedAmounts = [];
+                                            
+                                            // Process descriptions - handle up to 3 levels of nesting
+                                            if (is_array($descriptions)) {
+                                                foreach ($descriptions as $k1 => $v1) {
+                                                    if (is_array($v1)) {
+                                                        foreach ($v1 as $k2 => $v2) {
+                                                            if (is_array($v2)) {
+                                                                foreach ($v2 as $v3) {
+                                                                    $processedDescriptions[] = $v3;
+                                                                }
+                                                            } else {
+                                                                $processedDescriptions[] = $v2;
+                                                            }
+                                                        }
+                                                    } else {
+                                                        $processedDescriptions[] = $v1;
+                                                    }
+                                                }
+                                            } else {
+                                                $processedDescriptions[] = $descriptions;
+                                            }
+                                            
+                                            // Process amounts - handle up to 3 levels of nesting
+                                            if (is_array($amounts)) {
+                                                foreach ($amounts as $k1 => $v1) {
+                                                    if (is_array($v1)) {
+                                                        foreach ($v1 as $k2 => $v2) {
+                                                            if (is_array($v2)) {
+                                                                foreach ($v2 as $v3) {
+                                                                    $processedAmounts[] = $v3;
+                                                                }
+                                                            } else {
+                                                                $processedAmounts[] = $v2;
+                                                            }
+                                                        }
+                                                    } else {
+                                                        $processedAmounts[] = $v1;
+                                                    }
+                                                }
+                                            } else {
+                                                $processedAmounts[] = $amounts;
+                                            }
+                                            
+                                            // Now process each description with its corresponding amount
+                                            foreach ($processedDescriptions as $descIndex => $description) {
+                                                $amount = isset($processedAmounts[$descIndex]) ? $processedAmounts[$descIndex] : 0;
+                                                
+                                                // Convert to string safely
+                                                $descriptionStr = is_array($description) ? json_encode($description) : (string)$description;
+                                                $amountVal = is_array($amount) ? array_sum($amount) : (float)$amount;
+                                                
+                                                Log::info('Processing item:', [
+                                                    'category_id' => $categoryId,
+                                                    'description' => $descriptionStr,
+                                                    'amount' => $amountVal
+                                                ]);
+                                                
+                                                // Skip empty descriptions
+                                                if (empty($descriptionStr)) continue;
+                                                
+                                                // Check if record already exists
+                                                $existingRecord = ExpenHasSubtopicBudgetModel::where('Subtopic_Budget_Id', $categoryId)
+                                                    ->where('Expense_Id', $expense->Id_Expense)
+                                                    ->where('Details_Expense_Budget', $descriptionStr)
+                                                    ->first();
+                                                
+                                                if (!$existingRecord) {
+                                                    $expenseSubtopic = new ExpenHasSubtopicBudgetModel;
+                                                    $expenseSubtopic->Subtopic_Budget_Id = (int)$categoryId;
+                                                    $expenseSubtopic->Expense_Id = $expense->Id_Expense;
+                                                    $expenseSubtopic->Details_Expense_Budget = $descriptionStr;
+                                                    $expenseSubtopic->Amount_Expense_Budget = $amountVal;
+                                                    
+                                                    $expenseSubtopic->save();
+                                                    
+                                                    Log::info('Expense subtopic created', [
+                                                        'expense_id' => $expense->Id_Expense,
+                                                        'subtopic_id' => $categoryId,
+                                                        'description' => $descriptionStr,
+                                                        'amount' => $amountVal
+                                                    ]);
+                                                } else {
+                                                    Log::warning('Duplicate entry skipped', [
+                                                        'subtopic_id' => $categoryId,
+                                                        'expense_id' => $expense->Id_Expense,
+                                                        'description' => $descriptionStr
+                                                    ]);
+                                                }
+                                            }
+                                        } else {
+                                            Log::warning('Invalid category ID: ' . $categoryId);
+                                        }
+                                    }
+                                } else {
+                                    Log::warning('No budget categories found for expense ID: ' . $expense->Id_Expense);
+                                }
+                                
+                                // ADDITIONAL DAY PROCESSING (using category_N, item_desc_N, item_amount_N)
+                                // Only process this for indices greater than 0 (additional days)
+                                if ($index > 0) {
+                                    $categoryKey = "category_{$index}";
+                                    
+                                    if ($request->has($categoryKey) && is_array($request->$categoryKey)) {
+                                        Log::info("Processing additional data for day {$index} with {$categoryKey}");
+                                        
+                                        foreach ($request->$categoryKey as $catIndex => $categoryId) {
+                                            Log::info("Processing day {$index}, category {$categoryId} from {$categoryKey}");
+                                            
+                                            if ($categoryId !== null && $categoryId !== '' && is_numeric($categoryId)) {
+                                                // Get additional descriptions and amounts
+                                                $descKey = "item_desc_{$index}";
+                                                $amountKey = "item_amount_{$index}";
+                                                
+                                                if ($request->has($descKey) && isset($request->$descKey[$categoryId])) {
+                                                    $additionalDesc = $request->$descKey[$categoryId];
+                                                    $additionalAmount = $request->has($amountKey) && isset($request->$amountKey[$categoryId]) 
+                                                        ? $request->$amountKey[$categoryId] 
+                                                        : [];
+                                                        
+                                                    Log::info("Found additional data in {$descKey} and {$amountKey} for category {$categoryId}");
+                                                    
+                                                    // Handle nested descriptions and amounts for additional days
+                                                    $processedDescriptions = [];
+                                                    $processedAmounts = [];
+                                                    
+                                                    // Process descriptions - handle up to 3 levels of nesting
+                                                    if (is_array($additionalDesc)) {
+                                                        foreach ($additionalDesc as $k1 => $v1) {
+                                                            if (is_array($v1)) {
+                                                                foreach ($v1 as $k2 => $v2) {
+                                                                    if (is_array($v2)) {
+                                                                        foreach ($v2 as $v3) {
+                                                                            $processedDescriptions[] = $v3;
+                                                                        }
+                                                                    } else {
+                                                                        $processedDescriptions[] = $v2;
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                $processedDescriptions[] = $v1;
+                                                            }
+                                                        }
+                                                    } else {
+                                                        $processedDescriptions[] = $additionalDesc;
+                                                    }
+                                                    
+                                                    // Process amounts - handle up to 3 levels of nesting
+                                                    if (is_array($additionalAmount)) {
+                                                        foreach ($additionalAmount as $k1 => $v1) {
+                                                            if (is_array($v1)) {
+                                                                foreach ($v1 as $k2 => $v2) {
+                                                                    if (is_array($v2)) {
+                                                                        foreach ($v2 as $v3) {
+                                                                            $processedAmounts[] = $v3;
+                                                                        }
+                                                                    } else {
+                                                                        $processedAmounts[] = $v2;
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                $processedAmounts[] = $v1;
+                                                            }
+                                                        }
+                                                    } else {
+                                                        $processedAmounts[] = $additionalAmount;
+                                                    }
+                                                    
+                                                    // Process each description with its amount for this additional day
+                                                    foreach ($processedDescriptions as $descIndex => $description) {
+                                                        $amount = isset($processedAmounts[$descIndex]) ? $processedAmounts[$descIndex] : 0;
+                                                        
+                                                        // Convert to string safely
+                                                        $descriptionStr = is_array($description) ? json_encode($description) : (string)$description;
+                                                        $amountVal = is_array($amount) ? array_sum($amount) : (float)$amount;
+                                                        
+                                                        // Skip empty descriptions
+                                                        if (empty($descriptionStr)) continue;
+                                                        
+                                                        Log::info("Processing additional day item:", [
+                                                            'day' => $index,
+                                                            'category_id' => $categoryId,
+                                                            'description' => $descriptionStr,
+                                                            'amount' => $amountVal
+                                                        ]);
+                                                        
+                                                        // Check if record already exists
+                                                        $existingRecord = ExpenHasSubtopicBudgetModel::where('Subtopic_Budget_Id', $categoryId)
+                                                            ->where('Expense_Id', $expense->Id_Expense)
+                                                            ->where('Details_Expense_Budget', $descriptionStr)
+                                                            ->first();
+                                                        
+                                                        if (!$existingRecord) {
+                                                            $expenseSubtopic = new ExpenHasSubtopicBudgetModel;
+                                                            $expenseSubtopic->Subtopic_Budget_Id = (int)$categoryId;
+                                                            $expenseSubtopic->Expense_Id = $expense->Id_Expense;
+                                                            $expenseSubtopic->Details_Expense_Budget = $descriptionStr;
+                                                            $expenseSubtopic->Amount_Expense_Budget = $amountVal;
+                                                            
+                                                            $expenseSubtopic->save();
+                                                            
+                                                            Log::info('Additional day expense subtopic created', [
+                                                                'day' => $index,
+                                                                'expense_id' => $expense->Id_Expense,
+                                                                'subtopic_id' => $categoryId,
+                                                                'description' => $descriptionStr,
+                                                                'amount' => $amountVal
+                                                            ]);
+                                                        } else {
+                                                            Log::warning('Additional day duplicate entry skipped', [
+                                                                'day' => $index,
+                                                                'subtopic_id' => $categoryId,
+                                                                'expense_id' => $expense->Id_Expense,
+                                                                'description' => $descriptionStr
+                                                            ]);
+                                                        }
+                                                    }
+                                                } else {
+                                                    Log::warning("No descriptions found in {$descKey} for category {$categoryId}");
+                                                }
+                                            } else {
+                                                Log::warning("Invalid category ID in {$categoryKey}: {$categoryId}");
+                                            }
+                                        }
+                                    } else {
+                                        Log::info("No {$categoryKey} array found for day {$index}");
+                                    }
+                                }
                             }
                         }
                     }
@@ -446,13 +801,35 @@ class ListProjectController extends Controller
             
                 if (!Storage::disk('public')->exists($folderPath)) {
                     Storage::disk('public')->makeDirectory($folderPath);
-                    Log::info('Project directory created', ['path' => $folderPath]);
+                    // Log::info('Project directory created', ['path' => $folderPath]);
                 }
+            
+                // Calculate total budget from Budget_Source_Total
+                $totalBudget = 0;
+                $projectBudgetSources = $project->projectBudgetSources;
+                
+                // Load budget source totals for each project budget source
+                foreach ($projectBudgetSources as $pbs) {
+                    // Get the budget source total related to this project_has_budget_source
+                    $budgetSourceTotal = BudgetSourceTotalModel::where('Project_has_Budget_Source_Id', $pbs->Id_Project_has_Budget_Source)->first();
+                    
+                    // Add to total if budget source total exists
+                    if ($budgetSourceTotal) {
+                        $totalBudget += (float)$budgetSourceTotal->Amount_Total;
+                    }
+                }
+                
+                // Log the calculated total budget
+                // Log::info('Total budget calculated for project', [
+                //     'project_id' => $project->Id_Project,
+                //     'total_budget' => $totalBudget
+                // ]);
             
                 $pdfData = [
                     'project' => $project->load([
                         'subProjects',
                         'projectBudgetSources.budget_source',
+                        'projectBudgetSources.budgetSourceTotal', // Changed from budgetSourceTotals to budgetSourceTotal
                         'strategic',
                         'strategy',
                         'employee',
@@ -467,7 +844,8 @@ class ListProjectController extends Controller
                     'strategy' => $strategy,
                     'nameCreator' => $nameCreator,
                     'roleCreator' => $roleCreator,
-                    'projectBudgetSources' => $project->projectBudgetSources
+                    'projectBudgetSources' => $projectBudgetSources,
+                    'totalBudget' => $totalBudget // Pass the calculated total budget to the view
                 ];
             
                 $pdf = PDF::loadView('PDF.PDFFirstForm', $pdfData);
@@ -503,12 +881,12 @@ class ListProjectController extends Controller
                         throw new \Exception('Failed to create storage file record');
                     }
             
-                    Log::info('PDF generated and saved successfully', [
-                        'project_id' => $project->Id_Project,
-                        'file_name' => $filename,
-                        'path' => $filePath,
-                        'size' => $storageFile->getSizeInMB() . 'MB'
-                    ]);
+                    // Log::info('PDF generated and saved successfully', [
+                    //     'project_id' => $project->Id_Project,
+                    //     'file_name' => $filename,
+                    //     'path' => $filePath,
+                    //     'size' => $storageFile->getSizeInMB() . 'MB'
+                    // ]);
             
                 } else {
                     throw new \Exception('Failed to save PDF file');
@@ -592,13 +970,13 @@ class ListProjectController extends Controller
             $approve->save();
         }
 
-        if ($request->has('Name_Sup_Project')) {
-            $project->supProjects()->delete();
-            foreach ($request->Name_Sup_Project as $supProjectName) {
-                $supProject = new SupProjectModel;
-                $supProject->Project_Id = $project->Id_Project ?? null;
-                $supProject->Name_Sup_Project = $supProjectName ?? null ; 
-                $supProject->save();
+        if ($request->has('Name_Sub_Project')) {
+            $project->subProjects()->delete();
+            foreach ($request->Name_Sub_Project as $subProjectName) {
+                $subProject = new SubProjectModel;
+                $subProject->Project_Id = $project->Id_Project ?? null;
+                $subProject->Name_Sub_Project = $subProjectName ?? null ; 
+                $subProject->save();
             }
         }
 

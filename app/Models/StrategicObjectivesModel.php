@@ -13,6 +13,7 @@ class StrategicObjectivesModel extends Model
         'Id_Strategic_Objectives',
         'Strategy_Id',
         'Details_Strategic_Objectives',
+        'Strategy_Strategic_Id' ,
     ];
     public $timestamps = false;
 

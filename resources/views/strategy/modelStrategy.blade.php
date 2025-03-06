@@ -53,6 +53,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#addStrategicOpportunityModal">
+                    เพิ่มโอกาสเชิงกลยุทธ์ใหม่
+                </button>
+
                 <div class="d-flex justify-content-end mb-3">
                 </div>
                 <table class="table table-bordered">

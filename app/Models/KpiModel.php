@@ -14,6 +14,7 @@ class KpiModel extends Model
         'Strategy_Id',
         'Name_Kpi',
         'Target_Value',
+        'Strategy_Strategic_Id',
     ];
     public $timestamps = false;
 

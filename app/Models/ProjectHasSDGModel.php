@@ -24,6 +24,6 @@ class ProjectHasSDGModel extends Model
 
     public function sdg()
     {
-        return $this->belongsTo(SDGModel::class, 'SDG_Id', 'SDGs_Id');
+        return $this->belongsTo(SDGsModel::class, 'SDGs_Id', 'Id_SDGs');
     }
 }

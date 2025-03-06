@@ -26,40 +26,40 @@
 }
 
 .project-info {
-    display: flex;
-    justify-content: center;
-    gap: 200px;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+    justify-items: center;
 }
 
 .info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.info-top {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.info-label {
+.info-icon {
     color: #666;
+    font-size: 20px;
+}
+
+.info-label {
     font-size: 14px;
+    color: #666;
+    padding-left: 5px;
 }
 
 .info-value {
-    margin-left: 28px;
+    font-weight: 500;
+    padding-left: 5px;
 }
 
 .project-actions {
-    display: flex;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: minmax(190px, 2fr) 2fr minmax(190px, 2fr) 4fr;
     margin-top: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #e0e0e0;
 }
 
 .action-link {
@@ -92,8 +92,8 @@
 }
 
 .status-card {
-    display: flex;
-    justify-content: space-between;
+    /* display: grid;
+    grid-template-columns: repeat(2, 1fr); */
     align-items: center;
     padding: 10px;
     border: 1px solid #e0e0e0;
@@ -111,31 +111,39 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    width: 150px;
-    height: 50px;
 }
 
 .action-buttons {
     display: flex;
-    gap: 10px;
-    justify-content: center;
+    flex-direction: row;
+    /* justify-content: left; */
+    justify-content: right;
+    flex-wrap: wrap; 
 }
 
-.status-button.approved {
+.action-buttons-all {
+    display: flex;
+    flex-direction: row;
+    /* justify-content: left; */
+    justify-content: left;
+    flex-wrap: wrap; 
+}
+
+.status-button.approved, .status-button.approved-all {
     background-color: #28a745;
     color: white;
 }
 
-.status-button.approved:hover {
+.status-button.approved:hover, .status-button.approved-all:hover {
     background-color: #218838;
 }
 
-.status-button.not-approved {
+.status-button.not-approved, .status-button.not-approved-all {
     background-color: #dc3545;
     color: white;
 }
 
-.status-button.not-approved:hover {
+.status-button.not-approved:hover, .status-button.not-approved-all:hover {
     background-color: #c82333;
 }
 
@@ -245,14 +253,19 @@ i {
 }
 
 .accordion-btn {
-    display: flex;
-    justify-content: space-between;
+    /* display: grid;
+    grid-template-columns: 4fr 2fr; */
     align-items: center;
-    padding: 10px;
+    gap: 1rem;
+    padding: 20px;
     background-color: #f8f9fa;
-    border: 1px solid #ddd;
     border-radius: 4px;
     cursor: pointer;
+}
+
+.accordion-btn div:nth-child(2) {
+    text-align: right;
+    justify-self: end;
 }
 
 .accordion-btn:hover {
@@ -261,7 +274,6 @@ i {
 
 .accordion-content {
     padding: 10px;
-    border: 1px solid #ddd;
     border-top: none;
     border-radius: 0 0 4px 4px;
     background-color: #fff;
@@ -372,81 +384,117 @@ th {
     background-color: #c82333;
 }
 
-.page-container {
-    padding: 40px;
+.text-heading {
+    font-size: 217%;
 }
 
-.page-container {
-    padding: 40px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-    margin-bottom: 1px;
-    border: 1px solid #000;
-}
-
-th {
-    background-color: #c8e6c9 !important;
-    font-weight: bold;
-    text-align: center;
-    border: 2px solid #000 !important;
-    padding: 10px;
-    font-size: 14px;
-}
-
-td {
-    border: 2px solid #000 !important;
-    padding: 10px;
-    font-size: 14px;
-    vertical-align: top;
-    word-wrap: break-word;
-    background-color: white;
-}
-
-.summary-row {
-    background-color: #c8e6c9 !important;
-}
-
-.summary-row td {
-    background-color: #c8e6c9 !important;
-    padding: 20px 10px !important;
-    border: 2px solid #000 !important;
-    line-height: 1.2 !important;
-    vertical-align: middle !important;
-    font-weight: bold;
-}
-
-td[rowspan] {
-    border: 2px solid #000 !important;
-}
-
-.button-container {
-    margin: 20px 0;
-    text-align: center;
-}
-
-.print-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.text-gray {
-    color: #a9a9a9;
-}
-
-@media print {
-    .button-container {
-        display: none;
+@media (max-width: 768px) {
+    /* .accordion-btn {
+        grid-template-columns: 1fr;
+        gap: 0.2rem;
+    } */
+    .accordion-btn div:nth-child(2) {
+        text-align: left;
+        justify-self: start;
     }
+    .modal-dialog {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+    .modal-content {
+        border-radius: 0;
+        height: 100%;
+    }
+}
 
-    @page {
-        size: A4 landscape;
+@media (max-width: 1200px) {
+    .table-responsive {
+        overflow-x: auto;
+        display: block;
+        width: 100%;
+    }
+    table {
+        width: 100%; 
+        min-width: 972px;
+        max-width: none;
+        font-size: 16px;
+    }
+    th, td {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+    .accordion-content table th {
+        text-align: center;
+        font-size: 12px;
+    }
+    .accordion-content table td {
+        text-align: left;
+    }
+}
+
+@media (max-width: 428px) {
+    .text-heading {
+        font-size: clamp(16px, 6vw, 40px);
+    }
+    .approved-button {
+        font-size: clamp(4px, 5vw, 12px);
+    }
+    .status-button.approved-all, .status-button.not-approved-all {
+        font-size: clamp(4px, 5vw, 12px);
+    }
+}
+
+@media (max-width: 750px) {
+    .project-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .project-info, .status-card {
+        grid-template-columns: 1fr;
+        align-items: start;
+        justify-items: start;
+    }
+    .info-label {
+        display: inline;
+    }
+    .info-label::after {
+        content: ":";
+        margin-left: 5px;
+    }
+    .info-value {
+        display: inline;
+        margin-left: 5px;
+    }
+    .info-item {
+        margin-bottom: -15px;
+        width: 100%; 
+    }
+    .info-item:last-child {
+        margin-bottom: -3px;
+    }
+    .project-actions {
+        grid-template-columns: 1fr;
+        border-top: #a9a9a9 solid;
+        padding-top: 10px;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        justify-content: left;
+    }
+    .status-button {
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+    .status-text {
+        margin-bottom: 15px;
     }
 }

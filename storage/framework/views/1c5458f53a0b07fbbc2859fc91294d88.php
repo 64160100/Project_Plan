@@ -4,8 +4,14 @@ Carbon::setLocale('th');
 ?>
 
 
+<!DOCTYPE html>
+<html>
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Index</title>
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="<?php echo e(asset('css/proposeProject.css')); ?>">
     <style>
     @font-face {
@@ -27,7 +33,7 @@ Carbon::setLocale('th');
 <?php $__env->startSection('content'); ?>
 <div class="container">
     <h1>เสนอโครงการเพื่อพิจารณา</h1>
-
+        
     <?php $__currentLoopData = $projects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $project): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <?php if($project->Count_Steps !== 0): ?>
     <div class="outer-container">
@@ -40,35 +46,40 @@ Carbon::setLocale('th');
                 </div>
                 <div class="project-info">
                     <div class="info-item">
-                        <div class="info-top">
-                            <i class='bx bxs-calendar-event' style="width: 20px; height: 0px;"></i>
-                            <span class="info-label">วันที่เริ่ม</span>
-                        </div>
-                        <span class="info-value"><?php echo e($project->formattedFirstTime); ?></span>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-top">
-                            <i class='bx bx-group' style="width: 20px; height: 0px;"></i>
-                            <span class="info-label">ผู้รับผิดชอบ</span>
-                        </div>
-                        <span class="info-value">
-                            <?php if($project->employee && ($project->employee->Firstname_Employee ||
-                            $project->employee->Lastname_Employee)): ?>
-                            <?php echo e($project->employee->Firstname_Employee ?? ''); ?>
-
-                            <?php echo e($project->employee->Lastname_Employee ?? ''); ?>
-
-                            <?php else: ?>
-                            -
-                            <?php endif; ?>
+                        <span class="info-icon">
+                            <i class='bx bx-calendar' style="width: 20px; height: 0px;"></i>
                         </span>
+                        <div>
+                            <div class="info-label">วันที่เริ่ม</div>
+                            <div class="info-value"><?php echo e($project->formattedFirstTime); ?></div>
+                        </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-top">
-                            <i class='bx bx-wallet-alt' style="width: 20px; height: 0px;"></i>
-                            <span class="info-label">งบประมาณ</span>
+                        <span class="info-icon">
+                            <i class='bx bx-user' style="width: 20px; height: 0px;"></i>
+                        </span>
+                        <div>
+                            <div class="info-label">ผู้รับผิดชอบ</div>
+                            <div class="info-value">
+                                <?php if($project->employee && ($project->employee->Firstname_Employee ||
+                                    $project->employee->Lastname_Employee)): ?>
+                                    <?php echo e($project->employee->Firstname_Employee ?? ''); ?>
+
+                                    <?php echo e($project->employee->Lastname_Employee ?? ''); ?>
+
+                                <?php else: ?>
+                                -
+                                <?php endif; ?>
+                            </div>
                         </div>
-                        <span class="info-value">
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">
+                            <i class='bx bx-wallet-alt' style="width: 20px; height: 0px;"></i>
+                        </span>
+                        <div>
+                            <div class="info-label">งบประมาณ</div>
+                            <div class="info-value">
                             <?php if($project->Status_Budget === 'Y'): ?>
                             <?php
                             $totalBudget = $project->projectBudgetSources->sum('Amount_Total');
@@ -77,17 +88,19 @@ Carbon::setLocale('th');
                             <?php else: ?>
                             ไม่ใช้งบประมาณ
                             <?php endif; ?>
-                        </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="project-actions">
-                <a href="<?php echo e(route('StorageFiles.index', ['project_id' => $project->Id_Project])); ?>" class="action-link">
-                    <i class='bx bx-info-circle'></i>
-                    ดูรายละเอียดโครงการ
-                </a>
-
+                <div>
+                    <a href="<?php echo e(route('StorageFiles.index', ['project_id' => $project->Id_Project])); ?>" class="action-link">
+                        <i class='bx bx-info-circle'></i>
+                        ดูรายละเอียดโครงการ
+                    </a>
+                </div>
                 <div class="dropdown">
                     <a href="#" class="action-link dropdown-toggle" id="commentsDropdown-<?php echo e($project->Id_Project); ?>"
                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -114,11 +127,12 @@ Carbon::setLocale('th');
                         <?php endif; ?>
                     </ul>
                 </div>
-
-                <a href="#" class="action-link">
-                    <i class='bx bx-error warning-icon'></i>
-                    แจ้งเตือน
-                </a>
+                <div>
+                    <a href="#" class="action-link">
+                        <i class='bx bx-error warning-icon'></i>
+                        แจ้งเตือน
+                    </a>
+                </div>
             </div>
 
             <div class="status-section">
@@ -148,24 +162,28 @@ Carbon::setLocale('th');
                             </div>
                         </div>
                         <div class="status-right">
-                            <span class="status-date">
-                                <?php echo e($history->formattedDateTime ?? 'N/A'); ?>
+                            <div>
+                                <span class="status-date">
+                                    <?php echo e($history->formattedDateTime ?? 'N/A'); ?>
 
-                            </span>
-                            <?php if($history->Status_Record === 'Y'): ?>
-                            <button class="status-button approval-status approved">
-                                เสร็จสิ้น
-                            </button>
-                            <?php elseif($history->Status_Record === 'N'): ?>
-                            <a href="<?php echo e(route('approveProject', ['id' => $history->Approve_Id])); ?>"
-                                class="status-button approval-status not-approved">
-                                ไม่อนุมัติ
-                            </a>
-                            <?php else: ?>
-                            <button class="status-button approval-status pending">
-                                รอการอนุมัติ
-                            </button>
-                            <?php endif; ?>
+                                </span>
+                            </div>
+                            <div>
+                                <?php if($history->Status_Record === 'Y'): ?>
+                                <button class="status-button approval-status approved">
+                                    เสร็จสิ้น
+                                </button>
+                                <?php elseif($history->Status_Record === 'N'): ?>
+                                <a href="<?php echo e(route('approveProject', ['id' => $history->Approve_Id])); ?>"
+                                    class="status-button approval-status not-approved">
+                                    ไม่อนุมัติ
+                                </a>
+                                <?php else: ?>
+                                <button class="status-button approval-status pending">
+                                    รอการอนุมัติ
+                                </button>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -291,42 +309,46 @@ Carbon::setLocale('th');
                             </div>
                         </div>
                         <div class="status-right">
-                            <span class="status-date">
-                                <?php if($project->approvals->first()->recordHistory->isNotEmpty()): ?>
-                                <?php echo e($project->approvals->first()->recordHistory->first()->formattedTimeRecord); ?>
+                            <div>
+                                <span class="status-date">
+                                    <?php if($project->approvals->first()->recordHistory->isNotEmpty()): ?>
+                                    <?php echo e($project->approvals->first()->recordHistory->first()->formattedTimeRecord); ?>
 
-                                <?php else: ?>
-                                N/A
-                                <?php endif; ?>
-                            </span>
-                            <button class="status-button approval-status pending">
-                                <?php if($project->Count_Steps === 0): ?>
-                                ส่ง Email
-                                <?php elseif($project->Count_Steps === 1): ?>
-                                กำลังพิจารณา
-                                <?php elseif($project->Count_Steps === 2): ?>
-                                กำลังพิจารณา
-                                <?php elseif($project->Count_Steps === 3): ?>
-                                กำลังพิจารณา
-                                <?php elseif($project->Count_Steps === 4): ?>
-                                กำลังพิจารณา
-                                <?php elseif($project->Count_Steps === 5): ?>
-                                กำลังพิจารณา
-                                <?php elseif($project->Count_Steps === 6): ?>
-                                กำลังพิจารณา
-                                <?php elseif($project->Count_Steps === 7): ?>
-                                กำลังพิจารณา
-                                <?php elseif($project->Count_Steps === 8): ?>
-                                เสร็จสิ้น
-                                <?php elseif($project->Count_Steps === 9): ?>
-                                สิ้นสุดโครงการ
-                                <?php elseif($project->Count_Steps === 11): ?>
-                                โครงการเสร็จไม่ทันเวลา
-                                <?php else: ?>
-                                <?php echo e($project->approvals->first()->Status ?? 'รอการอนุมัติ'); ?>
+                                    <?php else: ?>
+                                    N/A
+                                    <?php endif; ?>
+                                </span>
+                            </div>
+                            <div>
+                                <button class="status-button approval-status pending">
+                                    <?php if($project->Count_Steps === 0): ?>
+                                    ส่ง Email
+                                    <?php elseif($project->Count_Steps === 1): ?>
+                                    กำลังพิจารณา
+                                    <?php elseif($project->Count_Steps === 2): ?>
+                                    กำลังพิจารณา
+                                    <?php elseif($project->Count_Steps === 3): ?>
+                                    กำลังพิจารณา
+                                    <?php elseif($project->Count_Steps === 4): ?>
+                                    กำลังพิจารณา
+                                    <?php elseif($project->Count_Steps === 5): ?>
+                                    กำลังพิจารณา
+                                    <?php elseif($project->Count_Steps === 6): ?>
+                                    กำลังพิจารณา
+                                    <?php elseif($project->Count_Steps === 7): ?>
+                                    กำลังพิจารณา
+                                    <?php elseif($project->Count_Steps === 8): ?>
+                                    เสร็จสิ้น
+                                    <?php elseif($project->Count_Steps === 9): ?>
+                                    สิ้นสุดโครงการ
+                                    <?php elseif($project->Count_Steps === 11): ?>
+                                    โครงการเสร็จไม่ทันเวลา
+                                    <?php else: ?>
+                                    <?php echo e($project->approvals->first()->Status ?? 'รอการอนุมัติ'); ?>
 
-                                <?php endif; ?>
-                            </button>
+                                    <?php endif; ?>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -523,101 +545,103 @@ Carbon::setLocale('th');
                     </summary>
                     <?php if($filteredProjectCount > 0): ?>
                     <div class="accordion-content">
-                        <table class="summary-table">
-                            <thead>
-                                <tr>
-                                    <th style="width:10%; text-align: center;">ยุทธศาสตร์ สำนักหอสมุด</th>
-                                    <th style="width:10%; text-align: center;">กลยุทธ์ สำนักหอสมุด</th>
-                                    <th style="width:14%; text-align: center;">โครงการ</th>
-                                    <th style="width:14%; text-align: center;">ตัวชี้วัดความสำเร็จ<br>ของโครงการ</th>
-                                    <th style="width:12%; text-align: center;">ค่าเป้าหมาย</th>
-                                    <th style="width:10%; text-align: center;">งบประมาณ (บาท)</th>
-                                    <th style="width:12%; text-align: center;">ผู้รับผิดชอบ</th>
-                                    <th style="width:18%; text-align: center;">การจัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php $__currentLoopData = $projectsByStrategy; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $strategyName => $projects): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php
-                                $strategyCount = $projects->count();
-                                ?>
-                                <?php $__currentLoopData = $projects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $Project): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php
-                                $isStatusN = in_array('N', $Project->approvalStatuses);
-                                $isStatusI = in_array('I', $Project->approvalStatuses);
-                                $allProjectsDeleted = $projects->every(function($project) {
-                                return in_array('N', $project->approvalStatuses);
-                                });
-                                ?>
-                                <tr>
-                                    <?php if($index === 0 && $loop->parent->first): ?>
-                                    <td rowspan="<?php echo e($filteredProjectCount); ?>"><?php echo e($firstStrategicPlanName); ?></td>
-                                    <?php endif; ?>
-                                    <?php if($index === 0): ?>
-                                    <td class="<?php echo e($allProjectsDeleted ? 'text-gray' : ''); ?>"
-                                        rowspan="<?php echo e($strategyCount); ?>">
-                                        <?php echo e($strategyName ?? '-'); ?>
-
-                                    </td>
-                                    <?php endif; ?>
-                                    <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
-                                        <b><?php echo e($Project->Name_Project); ?></b><br>
-                                        <?php $__currentLoopData = $Project->subProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subProject): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        - <?php echo e($subProject->Name_Sub_Project); ?><br> 
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </td>
-                                    <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
-                                        <?php echo $Project->Success_Indicators ? nl2br(e($Project->Success_Indicators)) : '-'; ?>
-
-                                    </td>
-                                    <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
-                                        <?php echo $Project->Value_Target ? nl2br(e($Project->Value_Target)) : '-'; ?>
-
-                                    </td>
-                                    <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>"
-                                        style="text-align: center;">
-                                        <?php if($Project->Status_Budget === 'N'): ?>
-                                        ไม่ใช้งบประมาณ
-                                        <?php else: ?>
-                                        <?php
-                                        $totalBudget = $Project->projectBudgetSources ?
-                                        $Project->projectBudgetSources->sum('Amount_Total') : 0;
-                                        ?>
-                                        <?php echo e(number_format($totalBudget, 2)); ?>
-
+                        <div class="table-responsive">
+                            <table class="summary-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10%; text-align: center;">ยุทธศาสตร์ สำนักหอสมุด</th>
+                                        <th style="width:10%; text-align: center;">กลยุทธ์ สำนักหอสมุด</th>
+                                        <th style="width:14%; text-align: center;">โครงการ</th>
+                                        <th style="width:14%; text-align: center;">ตัวชี้วัดความสำเร็จ<br>ของโครงการ</th>
+                                        <th style="width:12%; text-align: center;">ค่าเป้าหมาย</th>
+                                        <th style="width:10%; text-align: center;">งบประมาณ (บาท)</th>
+                                        <th style="width:12%; text-align: center;">ผู้รับผิดชอบ</th>
+                                        <th style="width:18%; text-align: center;">การจัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $__currentLoopData = $projectsByStrategy; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $strategyName => $projects): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php
+                                    $strategyCount = $projects->count();
+                                    ?>
+                                    <?php $__currentLoopData = $projects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $Project): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php
+                                    $isStatusN = in_array('N', $Project->approvalStatuses);
+                                    $isStatusI = in_array('I', $Project->approvalStatuses);
+                                    $allProjectsDeleted = $projects->every(function($project) {
+                                    return in_array('N', $project->approvalStatuses);
+                                    });
+                                    ?>
+                                    <tr>
+                                        <?php if($index === 0 && $loop->parent->first): ?>
+                                        <td rowspan="<?php echo e($filteredProjectCount); ?>"><?php echo e($firstStrategicPlanName); ?></td>
                                         <?php endif; ?>
-                                    </td>
-                                    <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
-                                        <?php echo e($Project->employee->Firstname_Employee ?? '-'); ?>
+                                        <?php if($index === 0): ?>
+                                        <td class="<?php echo e($allProjectsDeleted ? 'text-gray' : ''); ?>"
+                                            rowspan="<?php echo e($strategyCount); ?>">
+                                            <?php echo e($strategyName ?? '-'); ?>
 
-                                        <?php echo e($Project->employee->Lastname_Employee ?? ''); ?>
-
-                                    </td>
-                                    <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>"
-                                        style="text-align: center;">
-                                        <a href="<?php echo e(route('editProject', ['Id_Project' => $Project->Id_Project, 'sourcePage' => 'proposeProject'])); ?>"
-                                            class="btn btn-warning btn-sm">แก้ไข</a>
-                                        <?php if(!$isStatusN || $isStatusI): ?>
-                                        <form
-                                            action="<?php echo e(route('projects.updateStatus', ['id' => $Project->Id_Project])); ?>"
-                                            method="POST" style="display:inline;">
-                                            <?php echo csrf_field(); ?>
-                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Are you sure you want to update the status of this project?');">ลบ</button>
-                                        </form>
+                                        </td>
                                         <?php endif; ?>
-                                    </td>
-                                </tr>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                <tr class="summary-row">
-                                    <td colspan="2" style="text-align: left; font-weight: bold;">รวมรายได้ทั้งหมด:</td>
-                                    <td colspan="6" style="text-align: center; font-weight: bold;">
-                                        <?php echo e(number_format($totalStrategicBudget, 2)); ?> บาท
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                        <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
+                                            <b><?php echo e($Project->Name_Project); ?></b><br>
+                                            <?php $__currentLoopData = $Project->subProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subProject): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            - <?php echo e($subProject->Name_Sub_Project); ?><br>                                            - <?php echo e($subProject->Name_Sup_Project); ?><br>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </td>
+                                        <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
+                                            <?php echo $Project->Success_Indicators ? nl2br(e($Project->Success_Indicators)) : '-'; ?>
+
+                                        </td>
+                                        <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
+                                            <?php echo $Project->Value_Target ? nl2br(e($Project->Value_Target)) : '-'; ?>
+
+                                        </td>
+                                        <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>"
+                                            style="text-align: center;">
+                                            <?php if($Project->Status_Budget === 'N'): ?>
+                                            ไม่ใช้งบประมาณ
+                                            <?php else: ?>
+                                            <?php
+                                            $totalBudget = $Project->projectBudgetSources ?
+                                            $Project->projectBudgetSources->sum('Amount_Total') : 0;
+                                            ?>
+                                            <?php echo e(number_format($totalBudget, 2)); ?>
+
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
+                                            <?php echo e($Project->employee->Firstname_Employee ?? '-'); ?>
+
+                                            <?php echo e($Project->employee->Lastname_Employee ?? ''); ?>
+
+                                        </td>
+                                        <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>"
+                                            style="text-align: center;">
+                                            <a href="<?php echo e(route('editProject', ['Id_Project' => $Project->Id_Project, 'sourcePage' => 'proposeProject'])); ?>"
+                                                class="btn btn-warning btn-sm">แก้ไข</a>
+                                            <?php if(!$isStatusN || $isStatusI): ?>
+                                            <form
+                                                action="<?php echo e(route('projects.updateStatus', ['id' => $Project->Id_Project])); ?>"
+                                                method="POST" style="display:inline;">
+                                                <?php echo csrf_field(); ?>
+                                                <button type="submit" class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('Are you sure you want to update the status of this project?');">ลบ</button>
+                                            </form>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <tr class="summary-row">
+                                        <td colspan="2" style="text-align: left; font-weight: bold;">รวมรายได้ทั้งหมด:</td>
+                                        <td colspan="6" style="text-align: center; font-weight: bold;">
+                                            <?php echo e(number_format($totalStrategicBudget, 2)); ?> บาท
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <?php else: ?>
                     <div class="accordion-content">

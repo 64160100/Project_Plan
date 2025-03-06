@@ -4,8 +4,14 @@ Carbon::setLocale('th');
 @endphp
 
 @extends('navbar.app')
+<!DOCTYPE html>
+<html>
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Index</title>
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{{ asset('css/proposeProject.css') }}">
     <style>
     @font-face {
@@ -27,7 +33,7 @@ Carbon::setLocale('th');
 @section('content')
 <div class="container">
     <h1>เสนอโครงการเพื่อพิจารณา</h1>
-
+        
     @foreach($projects as $project)
     @if($project->Count_Steps !== 0)
     <div class="outer-container">
@@ -39,33 +45,38 @@ Carbon::setLocale('th');
                 </div>
                 <div class="project-info">
                     <div class="info-item">
-                        <div class="info-top">
-                            <i class='bx bxs-calendar-event' style="width: 20px; height: 0px;"></i>
-                            <span class="info-label">วันที่เริ่ม</span>
-                        </div>
-                        <span class="info-value">{{ $project->formattedFirstTime }}</span>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-top">
-                            <i class='bx bx-group' style="width: 20px; height: 0px;"></i>
-                            <span class="info-label">ผู้รับผิดชอบ</span>
-                        </div>
-                        <span class="info-value">
-                            @if($project->employee && ($project->employee->Firstname_Employee ||
-                            $project->employee->Lastname_Employee))
-                            {{ $project->employee->Firstname_Employee ?? '' }}
-                            {{ $project->employee->Lastname_Employee ?? '' }}
-                            @else
-                            -
-                            @endif
+                        <span class="info-icon">
+                            <i class='bx bx-calendar' style="width: 20px; height: 0px;"></i>
                         </span>
+                        <div>
+                            <div class="info-label">วันที่เริ่ม</div>
+                            <div class="info-value">{{ $project->formattedFirstTime }}</div>
+                        </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-top">
-                            <i class='bx bx-wallet-alt' style="width: 20px; height: 0px;"></i>
-                            <span class="info-label">งบประมาณ</span>
+                        <span class="info-icon">
+                            <i class='bx bx-user' style="width: 20px; height: 0px;"></i>
+                        </span>
+                        <div>
+                            <div class="info-label">ผู้รับผิดชอบ</div>
+                            <div class="info-value">
+                                @if($project->employee && ($project->employee->Firstname_Employee ||
+                                    $project->employee->Lastname_Employee))
+                                    {{ $project->employee->Firstname_Employee ?? '' }}
+                                    {{ $project->employee->Lastname_Employee ?? '' }}
+                                @else
+                                -
+                                @endif
+                            </div>
                         </div>
-                        <span class="info-value">
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">
+                            <i class='bx bx-wallet-alt' style="width: 20px; height: 0px;"></i>
+                        </span>
+                        <div>
+                            <div class="info-label">งบประมาณ</div>
+                            <div class="info-value">
                             @if($project->Status_Budget === 'Y')
                             @php
                             $totalBudget = $project->projectBudgetSources->sum('Amount_Total');
@@ -74,17 +85,19 @@ Carbon::setLocale('th');
                             @else
                             ไม่ใช้งบประมาณ
                             @endif
-                        </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="project-actions">
-                <a href="{{ route('StorageFiles.index', ['project_id' => $project->Id_Project]) }}" class="action-link">
-                    <i class='bx bx-info-circle'></i>
-                    ดูรายละเอียดโครงการ
-                </a>
-
+                <div>
+                    <a href="{{ route('StorageFiles.index', ['project_id' => $project->Id_Project]) }}" class="action-link">
+                        <i class='bx bx-info-circle'></i>
+                        ดูรายละเอียดโครงการ
+                    </a>
+                </div>
                 <div class="dropdown">
                     <a href="#" class="action-link dropdown-toggle" id="commentsDropdown-{{ $project->Id_Project }}"
                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -111,11 +124,12 @@ Carbon::setLocale('th');
                         @endif
                     </ul>
                 </div>
-
-                <a href="#" class="action-link">
-                    <i class='bx bx-error warning-icon'></i>
-                    แจ้งเตือน
-                </a>
+                <div>
+                    <a href="#" class="action-link">
+                        <i class='bx bx-error warning-icon'></i>
+                        แจ้งเตือน
+                    </a>
+                </div>
             </div>
 
             <div class="status-section">
@@ -142,23 +156,27 @@ Carbon::setLocale('th');
                             </div>
                         </div>
                         <div class="status-right">
-                            <span class="status-date">
-                                {{ $history->formattedDateTime ?? 'N/A' }}
-                            </span>
-                            @if($history->Status_Record === 'Y')
-                            <button class="status-button approval-status approved">
-                                เสร็จสิ้น
-                            </button>
-                            @elseif($history->Status_Record === 'N')
-                            <a href="{{ route('approveProject', ['id' => $history->Approve_Id]) }}"
-                                class="status-button approval-status not-approved">
-                                ไม่อนุมัติ
-                            </a>
-                            @else
-                            <button class="status-button approval-status pending">
-                                รอการอนุมัติ
-                            </button>
-                            @endif
+                            <div>
+                                <span class="status-date">
+                                    {{ $history->formattedDateTime ?? 'N/A' }}
+                                </span>
+                            </div>
+                            <div>
+                                @if($history->Status_Record === 'Y')
+                                <button class="status-button approval-status approved">
+                                    เสร็จสิ้น
+                                </button>
+                                @elseif($history->Status_Record === 'N')
+                                <a href="{{ route('approveProject', ['id' => $history->Approve_Id]) }}"
+                                    class="status-button approval-status not-approved">
+                                    ไม่อนุมัติ
+                                </a>
+                                @else
+                                <button class="status-button approval-status pending">
+                                    รอการอนุมัติ
+                                </button>
+                                @endif
+                            </div>
                         </div>
                     </div>
                     @endforeach
@@ -282,40 +300,44 @@ Carbon::setLocale('th');
                             </div>
                         </div>
                         <div class="status-right">
-                            <span class="status-date">
-                                @if($project->approvals->first()->recordHistory->isNotEmpty())
-                                {{ $project->approvals->first()->recordHistory->first()->formattedTimeRecord }}
-                                @else
-                                N/A
-                                @endif
-                            </span>
-                            <button class="status-button approval-status pending">
-                                @if($project->Count_Steps === 0)
-                                ส่ง Email
-                                @elseif($project->Count_Steps === 1)
-                                กำลังพิจารณา
-                                @elseif($project->Count_Steps === 2)
-                                กำลังพิจารณา
-                                @elseif($project->Count_Steps === 3)
-                                กำลังพิจารณา
-                                @elseif($project->Count_Steps === 4)
-                                กำลังพิจารณา
-                                @elseif($project->Count_Steps === 5)
-                                กำลังพิจารณา
-                                @elseif($project->Count_Steps === 6)
-                                กำลังพิจารณา
-                                @elseif($project->Count_Steps === 7)
-                                กำลังพิจารณา
-                                @elseif($project->Count_Steps === 8)
-                                เสร็จสิ้น
-                                @elseif($project->Count_Steps === 9)
-                                สิ้นสุดโครงการ
-                                @elseif($project->Count_Steps === 11)
-                                โครงการเสร็จไม่ทันเวลา
-                                @else
-                                {{ $project->approvals->first()->Status ?? 'รอการอนุมัติ' }}
-                                @endif
-                            </button>
+                            <div>
+                                <span class="status-date">
+                                    @if($project->approvals->first()->recordHistory->isNotEmpty())
+                                    {{ $project->approvals->first()->recordHistory->first()->formattedTimeRecord }}
+                                    @else
+                                    N/A
+                                    @endif
+                                </span>
+                            </div>
+                            <div>
+                                <button class="status-button approval-status pending">
+                                    @if($project->Count_Steps === 0)
+                                    ส่ง Email
+                                    @elseif($project->Count_Steps === 1)
+                                    กำลังพิจารณา
+                                    @elseif($project->Count_Steps === 2)
+                                    กำลังพิจารณา
+                                    @elseif($project->Count_Steps === 3)
+                                    กำลังพิจารณา
+                                    @elseif($project->Count_Steps === 4)
+                                    กำลังพิจารณา
+                                    @elseif($project->Count_Steps === 5)
+                                    กำลังพิจารณา
+                                    @elseif($project->Count_Steps === 6)
+                                    กำลังพิจารณา
+                                    @elseif($project->Count_Steps === 7)
+                                    กำลังพิจารณา
+                                    @elseif($project->Count_Steps === 8)
+                                    เสร็จสิ้น
+                                    @elseif($project->Count_Steps === 9)
+                                    สิ้นสุดโครงการ
+                                    @elseif($project->Count_Steps === 11)
+                                    โครงการเสร็จไม่ทันเวลา
+                                    @else
+                                    {{ $project->approvals->first()->Status ?? 'รอการอนุมัติ' }}
+                                    @endif
+                                </button>
+                            </div>
                         </div>
                     </div>
                     @endif
@@ -512,96 +534,98 @@ Carbon::setLocale('th');
                     </summary>
                     @if ($filteredProjectCount > 0)
                     <div class="accordion-content">
-                        <table class="summary-table">
-                            <thead>
-                                <tr>
-                                    <th style="width:10%; text-align: center;">ยุทธศาสตร์ สำนักหอสมุด</th>
-                                    <th style="width:10%; text-align: center;">กลยุทธ์ สำนักหอสมุด</th>
-                                    <th style="width:14%; text-align: center;">โครงการ</th>
-                                    <th style="width:14%; text-align: center;">ตัวชี้วัดความสำเร็จ<br>ของโครงการ</th>
-                                    <th style="width:12%; text-align: center;">ค่าเป้าหมาย</th>
-                                    <th style="width:10%; text-align: center;">งบประมาณ (บาท)</th>
-                                    <th style="width:12%; text-align: center;">ผู้รับผิดชอบ</th>
-                                    <th style="width:18%; text-align: center;">การจัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($projectsByStrategy as $strategyName => $projects)
-                                @php
-                                $strategyCount = $projects->count();
-                                @endphp
-                                @foreach ($projects as $index => $Project)
-                                @php
-                                $isStatusN = in_array('N', $Project->approvalStatuses);
-                                $isStatusI = in_array('I', $Project->approvalStatuses);
-                                $allProjectsDeleted = $projects->every(function($project) {
-                                return in_array('N', $project->approvalStatuses);
-                                });
-                                @endphp
-                                <tr>
-                                    @if ($index === 0 && $loop->parent->first)
-                                    <td rowspan="{{ $filteredProjectCount }}">{{ $firstStrategicPlanName }}</td>
-                                    @endif
-                                    @if ($index === 0)
-                                    <td class="{{ $allProjectsDeleted ? 'text-gray' : '' }}"
-                                        rowspan="{{ $strategyCount }}">
-                                        {{ $strategyName ?? '-' }}
-                                    </td>
-                                    @endif
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        <b>{{ $Project->Name_Project }}</b><br>
-                                        @foreach($Project->subProjects as $subProject)
-                                        - {{ $subProject->Name_Sub_Project }}<br> 
-                                        @endforeach
-                                    </td>
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        {!! $Project->Success_Indicators ? nl2br(e($Project->Success_Indicators)) : '-'
-                                        !!}
-                                    </td>
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        {!! $Project->Value_Target ? nl2br(e($Project->Value_Target)) : '-' !!}
-                                    </td>
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
-                                        style="text-align: center;">
-                                        @if($Project->Status_Budget === 'N')
-                                        ไม่ใช้งบประมาณ
-                                        @else
-                                        @php
-                                        $totalBudget = $Project->projectBudgetSources ?
-                                        $Project->projectBudgetSources->sum('Amount_Total') : 0;
-                                        @endphp
-                                        {{ number_format($totalBudget, 2) }}
+                        <div class="table-responsive">
+                            <table class="summary-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10%; text-align: center;">ยุทธศาสตร์ สำนักหอสมุด</th>
+                                        <th style="width:10%; text-align: center;">กลยุทธ์ สำนักหอสมุด</th>
+                                        <th style="width:14%; text-align: center;">โครงการ</th>
+                                        <th style="width:14%; text-align: center;">ตัวชี้วัดความสำเร็จ<br>ของโครงการ</th>
+                                        <th style="width:12%; text-align: center;">ค่าเป้าหมาย</th>
+                                        <th style="width:10%; text-align: center;">งบประมาณ (บาท)</th>
+                                        <th style="width:12%; text-align: center;">ผู้รับผิดชอบ</th>
+                                        <th style="width:18%; text-align: center;">การจัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($projectsByStrategy as $strategyName => $projects)
+                                    @php
+                                    $strategyCount = $projects->count();
+                                    @endphp
+                                    @foreach ($projects as $index => $Project)
+                                    @php
+                                    $isStatusN = in_array('N', $Project->approvalStatuses);
+                                    $isStatusI = in_array('I', $Project->approvalStatuses);
+                                    $allProjectsDeleted = $projects->every(function($project) {
+                                    return in_array('N', $project->approvalStatuses);
+                                    });
+                                    @endphp
+                                    <tr>
+                                        @if ($index === 0 && $loop->parent->first)
+                                        <td rowspan="{{ $filteredProjectCount }}">{{ $firstStrategicPlanName }}</td>
                                         @endif
-                                    </td>
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        {{ $Project->employee->Firstname_Employee ?? '-' }}
-                                        {{ $Project->employee->Lastname_Employee ?? '' }}
-                                    </td>
-                                    <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
-                                        style="text-align: center;">
-                                        <a href="{{ route('editProject', ['Id_Project' => $Project->Id_Project, 'sourcePage' => 'proposeProject']) }}"
-                                            class="btn btn-warning btn-sm">แก้ไข</a>
-                                        @if (!$isStatusN || $isStatusI)
-                                        <form
-                                            action="{{ route('projects.updateStatus', ['id' => $Project->Id_Project]) }}"
-                                            method="POST" style="display:inline;">
-                                            @csrf
-                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Are you sure you want to update the status of this project?');">ลบ</button>
-                                        </form>
+                                        @if ($index === 0)
+                                        <td class="{{ $allProjectsDeleted ? 'text-gray' : '' }}"
+                                            rowspan="{{ $strategyCount }}">
+                                            {{ $strategyName ?? '-' }}
+                                        </td>
                                         @endif
-                                    </td>
-                                </tr>
-                                @endforeach
-                                @endforeach
-                                <tr class="summary-row">
-                                    <td colspan="2" style="text-align: left; font-weight: bold;">รวมรายได้ทั้งหมด:</td>
-                                    <td colspan="6" style="text-align: center; font-weight: bold;">
-                                        {{ number_format($totalStrategicBudget, 2) }} บาท
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                        <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
+                                            <b>{{ $Project->Name_Project }}</b><br>
+                                            @foreach($Project->subProjects as $subProject)
+                                            - {{ $subProject->Name_Sub_Project }}<br>                                            - {{ $subProject->Name_Sup_Project }}<br>
+                                            @endforeach
+                                        </td>
+                                        <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
+                                            {!! $Project->Success_Indicators ? nl2br(e($Project->Success_Indicators)) : '-'
+                                            !!}
+                                        </td>
+                                        <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
+                                            {!! $Project->Value_Target ? nl2br(e($Project->Value_Target)) : '-' !!}
+                                        </td>
+                                        <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
+                                            style="text-align: center;">
+                                            @if($Project->Status_Budget === 'N')
+                                            ไม่ใช้งบประมาณ
+                                            @else
+                                            @php
+                                            $totalBudget = $Project->projectBudgetSources ?
+                                            $Project->projectBudgetSources->sum('Amount_Total') : 0;
+                                            @endphp
+                                            {{ number_format($totalBudget, 2) }}
+                                            @endif
+                                        </td>
+                                        <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
+                                            {{ $Project->employee->Firstname_Employee ?? '-' }}
+                                            {{ $Project->employee->Lastname_Employee ?? '' }}
+                                        </td>
+                                        <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
+                                            style="text-align: center;">
+                                            <a href="{{ route('editProject', ['Id_Project' => $Project->Id_Project, 'sourcePage' => 'proposeProject']) }}"
+                                                class="btn btn-warning btn-sm">แก้ไข</a>
+                                            @if (!$isStatusN || $isStatusI)
+                                            <form
+                                                action="{{ route('projects.updateStatus', ['id' => $Project->Id_Project]) }}"
+                                                method="POST" style="display:inline;">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('Are you sure you want to update the status of this project?');">ลบ</button>
+                                            </form>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                    @endforeach
+                                    <tr class="summary-row">
+                                        <td colspan="2" style="text-align: left; font-weight: bold;">รวมรายได้ทั้งหมด:</td>
+                                        <td colspan="6" style="text-align: center; font-weight: bold;">
+                                            {{ number_format($totalStrategicBudget, 2) }} บาท
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     @else
                     <div class="accordion-content">

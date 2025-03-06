@@ -56,12 +56,38 @@
         white-space: normal;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
+    .noit-detail {
+        padding: 2px;
+        padding-left: 8px;
+        margin: 4px;
+        width: 293px;
+        font-size: 13px
+    }
+
+    [id] {
+    scroll-margin-top: 80px;
+    }
+
+    .link-project {
+        color: black;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .link-project:hover {
+        color:rgb(128, 18, 223);;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
     </style>
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="<?php echo e(asset('kaiadmin/assets/css/bootstrap.min.css')); ?>" />
     <link rel="stylesheet" href="<?php echo e(asset('kaiadmin/assets/css/plugins.min.css')); ?>" />
     <link rel="stylesheet" href="<?php echo e(asset('kaiadmin/assets/css/kaiadmin.min.css')); ?>" />
+    <link rel="stylesheet" href="<?php echo e(asset('kaiadmin/assets/css/kaiadmin.css')); ?>" />
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
 
 </head>
@@ -302,7 +328,7 @@
                             <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
                                     aria-expanded="false" aria-haspopup="true">
-                                    <i class="fa fa-search"></i>
+                                    <i class="bx bx-search-alt-2"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-search animated fadeIn">
                                     <form class="navbar-left navbar-form nav-search">
@@ -423,9 +449,8 @@
                             <li class="nav-item topbar-user dropdown hidden-caret">
                                 <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#"
                                     aria-expanded="false">
-                                    <div class="profile-container"
-                                        style="background: linear-gradient(180deg, #8729DA 0%, #AC2BDD 100%); border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; display: flex; align-items: center; color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); width: auto; max-width: 300px; margin-left: auto; margin-right: -20px;">
-                                        <div class="avatar-sm" style="margin-right: 10px;">
+                                    <div class="profile-container">
+                                        <div class="avatar-sm">
                                             <img src="<?php echo e(asset('images/profile.jpg')); ?>" alt="..."
                                                 class="avatar-img rounded-circle" />
                                         </div>
@@ -444,6 +469,12 @@
                                                 <?php endif; ?>
                                             </span>
                                         </span>
+                                    </div>
+                                    <div class="avatar-sm-only">
+                                        <div class="avatar-sm">
+                                            <img src="<?php echo e(asset('images/profile.jpg')); ?>" alt="..."
+                                                class="avatar-img rounded-circle" />
+                                        </div>
                                     </div>
                                 </a>
                                 <ul class="dropdown-menu dropdown-user animated fadeIn">

@@ -2,34 +2,34 @@
 <html lang="th">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <!-- <link rel="stylesheet" href="{{ public_path('css/pdf.css') }}"> -->
+    <!-- <link rel="stylesheet" href="<?php echo e(public_path('css/pdf.css')); ?>"> -->
     <title>ตัวอย่าง PDF ภาษาไทย</title>
     <style>
         @font-face {
             font-family: 'THSarabunNew';
             font-style: normal;
             font-weight: normal;
-            src: url('{{ public_path('fonts/THSarabunNew.ttf') }}') format('truetype');
+            src: url('<?php echo e(public_path('fonts/THSarabunNew.ttf')); ?>') format('truetype');
         }
 
         @font-face {
             font-family: 'THSarabunNew';
             font-style: normal;
             font-weight: bold;
-            src: url('{{ public_path('fonts/THSarabunNew Bold.ttf') }}') format('truetype');
+            src: url('<?php echo e(public_path('fonts/THSarabunNew Bold.ttf')); ?>') format('truetype');
         }
 
         @font-face {
             font-family: 'THSarabunNew';
             font-style: italic;
             font-weight: normal;
-            src: url('{{ public_path('fonts/THSarabunNew Italic.ttf') }}') format('truetype');
+            src: url('<?php echo e(public_path('fonts/THSarabunNew Italic.ttf')); ?>') format('truetype');
         }
         @font-face {
             font-family: 'THSarabunNew';
             font-style: italic;
             font-weight: bold;
-            src: url('{{ public_path('fonts/THSarabunNew BoldItalic.ttf') }}') format('truetype');
+            src: url('<?php echo e(public_path('fonts/THSarabunNew BoldItalic.ttf')); ?>') format('truetype');
         }
 
         table {
@@ -88,4 +88,4 @@
     </table>
     
 </body>
-</html>
+</html><?php /**PATH /var/www/resources/views/PDF/LongTerm.blade.php ENDPATH**/ ?>

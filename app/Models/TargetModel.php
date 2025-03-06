@@ -27,5 +27,6 @@ class TargetModel extends Model
     public function targetDetails()
     {
         return $this->hasMany(TargetDetailsModel::class, 'Target_Project_Id', 'Id_Target_Project');
+        // return $this->hasMany(TargetDetailsModel::class, 'Id_Target_Project', 'Id_Target_Detail');
     }
 }

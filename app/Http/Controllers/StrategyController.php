@@ -63,7 +63,8 @@ class StrategyController extends Controller
                 KpiModel::create([
                     'Name_Kpi' => $name,
                     'Target_Value' => $Target_Value[$key],
-                    'Strategy_Id' => $strategy->Id_Strategy 
+                    'Strategy_Id' => $strategy->Id_Strategy,
+                    'Strategy_Strategic_Id' => $strategy->Strategic_Id,
                 ]);
             }
         }
@@ -79,12 +80,14 @@ class StrategyController extends Controller
     {
         $strategies = StrategyModel::with('strategicObjectives')->where('Strategic_Id', $Id_Strategy)->get();
         $Details_Strategic_Objectives = $request->Details_Strategic_Objectives;
+        $strategy = StrategyModel::with('strategicObjectives')->where('Id_Strategy', $Id_Strategy)->first();
     
         if ($Details_Strategic_Objectives) {
             foreach ($Details_Strategic_Objectives as $detail) {
                 StrategicObjectivesModel::create([
                     'Details_Strategic_Objectives' => $detail,
-                    'Strategy_Id' => $Id_Strategy
+                    'Strategy_Id' => $Id_Strategy,
+                    'Strategy_Strategic_Id'=> $strategy->Strategic_Id,
                 ]);
             }
         }
@@ -123,7 +126,8 @@ class StrategyController extends Controller
             foreach ($request->newStrategicObjectives as $newObjective) {
                 StrategicObjectivesModel::create([
                     'Details_Strategic_Objectives' => $newObjective,
-                    'Strategy_Id' => $Id_Strategy
+                    'Strategy_Id' => $Id_Strategy,
+                    'Strategy_Strategic_Id'=> $strategy->Strategic_Id,
                 ]);
             }
         }
@@ -133,7 +137,8 @@ class StrategyController extends Controller
                 KpiModel::create([
                     'Name_Kpi' => $newKpi['Name_Kpi'],
                     'Target_Value' => $newKpi['Target_Value'],
-                    'Strategy_Id' => $Id_Strategy
+                    'Strategy_Id' => $Id_Strategy,
+                    'Strategy_Strategic_Id' => $strategy->Strategic_Id,
                 ]);
             }
         }

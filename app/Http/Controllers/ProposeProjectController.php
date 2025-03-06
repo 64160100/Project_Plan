@@ -29,7 +29,7 @@ class ProposeProjectController extends Controller
                 $projectsQuery->where('Employee_Id', $employee->Id_Employee);
             }
     
-            $projects = $projectsQuery->whereIn('Count_Steps', [0, 1, 2, 6, 9])
+            $projects = $projectsQuery->whereIn('Count_Steps', [0, 1, 2, 5, 6, 9])
                 ->with(['approvals.recordHistory', 'employee'])
                 ->get();
     

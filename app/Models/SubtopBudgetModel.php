@@ -14,4 +14,9 @@ class SubtopBudgetModel extends Model
     ];
 
     public $timestamps = false;
+
+    public function subtopicBudgetForms()
+    {
+        return $this->hasMany(SubtopicBudgetHasBudgetFormModel::class, 'Subtopic_Budget_Id', 'Id_Subtopic_Budget');
+    }
 }

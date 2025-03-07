@@ -74,6 +74,9 @@
                                     class='bx bx-folder-open'
                                     style='color:#000; font-size: 20px; padding-right: 5px;'></a>
                             </a>
+                            <!-- pdf ยาว -->
+                            <a href="{{ route('PDF.generate', $Project->Id_Project) }}" class='bx bx-folder-open'
+                                style='color:#f00; font-size: 20px; padding-right: 5px;'></a>
                         </strong>
                         <a
                             href="{{ route('editProject', ['Id_Project' => $Project->Id_Project, 'sourcePage' => 'listProject']) }}">

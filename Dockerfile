@@ -21,7 +21,9 @@ WORKDIR /var/www
 COPY . .
 
 # Install dependencies
-RUN composer install
+# RUN composer install
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN composer install --no-interaction --no-ansi --no-scripts --no-progress --prefer-dist
 
 # Expose port 8000
 EXPOSE 8000

@@ -14,7 +14,7 @@ use App\Models\ApproveModel;
 use App\Models\EmployeeModel;
 use App\Models\SDGsModel;
 use App\Models\IntegrationModel;
-use App\Models\SupProjectModel;
+use App\Models\SubProjectModel;
 use App\Models\PlatformModel;
 use App\Models\ProgramModel;
 use App\Models\Kpi_ProgramModel;
@@ -188,11 +188,11 @@ class ListProjectController extends Controller
             $approval->save();
             // Log::info('Approval record created for project ID: ' . $project->Id_Project);
     
-            if ($request->has('Name_Sup_Project')) {
-                foreach ($request->Name_Sup_Project as $supProjectName) {
-                    $supProject = new SupProjectModel;
+            if ($request->has('Name_Sub_Project')) {
+                foreach ($request->Name_Sub_Project as $supProjectName) {
+                    $supProject = new SubProjectModel;
                     $supProject->Project_Id = $project->Id_Project;
-                    $supProject->Name_Sup_Project = $supProjectName;
+                    $supProject->Name_Sub_Project = $supProjectName;
                     $supProject->save();
                     Log::info('Sub-project created with name: ' . $supProjectName);
                 }
@@ -532,6 +532,7 @@ class ListProjectController extends Controller
     public function editProject(Request $request, $Id_Project)
     {
         $project = ListProjectModel::findOrFail($Id_Project);
+        $subProjects = SubProjectModel::where('Project_Id', $Id_Project)->get();
         $strategics = StrategicModel::all();
         $strategies = StrategyModel::where('Strategic_Id', $project->Strategic_Id)->get();
         $employees = EmployeeModel::all();
@@ -541,7 +542,7 @@ class ListProjectController extends Controller
         $kpis = KpiModel::all();
         $sourcePage = $request->input('sourcePage', 'listProject');
     
-        return view('Project.editProject', compact('project', 'strategics', 'strategies', 'employees', 'budgetSources', 'subtopBudgets', 'strategicObjectives', 'kpis', 'sourcePage'));
+        return view('Project.editProject', compact('project','subProjects', 'strategics', 'strategies', 'employees', 'budgetSources', 'subtopBudgets', 'strategicObjectives', 'kpis', 'sourcePage'));
     }
     
     public function updateProject(Request $request, $id)
@@ -592,12 +593,12 @@ class ListProjectController extends Controller
             $approve->save();
         }
 
-        if ($request->has('Name_Sup_Project')) {
-            $project->supProjects()->delete();
-            foreach ($request->Name_Sup_Project as $supProjectName) {
-                $supProject = new SupProjectModel;
+        if ($request->has('Name_Sub_Project')) {
+            $project->subProjects()->delete();
+            foreach ($request->Name_Sub_Project as $supProjectName) {
+                $supProject = new SubProjectModel;
                 $supProject->Project_Id = $project->Id_Project ?? null;
-                $supProject->Name_Sup_Project = $supProjectName ?? null ; 
+                $supProject->Name_Sub_Project = $supProjectName ?? null ; 
                 $supProject->save();
             }
         }
@@ -648,6 +649,7 @@ class ListProjectController extends Controller
     public function editAllProject($Id_Project, Request $request)
     {
         $project = ListProjectModel::findOrFail($Id_Project);
+        $subProjects = SubProjectModel::where('Project_Id', $Id_Project)->get();
         $strategics = StrategicModel::with(['strategies.kpis', 'strategies.strategicObjectives', 'projects'])->findOrFail($project->Strategic_Id);
         $strategies = $strategics->strategies;
         $projects = $strategics->projects; 
@@ -662,10 +664,13 @@ class ListProjectController extends Controller
         $kpis = KpiModel::all();
         $strategicObjectives = StrategicObjectivesModel::all();
         $sourcePage = $request->input('sourcePage', 'listProject');
+        $output = OutputModel::all();
+        $outcome = OutcomeModel::all();
         
         log::info($project);
     
-        return view('Project.editBigFormProject', compact('project', 'strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets', 'kpis', 'strategicObjectives', 'sourcePage'));
+        return view('Project.editBigFormProject', compact('project','subProjects', 'strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories',
+         'months', 'pdcaStages', 'budgetSources', 'subtopBudgets', 'kpis', 'strategicObjectives', 'sourcePage', 'output', 'outcome'));
     }
 
     public function resetStatus($id)
@@ -677,10 +682,12 @@ class ListProjectController extends Controller
         return redirect()->route('proposeProject')->with('success', 'Project status reset to I successfully.');
     }
 
+
+
     public function updateField(Request $request)
     {
-        $project = ListProjectModel::findOrFail($request->id);
-        $field = $request->field;
+        $project = ListProjectModel::findOrFail($request->id); 
+        $field = $request->field; 
         $value = $request->value;
 
         $project->$field = $value;
@@ -688,5 +695,125 @@ class ListProjectController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function updateSubProject(Request $request)
+    {
+        $projectId      = $request->project_id;
+        $subProjectName = trim($request->sub_projects); // ในกรณีที่ส่งมาเป็นข้อความเดียว
+
+        if (empty($subProjectName)) {
+            return response()->json(['error' => 'Sub Project data is missing'], 400);
+        }
+
+        dd([
+            'project_id' => $projectId,
+            'sub_projects' => $subProjectName
+        ]);
+
+        try {
+            $project = ListProjectModel::with('subProjects')->find($projectId);
+            if ($project->subProjects->isEmpty()) {
+                return response()->json(['error' => 'No subProjects found'], 404);
+            }
+    
+
+            foreach ($project->subProjects as $sub) {
+                $subProject = new SubProjectModel();
+                $subProject->Project_Id = $projectId;
+                $subProject->Name_Sub_Project = $sub->Name_Sub_Project;
+                $subProject->save();
+            }
+        
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            \Log::error("❌ Error saving sub project: " . $e->getMessage());
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+    }
+
+
+
+
+
+
+
+    // public function updateSubProject(Request $request)
+    // {
+    //     $projectId = $request->project_id;
+    //     $subProjects = $request->sub_projects;
+
+    //     // ตรวจสอบว่า subProjects ไม่เป็นค่าว่างหรือไม่
+    //     if (empty($subProjects)) {
+    //         return response()->json(['error' => 'Sub Projects data is missing'], 400);
+    //     }
+
+    //     // foreach ($subProjects as $subProject) {
+    //         $subProject = new SubProjectModel();
+    //         $subProject->Project_Id = $projectId;
+    //         $subProject->Name_Sub_Project = $subProject;
+    //         $subProject->save();
+    //     // }
+
+    //     return response()->json(['success' => true]);
+    // }
+
+    public function updateSDGs(Request $request)
+    {
+        $project = ListProjectModel::findOrFail($request->project_id);
+        $sdgId = $request->sdg_id;
+        $isChecked = $request->is_checked;
+
+        if ($isChecked) {
+            if (!$project->sdgs()->where('SDGs_Id', $sdgId)->exists()) {
+                $project->sdgs()->attach($sdgId);
+            }
+        } else {
+            $project->sdgs()->detach($sdgId);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    // public function updateIntegrationCategory(Request $request)
+    // {
+    //     $project = ListProjectModel::findOrFail($request->project_id);
+        
+    //     $categoryId = $request->category_id;
+    //     $checked = $request->is_checked ? 1 : 0;
+    //     $details = $request->additional_info ?? null;
+    //     $categoryName = $request->category_name ?? '';
+
+    //     if ($checked) {
+    //         $project->projectHasIntegrationCategories()->syncWithoutDetaching([
+    //             $categoryId => ['details' => $details, 'name' => $categoryName]
+    //         ]);
+    //     } else {
+    //         $project->projectHasIntegrationCategories()->detach($categoryId);
+    //     }
+
+    //     return response()->json(['success' => true]);
+    // }
+
+
+    public function saveOutputs(Request $request)
+    {
+        $project = ListProjectModel::findOrFail($request->id);
+        $outputs = $request->outputs;
+
+        foreach ($outputs as $output) {
+            // บันทึกข้อมูล output แต่ละรายการ
+            OutputModel::create([
+                'Project_Id' => $id,
+                'Name_Output' => $output, 
+            ]);
+        }
+
+        // ส่งข้อมูลกลับไป
+        return response()->json(['success' => true]);
+    }
+
+
+   
 
 }

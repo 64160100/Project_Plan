@@ -91,7 +91,9 @@ Route::get('/statusTracking', [StatusController::class, 'statusTracking'])->name
 Route::get('/project/{Id_Project}', [StatusController::class, 'showDetails'])->name('project.details');
 
 // การแสดง PDF
-Route::get('generate-pdf/{id}', [PDFController::class, 'generatePDF']);
+Route::get('report-pdf/{id}', [PDFController::class, 'generatePDFReportForm'])->name('PDF.generateReportForm');
+
+Route::get('generate-pdf/{id}', [PDFController::class, 'generatePDF'])->name('PDF.generate');
 Route::get('actionplan-pdf', [PDFController::class, 'ActionPlanPDF']);
 Route::get('strategic-pdf/{Id_Strategic}', [PDFController::class, 'PDFStrategic'])->name('PDF.strategic');
 
@@ -111,9 +113,18 @@ Route::get('/showProjectDepartment/{Id_Department}', [PlanDLCController::class, 
 Route::resource('fiscalYearQuarter', FiscalYearQuarterController::class);
 
 Route::post('/projects/update-field', [ListProjectController::class, 'updateField'])->name('projects.updateField');
+Route::post('/projects/update-sdgs', [ListProjectController::class, 'updateSDGs'])->name('projects.updateSDGs');
+
+Route::post('/projects/update-integration', [ListProjectController::class, 'updateIntegrationCategory'])->name('projects.updateIntegrationCategory');
+Route::post('/projects/update-output', [ListProjectController::class, 'updateOutputs'])->name('projects.updateOutputs');
+
+Route::post('/projects/save-sub-project', [ProjectController::class, 'updateSubProject'])->name('projects.updateSubProject');
 
 Route::get('/report-form/{id}', [ReportFormController::class, 'showReportForm'])->name('reportForm');
 Route::post('/projects/complete/{id}', [ReportFormController::class, 'completeProject'])->name('projects.complete');
+
+Route::get('/reportResult', [ReportFormController::class, 'reportResult'])->name('reportResult');
+
 
 //Sdg
 Route::get('showSdg', [SustainableDevelopmentGoalsController::class, 'showSdg'])->name('showSdg');

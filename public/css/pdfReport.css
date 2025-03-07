@@ -1,0 +1,100 @@
+body {
+    font-family: 'THSarabunNew', sans-serif;
+    overflow-wrap: break-word;
+    margin-top: 0.2in;
+    margin-left: 0.5in;
+    margin-right: 0.2in;
+    line-height: 0.8;
+}
+
+h1 {
+    text-align: center;
+    font-weight: bold;
+    font-size: 24px;
+    padding-bottom: 20px;
+}
+
+p {
+    font-size: 21.33px;
+    padding: 0;
+    margin-top: 10px;
+    margin-bottom: 1px;
+}
+
+b {
+    margin-top: 30px;
+}
+
+.space {
+    margin-top: 20px;
+    page-break-inside: avoid;
+    page-break-after: auto;
+
+}
+
+.checkbox {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    margin-top: 14px;
+    font-family: 'DejaVu Sans', sans-serif;
+}
+
+.paragraph-tab {
+    margin-left: 35px;
+    margin-top: 1px;
+}
+
+
+.paragraph {
+    margin-left: 70px;
+    margin-top: 1px;
+}
+
+.paragraph-content{
+    text-indent: 70px;
+    margin-top: 1px;
+}
+
+.paragraph-two {
+    margin-left: 120px;
+}
+
+.line {
+    border-bottom: 1px dotted black;
+    display: inline-block;
+    padding-left: 30px;
+    height: 20px;
+}
+
+
+
+td, th {
+    padding: 5px;
+    border: 1px solid black;
+    font-size: 16px;
+    white-space: normal; 
+    word-wrap: break-word;
+    vertical-align: middle;
+}
+
+th {
+    font-weight: bold;
+    color: #000;
+}
+
+table {
+    width: 100%;
+    max-width: 100%;
+    border-collapse: collapse;
+    word-wrap: break-word;
+    table-layout: fixed; 
+    border-collapse: collapse;
+}
+
+.left-align {
+    text-align: left;
+}
+
+

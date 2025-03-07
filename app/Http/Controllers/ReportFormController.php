@@ -4,14 +4,46 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ListProjectModel;
 use App\Models\RecordHistory;
+
+use App\Models\ProjectHasIndicatorsModel;
+use App\Models\StrategicObjectivesModel;
+use App\Models\KpiModel;
+use App\Models\StrategyModel;
+use App\Models\BudgetFormModel;
+use App\Models\SubtopBudgetModel;
+use App\Models\SubtopicBudgetHasBudgetFormModel;
+use App\Models\ProjectHasBudgetSourceModel;
+use App\Models\MonthsModel;
+use App\Models\PdcaModel;
+use App\Models\StrategicHasQuarterProjectModel;
 use Carbon\Carbon;
 
 class ReportFormController extends Controller
 {
     public function showReportForm($id)
     {
-        $project = ListProjectModel::with(['strategic', 'strategy', 'employee', 'approvals', 'subProjects', 'storageFiles', 'sdgs', 'platforms', 'projectHasSDGs', 'projectHasIntegrationCategories', 'targets', 'locations', 'projectHasIndicators', 'pdca'])->findOrFail($id);
-        return view('ReportForm', compact('project'));
+        $project = ListProjectModel::with([ 'employee', 'targets.targetDetails', 'locations', 
+                            'projectHasIndicators.indicators','shortProjects', 'budgetForm',
+                            'monthlyPlans','monthlyPlans.month', 'monthlyPlans.pdca',])->findOrFail($id);
+
+        $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
+        $pdcaStages = PdcaModel::all();
+
+        $quarterProjectId = request()->input('quarter_project_id', StrategicHasQuarterProjectModel::pluck('Quarter_Project_Id')->first() ?? 1);
+        $quarterProjects = StrategicHasQuarterProjectModel::with(['strategic', 'quarterProject'])
+                    ->where('Quarter_Project_Id', $quarterProjectId)
+                    ->get();
+
+        $data = [
+            'title' => $project->Name_Project,
+            'date' => toThaiNumber(date('d/m/Y')),
+            'project' => $project,
+            'months' => $months,
+            'pdcaStages' => $pdcaStages,
+            'quarterProjects' => $quarterProjects,    
+        ];
+
+        return view('ReportForm', $data);
     }
 
     public function completeProject(Request $request, $id)
@@ -56,4 +88,41 @@ class ReportFormController extends Controller
 
         return redirect()->route('proposeProject')->with('success', 'Project submitted for approval.');
     }
+
+    public function reportResult() {
+        $strategicId = 1;
+        $report = ListProjectModel::find(1);
+
+        $strategicId = $report->Strategic_Id;
+        $strategies = StrategyModel::with(['kpis', 'strategic'])
+                    ->where('Strategic_Id', $strategicId)
+                    ->get();
+
+        $projectIndicator = ProjectHasIndicatorsModel::with('indicators')
+                        ->where('Project_Id', 1)
+                        ->get();
+
+        $budgetProject = BudgetFormModel::where('Project_Id', 1)->first();
+
+        $subBudgetProject = SubtopicBudgetHasBudgetFormModel::with('subtopicBudget')
+                        ->where('Subtopic_Budget_Id',1)
+                        ->where('Budget_Form_Id', 1)
+                        ->first();
+
+        $projectBudgetSource = ProjectHasBudgetSourceModel::with('budgetSource')
+                        ->where('Id_Project_has_Budget_Source',1)
+                        ->where('Budget_Source_Id', 1)
+                        ->first();
+
+        $data = [
+            'report' => $report,
+            'strategies' => $strategies,
+            'projectIndicator' => $projectIndicator,
+            'budgetProject' => $budgetProject,
+            'subBudgetProject' => $subBudgetProject,
+            'projectBudgetSource' => $projectBudgetSource,
+        ];
+        return view('reportResult', $data);
+    }  
+
 }

@@ -12,9 +12,19 @@ use App\Models\SupProjectModel;
 use App\Models\ProjectHasBudgetSourceModel;
 use App\Models\TargetModel;
 use App\Models\TargetDetailsModel;
+use App\Models\ProjectHasIntegrationCategoryModel;
+use App\Models\KpiModel;
+use App\Models\OutcomeModel;
+use App\Models\OutputModel;
+use App\Models\ExpectedResultsModel;
+use App\Models\SubtopicBudgetHasBudgetFormModel;
+use App\Models\ProjectHasSDGModel;
+use App\Models\MonthsModel;
+use App\Models\PdcaModel;
+use App\Models\StrategicHasQuarterProjectModel;
 
 
-
+use Carbon\Carbon;
 
 class PDFController extends Controller
 {
@@ -23,20 +33,45 @@ class PDFController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function generatePDF()
+    public function generatePDF($Id_Project)
     {
-        // $strategic = StrategicModel::find(5);
-        $strategy = StrategyModel::find(11);
-        $data = [
-            'title' => 'Welcome to ItSolutionStuff.com',
-            'date' => date('m/d/Y'),
-            // 'strategic' => $strategic,
-            'strategy' => $strategy,
-        ]; 
-           
-        $pdf = PDF::loadView('PDF.PDF', $data);
+        $project = ListProjectModel::with(['strategic.strategies', 'sdgs'])
+                    ->where('Id_Project', $Id_Project)
+                    ->firstOrFail();
+
+        $projectBudgetSources = ProjectHasBudgetSourceModel::with('budgetSource')
+                    ->where('Project_Id', $Id_Project)->get();
+
+
+        $outcome = OutcomeModel::with('project')->where('Project_Id', $Id_Project)->get();
+        $output = OutputModel::with('project')->where('Project_Id', $Id_Project)->get();
+        $expectedResult = ExpectedResultsModel::with('project')->where('Project_Id', $Id_Project)->get();
+
+        // app/Helpers.php
+        $project->formatted_first_time = formatDateThai($project->First_Time);
+        $project->formatted_end_time = formatDateThai($project->End_Time);
+
+        $projectBudgetSources = $projectBudgetSources->map(function ($budget) {
+            $budget->Amount_Total = toThaiNumber($budget->Amount_Total);
+            return $budget;
+        });
+
     
-        return $pdf->stream('itsolutionstuff.pdf');
+        $data = [
+            'title' => $project->Name_Project,
+            'date' => toThaiNumber(date('d/m/Y')),
+            'project' => $project,
+            'projectBudgetSources' => $projectBudgetSources,
+            'outcome' => $outcome,
+            'output' => $output,
+            'expectedResult' => $expectedResult,
+            
+            // 'subBudget' => $subBudget,
+              
+        ];
+    
+        $pdf = PDF::loadView('PDF.PDF', $data);
+        return $pdf->stream('project_report.pdf');
     }
     
     public function ActionPlanPDF()
@@ -120,6 +155,42 @@ class PDFController extends Controller
         $projectBudgetSources = ProjectHasBudgetSourceModel::where('Project_Id', $Id_Project)->get();
             
         return view('PDF.ctrlP.pdfproject', compact('project', 'strategies', 'projectBudgetSources'));
+    }
+
+    public function generatePDFReportForm($id)
+    {
+
+        $project = ListProjectModel::with(['employee', 'targets.targetDetails', 'locations', 
+                            'projectHasIndicators.indicators','shortProjects', 'budgetForm',
+                            'monthlyPlans','monthlyPlans.month', 'monthlyPlans.pdca',])->findOrFail($id);
+
+                            log::info($project);
+        $projectBudgetSources = ProjectHasBudgetSourceModel::with('budgetSource')
+                    ->where('Project_Id', $id)->get();
+
+        $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
+        $pdcaStages = PdcaModel::all();
+
+        $quarterProjectId = request()->input('quarter_project_id', StrategicHasQuarterProjectModel::pluck('Quarter_Project_Id')->first() ?? 1);
+        $quarterProjects = StrategicHasQuarterProjectModel::with(['strategic', 'quarterProject'])
+                    ->where('Quarter_Project_Id', $quarterProjectId)
+                    ->get();
+
+        // app/Helpers.php
+        $project->formatted_first_time = formatDateThai($project->First_Time);
+        $project->formatted_end_time = formatDateThai($project->End_Time);
+    
+        $data = [
+            'title' => $project->Name_Project,
+            'date' => toThaiNumber(date('d/m/Y')),
+            'project' => $project,
+            'months' => $months,
+            'pdcaStages' => $pdcaStages,
+            'quarterProjects' => $quarterProjects,
+        ];
+    
+        $pdf = PDF::loadView('PDF.PDFReportForm', $data);
+        return $pdf->stream('project_report.pdf');
     }
 
 }

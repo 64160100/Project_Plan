@@ -27,4 +27,10 @@ class BudgetFormModel extends Model
     {
         return $this->belongsTo(BudgetSourceModel::class, 'Budget_Source_Id', 'Id_Budget_Source');
     }
+
+    public function subtopicBudgetHasBudgetForm()
+    {
+        return $this->hasMany(SubtopicBudgetHasBudgetFormModel::class, 'Budget_Form_Id', 'Id_Budget_Form');
+    }
+
 }

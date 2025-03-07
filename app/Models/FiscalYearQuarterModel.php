@@ -21,8 +21,13 @@ class FiscalYearQuarterModel extends Model
         return $this->hasMany(ProjectHasQuarterProject::class, 'Quarter_Project_Id');
     }
 
+    // public function strategic()
+    // {
+    //     return $this->hasMany(StrategicHasQuarterProjectModel::class, 'Quarter_Project_Id');
+    // }
+
     public function strategic()
     {
-        return $this->hasMany(StrategicHasQuarterProjectModel::class, 'Quarter_Project_Id');
+        return $this->belongsToMany(StrategicModel::class,'Strategic_has_Quarter_Project','Quarter_Project_Id','Strategic_Id');
     }
 }

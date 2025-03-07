@@ -101,9 +101,14 @@ class ListProjectModel extends Model
         return $this->hasMany(ProjectHasIndicatorsModel::class, 'Project_Id', 'Id_Project');
     }
 
-    public function pdca()
+    public function pdcaDetails()
     {
         return $this->hasMany(PdcaDetailsModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function shortProjects()
+    {
+        return $this->hasMany(ShortProjectModel::class, 'Project_Id', 'Id_Project');
     }
     
     public function projectBudgetSources()
@@ -111,9 +116,21 @@ class ListProjectModel extends Model
         return $this->hasMany(ProjectHasBudgetSourceModel::class, 'Project_Id', 'Id_Project');
     }
 
+    public function budgetForm()
+    {
+        return $this->hasMany(BudgetFormModel::class, 'Project_Id', 'Id_Project');
+    }
+
     public function quarterProjects()
     {
         return $this->hasMany(ProjectHasQuarterProjectModel::class, 'Project_Id');
     }
+
+    public function monthlyPlans()
+    {
+        return $this->hasMany(MonthlyPlansModel::class, 'Project_Id', 'Id_Project');
+    }
+
+
 
 }

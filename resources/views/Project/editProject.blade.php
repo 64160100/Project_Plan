@@ -103,12 +103,24 @@
                         </div>
                         <div id="projectContainer">
                             @csrf
+                            @foreach ($subProjects as $index => $subProject)
+                                <div class="form-group mb-2 dynamic-field">
+                                    <div class="input-group">
+                                        <span class="input-group-text">1.{{ $index + 1 }}</span>
+                                        <input type="text" class="form-control" name="Name_Sub_Project[]" 
+                                            value="{{ $subProject->Name_Sub_Project }}" 
+                                            placeholder="กรอกชื่อโครงการย่อย" required>
+                                        <button type="button" class="btn btn-danger" onclick="removeField(this)">
+                                            <i class='bx bx-trash'></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                         <div>
-                            <button type="button" class="btn-addlist"
-                                onclick="addField1('projectContainer', 'Name_Sup_Project[]')">
-                                <i class='bx bx-plus-circle'></i>เพิ่มชื่อโครงการย่อย
-                            </button>
+                        <button type="button" class="btn btn-primary" onclick="addField1('projectContainer', 'Name_Sub_Project[]')">
+                            เพิ่มโครงการย่อย
+                        </button>
                         </div>
                     </div>
                 </div>
@@ -310,7 +322,7 @@
                                 @foreach($employees as $employee)
                                 <option value="{{ $employee->Id_Employee }}"
                                     {{ $project->employee_id == $employee->Id_Employee ? 'selected' : '' }}>
-                                    {{ $employee->Firstname_Employee }} {{ $employee->Lastname_Employee }}
+                                    {{ $employee->Firstname }} {{ $employee->Lastname }}
                                 </option>
                                 @endforeach
                             </select>

@@ -152,6 +152,29 @@ Carbon::setLocale('th');
             <?php
             $displayedStrategicPlans[] = $strategic->Name_Strategic_Plan;
             ?>
+
+            <?php
+            // คำนวณงบประมาณทั้งหมดของยุทธศาสตร์
+            $totalStrategicBudget = 0;
+            foreach ($strategic->strategies as $strategy) {
+            $filteredProjects = $strategy->projects->filter(function($project) {
+            return $project->Count_Steps == 1;
+            });
+
+            foreach ($filteredProjects as $project) {
+            if ($project->Status_Budget !== 'N') {
+            $projectBudget = 0;
+            if ($project->projectBudgetSources) {
+            foreach ($project->projectBudgetSources as $budgetSource) {
+            $projectBudget += $budgetSource->budgetSourceTotal ?
+            $budgetSource->budgetSourceTotal->Amount_Total : 0;
+            }
+            }
+            $totalStrategicBudget += $projectBudget;
+            }
+            }
+            }
+            ?>
             <details class="accordion">
                 <summary class="accordion-btn">
                     <b>
@@ -233,21 +256,38 @@ Carbon::setLocale('th');
                                     <b><?php echo e($project->Name_Project); ?></b>
                                 </td>
                                 <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
+                                    <?php if($project->successIndicators && $project->successIndicators->isNotEmpty()): ?>
+                                    <?php $__currentLoopData = $project->successIndicators; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $indicator): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    - <?php echo nl2br(e($indicator->Description_Indicators)); ?><br>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php else: ?>
                                     <?php echo e($project->Success_Indicators ?? '-'); ?>
 
+                                    <?php endif; ?>
                                 </td>
                                 <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>">
+                                    <?php if($project->valueTargets && $project->valueTargets->isNotEmpty()): ?>
+                                    <?php $__currentLoopData = $project->valueTargets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $target): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    - <?php echo nl2br(e($target->Value_Target)); ?><br>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php else: ?>
                                     <?php echo e($project->Value_Target ?? '-'); ?>
 
+                                    <?php endif; ?>
                                 </td>
-                                <td class="<?php echo e($project->Status_Budget === 'N' ? 'text-gray' : ''); ?>"
+                                <td class="<?php echo e($project->approvals->first()->Status === 'N' ? 'text-gray' : ''); ?>"
                                     style="text-align: center;">
                                     <?php if($project->Status_Budget === 'N'): ?>
                                     ไม่ใช้งบประมาณ
                                     <?php else: ?>
                                     <?php
-                                    $totalBudget = $project->projectBudgetSources ?
-                                    $project->projectBudgetSources->sum('Amount_Total') : 0;
+                                    $totalBudget = 0;
+                                    if($project->projectBudgetSources) {
+                                    foreach($project->projectBudgetSources as $budgetSource) {
+                                    $totalBudget += $budgetSource->budgetSourceTotal ?
+                                    $budgetSource->budgetSourceTotal->Amount_Total : 0;
+                                    }
+                                    }
                                     ?>
                                     <?php echo e(number_format($totalBudget, 2)); ?>
 
@@ -270,6 +310,13 @@ Carbon::setLocale('th');
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             <?php endif; ?>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <tr class="summary-row">
+                                <td colspan="2" style="text-align: left; font-weight: bold;">รวมงบประมาณทั้งหมด:
+                                </td>
+                                <td colspan="6" style="text-align: center; font-weight: bold;">
+                                    <?php echo e(number_format($totalStrategicBudget, 2)); ?> บาท
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -408,11 +455,11 @@ Carbon::setLocale('th');
                             <span class="info-label">ผู้รับผิดชอบ</span>
                         </div>
                         <span class="info-value">
-                            <?php if($approval->project->employee && ($approval->project->employee->Firstname_Employee ||
-                            $approval->project->employee->Lastname_Employee)): ?>
-                            <?php echo e($approval->project->employee->Firstname_Employee ?? ''); ?>
+                            <?php if($approval->project->employee && ($approval->project->employee->Firstname ||
+                            $approval->project->employee->Lastname)): ?>
+                            <?php echo e($approval->project->employee->Firstname ?? ''); ?>
 
-                            <?php echo e($approval->project->employee->Lastname_Employee ?? ''); ?>
+                            <?php echo e($approval->project->employee->Lastname ?? ''); ?>
 
                             <?php else: ?>
                             -
@@ -425,48 +472,136 @@ Carbon::setLocale('th');
                             <i class='bx bx-wallet-alt' style="width: 20px; height: 0px;"></i>
                             <span class="info-label">งบประมาณ</span>
                         </div>
-                        <span class="info-value">-</span>
+                        <span class="info-value">
+                            <?php if($approval->project->Status_Budget === 'Y'): ?>
+                            <?php
+                            $totalBudget = 0;
+                            // หากมี projectBudgetSources
+                            if ($approval->project->projectBudgetSources) {
+                            // วนลูปแต่ละ budget source
+                            foreach ($approval->project->projectBudgetSources as $budgetSource) {
+                            // ดึงค่าจาก relationship budgetSourceTotal และเพิ่มเข้าไปใน totalBudget
+                            if ($budgetSource->budgetSourceTotal) {
+                            $totalBudget += $budgetSource->budgetSourceTotal->Amount_Total;
+                            }
+                            }
+                            }
+                            ?>
+                            <?php echo e(number_format($totalBudget, 2)); ?> บาท
+                            <?php else: ?>
+                            ไม่ใช้งบประมาณ
+                            <?php endif; ?>
+                        </span>
                     </div>
                 </div>
 
                 <div class="project-actions">
-                    <a href="<?php echo e(route('StorageFiles.index')); ?>" class="action-link">
+                    <a href="<?php echo e(route('StorageFiles.index', ['project_id' => $approval->project->Id_Project])); ?>"
+                        class="action-link">
                         <i class='bx bx-info-circle'></i>
                         ดูรายละเอียดโครงการ
                     </a>
 
-                    <div class="dropdown">
-                        <a href="#" class="action-link dropdown-toggle"
-                            id="commentsDropdown-<?php echo e($approval->Id_Approve); ?>" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <i class='bx bx-message'></i>
-                            ข้อเสนอแนะ(<?php echo e($approval->recordHistory->where('Status_Record', 'N')->count()); ?>)
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="commentsDropdown-<?php echo e($approval->Id_Approve); ?>"
-                            style="max-height: 200px; overflow-y: auto; width: 300px;">
-                            <?php
-                            $filteredRecords = $approval->recordHistory->where('Status_Record', 'N');
-                            ?>
-                            <?php if($filteredRecords->count() > 0): ?>
-                            <?php $__currentLoopData = $filteredRecords; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $record): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <li class="p-2 border-bottom">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="font-weight-bold"><?php echo e($record->Name_Record ?? 'Unknown'); ?></span>
-                                    <span class="text-muted small"><?php echo e($record->formattedDateTime ?? 'N/A'); ?></span>
+                    <a href="#" class="action-link" data-bs-toggle="modal"
+                        data-bs-target="#commentsModal-<?php echo e($approval->project->Id_Project); ?>">
+                        <i class='bx bx-message'></i>
+                        ข้อเสนอแนะ(<?php echo e($approval->recordHistory->where('Status_Record', 'N')->count()); ?>)
+                    </a>
+
+                    <div class="modal fade" id="commentsModal-<?php echo e($approval->project->Id_Project); ?>" tabindex="-1"
+                        aria-labelledby="commentsModalLabel-<?php echo e($approval->project->Id_Project); ?>" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title"
+                                        id="commentsModalLabel-<?php echo e($approval->project->Id_Project); ?>">ข้อเสนอแนะ</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                                 </div>
-                                <p class="mb-0"><?php echo e($record->comment ?? 'No Comment'); ?></p>
-                            </li>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            <?php else: ?>
-                            <li class="p-2 text-center text-muted">ไม่มีข้อเสนอแนะ</li>
-                            <?php endif; ?>
-                        </ul>
+                                <div class="modal-body">
+                                    <?php
+                                    $filteredRecords = $approval->recordHistory->where('Status_Record', 'N');
+                                    ?>
+                                    <?php if($filteredRecords->count() > 0): ?>
+                                    <ul>
+                                        <?php $__currentLoopData = $filteredRecords; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $record): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <li class="p-2 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <span
+                                                    class="font-weight-bold"><?php echo e($record->Name_Record ?? 'Unknown'); ?></span>
+                                                <span
+                                                    class="text-muted small"><?php echo e($record->formattedDateTime ?? 'N/A'); ?></span>
+                                            </div>
+                                            <p class="mb-0"><?php echo e($record->comment ?? 'No Comment'); ?></p>
+                                        </li>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </ul>
+                                    <?php else: ?>
+                                    <p class="text-center text-muted">ไม่มีข้อเสนอแนะ</p>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <a href="#" class="action-link">
-                        <i class='bx bx-error warning-icon'></i>
-                        แจ้งเตือน
+                    <a href="#" class="action-link" data-bs-toggle="modal"
+                        data-bs-target="#viewersModal-<?php echo e($approval->project->Id_Project); ?>">
+                        <i class='bx bxs-book-content'></i>
+                        คำสั่ง
                     </a>
+
+                    <?php
+                    $approval->project->viewers = collect([
+                    (object) ['Firstname' => 'สมชาย', 'Lastname' => 'ใจดี', 'Position' => 'ผู้อำนวยการ'],
+                    (object) ['Firstname' => 'สมหญิง', 'Lastname' => 'ใจงาม', 'Position' => 'หัวหน้าฝ่าย'],
+                    (object) ['Firstname' => 'สมปอง', 'Lastname' => 'ใจเย็น', 'Position' => 'บุคลากรในฝ่าย'],
+                    (object) ['Firstname' => 'สมศรี', 'Lastname' => 'ใจสบาย', 'Position' => 'บุคลากรในฝ่าย'],
+                    (object) ['Firstname' => 'สมจิตร', 'Lastname' => 'ใจสงบ', 'Position' => 'บุคลากรในฝ่าย'],
+                    (object) ['Firstname' => 'สมหมาย', 'Lastname' => 'ใจมั่น', 'Position' => 'บุคลากรในฝ่าย'],
+                    (object) ['Firstname' => 'สมบัติ', 'Lastname' => 'ใจเพชร', 'Position' => 'บุคลากรในฝ่าย'],
+                    ]);
+                    ?>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="viewersModal-<?php echo e($approval->project->Id_Project); ?>" tabindex="-1"
+                        aria-labelledby="viewersModalLabel-<?php echo e($approval->project->Id_Project); ?>" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewersModalLabel-<?php echo e($approval->project->Id_Project); ?>">
+                                        รายชื่อผู้ที่สามารถมองเห็นโครงการ</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>ชื่อ</th>
+                                                <th>นามสกุล</th>
+                                                <th>ตำแหน่ง</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php $__currentLoopData = $approval->project->viewers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $viewer): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <tr>
+                                                <td><?php echo e($viewer->Firstname); ?></td>
+                                                <td><?php echo e($viewer->Lastname); ?></td>
+                                                <td><?php echo e($viewer->Position); ?></td>
+                                            </tr>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="status-section">

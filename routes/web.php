@@ -44,6 +44,8 @@ Route::get('/project/{id}/edit', [ListProjectController::class, 'editAllProject'
 Route::post('/projects/reset-status/{id}', [ListProjectController::class, 'resetStatus'])->name('projects.resetStatus');
 
 Route::post('/projects/{id}/update-responsible', 'App\Http\Controllers\ProposeProjectController@updateResponsible')->name('projects.updateResponsible');
+
+Route::post('/projects/{id}/updateEmployee', [ProposeProjectController::class, 'updateEmployee'])->name('projects.updateEmployee');
 // แก้ไขโครงการ
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
 Route::match(['get', 'post'],'/editProject/{Id_Project}', [ListProjectController::class, 'editProject'])->name('editProject');

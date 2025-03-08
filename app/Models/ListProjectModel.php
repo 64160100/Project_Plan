@@ -19,12 +19,11 @@ class ListProjectModel extends Model
         'Employee_Id',
         'Objective_Project',
         'Principles_Reasons',
-        'Success_Indicators',
-        'Value_Target',
         'Project_Type',
         'Status_Budget',
         'Name_Creator',
         'Role_Creator',
+        'Lecturer',
         'First_Time',
         'End_Time',
         'Count_Steps',
@@ -114,6 +113,16 @@ class ListProjectModel extends Model
     public function quarterProjects()
     {
         return $this->hasMany(ProjectHasQuarterProjectModel::class, 'Project_Id');
+    }
+
+    public function successIndicators()
+    {
+        return $this->hasMany(SuccessIndicatorsModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function valueTargets()
+    {
+        return $this->hasMany(ValueTargetModel::class, 'Project_Id', 'Id_Project');
     }
 
 }

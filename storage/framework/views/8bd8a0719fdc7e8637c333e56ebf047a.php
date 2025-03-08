@@ -61,6 +61,7 @@
                         class="btn-add">
                         <i class='bx bx-plus'></i>เพิ่มโครงการใหญ่
                     </a> -->
+                    
                 </summary>
                 <div class="accordion-content">
                     <?php if($Strategic->projects->isEmpty()): ?>

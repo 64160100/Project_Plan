@@ -46,6 +46,8 @@ use App\Models\BudgetSourceTotalModel;
 use App\Models\ExpenseTypesModel;
 use App\Models\ExpenseModel;
 use App\Models\ExpenHasSubtopicBudgetModel;
+use App\Models\SuccessIndicatorsModel;
+use App\Models\ValueTargetModel;
 use Carbon\Carbon;
 
 class ListProjectController extends Controller
@@ -155,21 +157,50 @@ class ListProjectController extends Controller
         $query = $request->input('query');
         $strategicId = $request->input('strategic_id');
         
-        Log::info('Project search query:', ['query' => $query, 'strategicId' => $strategicId]);
-        
         $projects = ListProjectModel::where('Strategic_Id', $strategicId)
             ->where('Name_Project', 'LIKE', "%{$query}%")
+            ->with([
+                'successIndicators',  // ดึงข้อมูลตัวชี้วัด
+                'valueTargets',       // ดึงข้อมูลค่าเป้าหมาย
+                'employee',           // ดึงข้อมูลผู้รับผิดชอบ
+                'strategy'            // ดึงข้อมูลกลยุทธ์
+            ])
             ->select([
                 'Id_Project', 
                 'Name_Project', 
                 'Strategy_Id', 
-                'Employee_Id', 
+                'Employee_Id',
                 'Objective_Project', 
-                'Principles_Reasons'
+                'Principles_Reasons'  // เพิ่มข้อมูลที่ต้องการดึงเพิ่มเติม
             ])
             ->get();
         
-        Log::info('Search projects results:', ['count' => $projects->count()]);
+        // บันทึก Log รายละเอียดของผลการค้นหา
+        Log::info('Search results returning to view:', [
+            'count' => $projects->count(),
+            'project_details' => $projects->map(function($project) {
+                return [
+                    'id' => $project->Id_Project,
+                    'name' => $project->Name_Project,
+                    'employee' => $project->employee ? ($project->employee->Firstname . ' ' . $project->employee->Lastname) : 'ไม่ระบุผู้รับผิดชอบ',
+                    'indicators_count' => $project->successIndicators->count(),
+                    'indicators_data' => $project->successIndicators->map(function($indicator) {
+                        return [
+                            'id' => $indicator->Id_Indicator,
+                            'description' => $indicator->Description_Indicators
+                        ];
+                    }),
+                    'targets_count' => $project->valueTargets->count(),
+                    'targets_data' => $project->valueTargets->map(function($target) {
+                        return [
+                            'id' => $target->Id_Value_Target,
+                            'value' => $target->Value_Target,
+                            'indicator_id' => $target->Indicator_Id
+                        ];
+                    })
+                ];
+            })
+        ]);
         
         return response()->json($projects);
     }
@@ -194,7 +225,7 @@ class ListProjectController extends Controller
     public function createProject(Request $request, $Strategic_Id)
     {   
 
-        log::info($request->all());
+        log::info($request);
 
         $strategics = StrategicModel::with(['strategies', 'projects'])->findOrFail($Strategic_Id);
         $strategies = $strategics->strategies;
@@ -225,8 +256,6 @@ class ListProjectController extends Controller
         $project->Employee_Id = $request->employee_id ?? null;
         $project->Objective_Project = $request->Objective_Project ?? $request->Objective_Project_Other ?? null;
         $project->Principles_Reasons = $request->Principles_Reasons ?? null;
-        $project->Success_Indicators = $request->Success_Indicators ?? $request->Success_Indicators_Other ?? null;
-        $project->Value_Target = $request->Value_Target ?? $request->Value_Target_Other ?? null;
         $project->Project_type = $request->Project_Type ?? null;
         $project->Status_Budget = $request->Status_Budget ?? null;
         $project->First_Time = $request->First_Time ?? null;
@@ -240,7 +269,6 @@ class ListProjectController extends Controller
             $approval->Status = 'I';
             $approval->Project_Id = $project->Id_Project;
             $approval->save();
-            // Log::info('Approval record created for project ID: ' . $project->Id_Project);
     
             if ($request->has('Name_Sub_Project')) {
                 foreach ($request->Name_Sub_Project as $subProjectName) {
@@ -379,6 +407,29 @@ class ListProjectController extends Controller
                             $projectIndicator->save();
                             Log::info('Qualitative indicator created with detail: ' . $qualitativeDetail);
                         }
+                    }
+                }
+            }
+
+            if ($request->has('indicators') && is_array($request->indicators) && 
+                $request->has('targets') && is_array($request->targets) && 
+                $request->has('target_types') && is_array($request->target_types)) {
+                
+                foreach ($request->indicators as $index => $indicatorText) {
+                    if (!empty($indicatorText) && isset($request->targets[$index]) && !empty($request->targets[$index]) && isset($request->target_types[$index])) {
+                        // สร้างตัวชี้วัด
+                        $indicator = new SuccessIndicatorsModel();
+                        $indicator->Project_Id = $project->Id_Project;
+                        $indicator->Description_Indicators = $indicatorText;
+                        $indicator->Type_Indicators = $request->target_types[$index];
+                        $indicator->save();
+                        
+                        // สร้างค่าเป้าหมาย
+                        $target = new ValueTargetModel();
+                        $target->Project_Id = $project->Id_Project;
+                        $target->Value_Target = $request->targets[$index];
+                        $target->Type_Value_Target = $request->target_types[$index];
+                        $target->save();
                     }
                 }
             }
@@ -825,11 +876,12 @@ class ListProjectController extends Controller
                 //     'total_budget' => $totalBudget
                 // ]);
             
+                // โหลดข้อมูลโครงการพร้อมกับความสัมพันธ์ทั้งหมด รวมถึง successIndicators และ valueTargets
                 $pdfData = [
                     'project' => $project->load([
                         'subProjects',
                         'projectBudgetSources.budget_source',
-                        'projectBudgetSources.budgetSourceTotal', // Changed from budgetSourceTotals to budgetSourceTotal
+                        'projectBudgetSources.budgetSourceTotal',
                         'strategic',
                         'strategy',
                         'employee',
@@ -839,7 +891,9 @@ class ListProjectController extends Controller
                         'platforms',
                         'projectHasSDGs.sdgs',
                         'projectHasIntegrationCategories.integrationCategory',
-                        'projectHasIndicators.indicators'
+                        'projectHasIndicators.indicators',
+                        'successIndicators', // เพิ่มความสัมพันธ์ตัวชี้วัดความสำเร็จ
+                        'valueTargets' // เพิ่มความสัมพันธ์ค่าเป้าหมาย
                     ]),
                     'strategy' => $strategy,
                     'nameCreator' => $nameCreator,
@@ -944,8 +998,6 @@ class ListProjectController extends Controller
         $project->Employee_Id = $request->Employee_Id ?? $project->Employee_Id;
         $project->Objective_Project = $request->Objective_Project ?? $project->Objective_Project;
         $project->Principles_Reasons = $request->Principles_Reasons ?? $project->Principles_Reasons;
-        $project->Success_Indicators = $request->Success_Indicators ?? $project->Success_Indicators;
-        $project->Value_Target = $request->Value_Target ?? $project->Value_Target;
         $project->Project_Type = $request->Project_Type ?? $project->Project_Type;
         $project->Status_Budget = $request->Status_Budget ?? $project->Status_Budget;
         $project->First_Time = $request->First_Time ?? $project->First_Time;
@@ -1040,9 +1092,9 @@ class ListProjectController extends Controller
         $kpis = KpiModel::all();
         $strategicObjectives = StrategicObjectivesModel::all();
         $sourcePage = $request->input('sourcePage', 'listProject');
-        
-        log::info($project);
-    
+
+        log::info($strategicObjectives);
+            
         return view('Project.editBigFormProject', compact('project', 'strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets', 'kpis', 'strategicObjectives', 'sourcePage'));
     }
 
@@ -1051,8 +1103,11 @@ class ListProjectController extends Controller
         $project = ListProjectModel::findOrFail($id);
         $project->approvals->first()->Status = 'I';
         $project->approvals->first()->save();
-
-        return redirect()->route('proposeProject')->with('success', 'Project status reset to I successfully.');
+    
+        $project->Count_Steps = 2;
+        $project->save();
+    
+        return redirect()->route('proposeProject')->with('success', 'Project status reset to I and Count_Steps reset to 2 successfully.');
     }
 
     public function updateField(Request $request)

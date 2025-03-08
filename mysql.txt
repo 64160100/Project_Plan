@@ -163,6 +163,17 @@ INSERT INTO `Budget_Source` (`Id_Budget_Source`, `Name_Budget_Source`) VALUES ('
 
 INSERT INTO `Subtopic_Budget` (`Id_Subtopic_Budget`, `Name_Subtopic_Budget`) VALUES ('1', 'ค่าตอบแทน'), ('2', 'ค่าใช้สอย'), ('3', 'ค่าวัสดุ');
 
+INSERT INTO `Quarter_Project` (`Id_Quarter_Project`, `Fiscal_Year`, `Quarter`) VALUES
+(1, 2567, '1'),
+(2, 2567, '2'),
+(3, 2568, '1');
+
+INSERT INTO `Strategic_has_Quarter_Project` (`Strategic_Id`, `Quarter_Project_Id`) VALUES
+(1, 1),
+(2, 1),
+(3, 1),
+(4, 1);
+
 INSERT INTO `Project` (`Id_Project`, `Strategic_Id`, `Strategy_Id`, `Name_Strategy`, `Name_Project`, `Description_Project`, `Objective_Project`, `Principles_Reasons`, `Success_Indicators`, `Value_Target`, `Project_Type`, `Status_Budget`, `First_Time`, `End_Time`, `Employee_Id`, `Name_Creator`, `Role_Creator`, `Count_Steps`) VALUES
 (1, 1, 1, 'กลยุทธ์ที่ 1.1 พัฒนากระบวนการ ปฏิบัติงานด้วยเกณฑ์คุณภาพ (ตอบ VG1)', 'โครงการสัปดาห์ห้องสมุด ประจำปี 2567', 'N', 'SO1 : เพื่อพัฒนาและปรับปรุงกระบวน\r\nการปฏิบัติงานให้มีความสอดคล้องตาม\r\nเกณฑ์คุณภาพ EdPEx', NULL, 'KPI 1 ผลการประเมินตามเกณฑ์ประกันคุณภาพการศึกษา\r\nเพื่อการด าเนินการที่เป็นเลิศ\r\n(รับเป้ามหาวิทยาลัย KPI C25)', '220 คะแนน', NULL, 'N', '2025-02-10', '2025-02-11', 6, 'Is Admin', 'ผู้ดูแลระบบ', 0),
 (2, 1, 2, 'กลยุทธ์ที่ 1.2 การบริหารจัดการของ ส านักหอสมุดเพื่อการพัฒนาที่ยั่งยืน (ตอบ VG2, VG3)', 'โครงการสัปดาห์ห้องสมุด ประจำปี 2568', 'N', 'SO1 : เพื่อพัฒนาและปรับปรุงกระบวน\r\nการปฏิบัติงานให้มีความสอดคล้องตาม\r\nเกณฑ์คุณภาพ EdPEx', NULL, 'KPI 2 จ านวนครั้งในการน าเสนอตราสัญลักษณ์มหาวิทยาลัย\r\nในกิจกรรมระดับสากล (รับเป้ามหาวิทยาลัย KPI C5)', '1 ครั้ง', NULL, 'N', '2025-02-11', '2025-02-13', 6, 'Is Admin', 'ผู้ดูแลระบบ', 0),
@@ -194,17 +205,6 @@ INSERT INTO `Approve` (`Id_Approve`, `Status`, `Project_Id`) VALUES
 (12, 'I', 12),
 (13, 'I', 13),
 (14, 'I', 14);
-
-INSERT INTO `Quarter_Project` (`Id_Quarter_Project`, `Fiscal_Year`, `Quarter`) VALUES
-(1, 2567, '1'),
-(2, 2567, '2'),
-(3, 2568, '1');
-
-INSERT INTO `Strategic_has_Quarter_Project` (`Strategic_Id`, `Quarter_Project_Id`) VALUES
-(1, 1),
-(2, 1),
-(3, 1),
-(4, 1);
 
 <?php
 $password = '12345678';

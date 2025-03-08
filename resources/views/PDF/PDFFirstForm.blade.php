@@ -170,16 +170,23 @@
                         - {{ $subProject->Name_Sub_Project }}<br>
                         @endforeach
                     </td>
-
                     <td>
-                        @if($project->Success_Indicators)
+                        @if($project->successIndicators && $project->successIndicators->isNotEmpty())
+                        @foreach($project->successIndicators as $index => $indicator)
+                        {{ $index + 1 }}. {!! nl2br(e($indicator->Description_Indicators)) !!}<br>
+                        @endforeach
+                        @elseif($project->Success_Indicators)
                         {!! nl2br(e($project->Success_Indicators)) !!}
                         @else
                         -
                         @endif
                     </td>
                     <td>
-                        @if($project->Value_Target)
+                        @if($project->valueTargets && $project->valueTargets->isNotEmpty())
+                        @foreach($project->valueTargets as $index => $target)
+                        {{ $index + 1 }}. {!! nl2br(e($target->Value_Target)) !!}<br>
+                        @endforeach
+                        @elseif($project->Value_Target)
                         {!! nl2br(e($project->Value_Target)) !!}
                         @else
                         -

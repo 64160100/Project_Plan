@@ -170,9 +170,12 @@
                         - <?php echo e($subProject->Name_Sub_Project); ?><br>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </td>
-
                     <td>
-                        <?php if($project->Success_Indicators): ?>
+                        <?php if($project->successIndicators && $project->successIndicators->isNotEmpty()): ?>
+                        <?php $__currentLoopData = $project->successIndicators; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $indicator): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php echo e($index + 1); ?>. <?php echo nl2br(e($indicator->Description_Indicators)); ?><br>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php elseif($project->Success_Indicators): ?>
                         <?php echo nl2br(e($project->Success_Indicators)); ?>
 
                         <?php else: ?>
@@ -180,7 +183,11 @@
                         <?php endif; ?>
                     </td>
                     <td>
-                        <?php if($project->Value_Target): ?>
+                        <?php if($project->valueTargets && $project->valueTargets->isNotEmpty()): ?>
+                        <?php $__currentLoopData = $project->valueTargets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $target): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php echo e($index + 1); ?>. <?php echo nl2br(e($target->Value_Target)); ?><br>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php elseif($project->Value_Target): ?>
                         <?php echo nl2br(e($project->Value_Target)); ?>
 
                         <?php else: ?>

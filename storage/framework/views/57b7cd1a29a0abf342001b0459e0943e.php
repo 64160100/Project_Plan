@@ -223,7 +223,8 @@
                         <?php endif; ?>
                         <?php endif; ?>
 
-                        <?php if($employee->IsAdmin === 'Y' || $employee->IsManager === 'Y'): ?>
+                        <?php if($employee->IsAdmin === 'Y' || $employee->IsManager === 'Y' || $employee->IsResponsible ===
+                        'Y'): ?>
                         <?php if(!$renderedItems['propose_project']): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('proposeProject')); ?>">

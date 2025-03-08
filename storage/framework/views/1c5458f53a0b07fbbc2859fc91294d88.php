@@ -46,21 +46,50 @@ Carbon::setLocale('th');
                         </div>
                         <span class="info-value"><?php echo e($project->formattedFirstTime); ?></span>
                     </div>
-                    
+
                     <div class="info-item">
-                        <div class="info-top">
-                            <i class='bx bx-group' style="width: 20px; height: 0px;"></i>
+                        <div class="info-top d-flex align-items-center">
+                            <i class='bx bx-group' style="width: 20px; height: 0px; margin-right: 10px;"></i>
                             <span class="info-label">ผู้รับผิดชอบ</span>
                         </div>
                         <span class="info-value">
-                            <?php if($project->employee && ($project->employee->Firstname ||
-                            $project->employee->Lastname)): ?>
-                            <?php echo e($project->employee->Firstname ?? ''); ?>
-
-                            <?php echo e($project->employee->Lastname ?? ''); ?>
+                            <?php if(session()->get('employee')->IsAdmin !== 'Y'): ?>
+                            <?php if($project->employee && ($project->employee->Firstname || $project->employee->Lastname)): ?>
+                            <?php echo e($project->employee->Firstname ?? ''); ?> <?php echo e($project->employee->Lastname ?? ''); ?>
 
                             <?php else: ?>
                             -
+                            <?php endif; ?>
+                            <?php endif; ?>
+
+                            <?php if(session()->get('employee')->IsAdmin === 'Y'): ?>
+                            <form action="<?php echo e(route('projects.updateEmployee', ['id' => $project->Id_Project])); ?>"
+                                method="POST" id="updateEmployeeForm-<?php echo e($project->Id_Project); ?>">
+                                <?php echo csrf_field(); ?>
+                                <div class="form-group d-flex align-items-center">
+                                    <label for="employee_id-<?php echo e($project->Id_Project); ?>" class="mb-0"></label>
+                                    <select name="employee_id" id="employee_id-<?php echo e($project->Id_Project); ?>"
+                                        class="form-control ml-2"
+                                        onchange="document.getElementById('updateEmployeeForm-<?php echo e($project->Id_Project); ?>').submit()">
+                                        <?php if($project->employee && ($project->employee->Firstname ||
+                                        $project->employee->Lastname)): ?>
+                                        <option value="<?php echo e($project->employee_id); ?>" selected>
+                                            <?php echo e($project->employee->Firstname); ?> <?php echo e($project->employee->Lastname); ?>
+
+                                        </option>
+                                        <?php else: ?>
+                                        <option value="" disabled selected>เลือกผู้รับผิดชอบ</option>
+                                        <?php endif; ?>
+                                        <?php $__currentLoopData = $employees; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $employee): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($employee->Id_Employee); ?>"
+                                            <?php echo e($project->employee_id == $employee->Id_Employee ? 'selected' : ''); ?>>
+                                            <?php echo e($employee->Firstname); ?> <?php echo e($employee->Lastname); ?>
+
+                                        </option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </select>
+                                </div>
+                            </form>
                             <?php endif; ?>
                         </span>
                     </div>
@@ -100,37 +129,108 @@ Carbon::setLocale('th');
                     ดูรายละเอียดโครงการ
                 </a>
 
-                <div class="dropdown">
-                    <a href="#" class="action-link dropdown-toggle" id="commentsDropdown-<?php echo e($project->Id_Project); ?>"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class='bx bx-message'></i>
-                        ข้อเสนอแนะ(<?php echo e($project->approvals->first()->recordHistory->where('Status_Record', 'N')->count()); ?>)
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="commentsDropdown-<?php echo e($project->Id_Project); ?>"
-                        style="max-height: 400px; overflow-y: auto; width: 400px;">
-                        <?php
-                        $filteredRecords = $project->approvals->first()->recordHistory->where('Status_Record', 'N');
-                        ?>
-                        <?php if($filteredRecords->count() > 0): ?>
-                        <?php $__currentLoopData = $filteredRecords; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $record): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <li class="p-2 border-bottom">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="font-weight-bold"><?php echo e($record->Name_Record ?? 'Unknown'); ?></span>
-                                <span class="text-muted small"><?php echo e($record->formattedDateTime ?? 'N/A'); ?></span>
+                <a href="#" class="action-link" data-bs-toggle="modal"
+                    data-bs-target="#commentsModal-<?php echo e($project->Id_Project); ?>">
+                    <i class='bx bx-message'></i>
+                    ข้อเสนอแนะ(<?php echo e($project->approvals->first()->recordHistory->where('Status_Record', 'N')->count()); ?>)
+                </a>
+
+                <div class="modal fade" id="commentsModal-<?php echo e($project->Id_Project); ?>" tabindex="-1"
+                    aria-labelledby="commentsModalLabel-<?php echo e($project->Id_Project); ?>" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="commentsModalLabel-<?php echo e($project->Id_Project); ?>">ข้อเสนอแนะ
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
-                            <p class="mb-0"><?php echo e($record->comment ?? 'No Comment'); ?></p>
-                        </li>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        <?php else: ?>
-                        <li class="p-2 text-center text-muted">ไม่มีข้อเสนอแนะ</li>
-                        <?php endif; ?>
-                    </ul>
+                            <div class="modal-body">
+                                <?php
+                                $filteredRecords = $project->approvals->first()->recordHistory->where('Status_Record',
+                                'N');
+                                ?>
+                                <?php if($filteredRecords->count() > 0): ?>
+                                <ul>
+                                    <?php $__currentLoopData = $filteredRecords; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $record): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <li class="p-2 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <span
+                                                class="font-weight-bold"><?php echo e($record->Name_Record ?? 'Unknown'); ?></span>
+                                            <span
+                                                class="text-muted small"><?php echo e($record->formattedDateTime ?? 'N/A'); ?></span>
+                                        </div>
+                                        <p class="mb-0"><?php echo e($record->comment ?? 'No Comment'); ?></p>
+                                    </li>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </ul>
+                                <?php else: ?>
+                                <p class="text-center text-muted">ไม่มีข้อเสนอแนะ</p>
+                                <?php endif; ?>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <a href="#" class="action-link">
-                    <i class='bx bx-error warning-icon'></i>
-                    แจ้งเตือน
+                <a href="#" class="action-link" data-bs-toggle="modal"
+                    data-bs-target="#viewersModal-<?php echo e($project->Id_Project); ?>">
+                    <i class='bx bxs-book-content'></i>
+                    คำสั่ง
                 </a>
+
+                <?php
+                $project->viewers = collect([
+                (object) ['Firstname' => 'สมชาย', 'Lastname' => 'ใจดี', 'Position' => 'ผู้อำนวยการ'],
+                (object) ['Firstname' => 'สมหญิง', 'Lastname' => 'ใจงาม', 'Position' => 'หัวหน้าฝ่าย'],
+                (object) ['Firstname' => 'สมปอง', 'Lastname' => 'ใจเย็น', 'Position' => 'บุคลากรในฝ่าย'],
+                (object) ['Firstname' => 'สมศรี', 'Lastname' => 'ใจสบาย', 'Position' => 'บุคลากรในฝ่าย'],
+                (object) ['Firstname' => 'สมจิตร', 'Lastname' => 'ใจสงบ', 'Position' => 'บุคลากรในฝ่าย'],
+                (object) ['Firstname' => 'สมหมาย', 'Lastname' => 'ใจมั่น', 'Position' => 'บุคลากรในฝ่าย'],
+                (object) ['Firstname' => 'สมบัติ', 'Lastname' => 'ใจเพชร', 'Position' => 'บุคลากรในฝ่าย'],
+                ]);
+                ?>
+
+                <!-- Modal -->
+                <div class="modal fade" id="viewersModal-<?php echo e($project->Id_Project); ?>" tabindex="-1"
+                    aria-labelledby="viewersModalLabel-<?php echo e($project->Id_Project); ?>" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="viewersModalLabel-<?php echo e($project->Id_Project); ?>">
+                                    รายชื่อผู้ที่สามารถมองเห็นโครงการ</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ชื่อ</th>
+                                            <th>นามสกุล</th>
+                                            <th>ตำแหน่ง</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php $__currentLoopData = $project->viewers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $viewer): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <tr>
+                                            <td><?php echo e($viewer->Firstname); ?></td>
+                                            <td><?php echo e($viewer->Lastname); ?></td>
+                                            <td><?php echo e($viewer->Position); ?></td>
+                                        </tr>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="status-section">
@@ -344,7 +444,7 @@ Carbon::setLocale('th');
                     <?php endif; ?>
 
                     <div class="button-container">
-                        <?php if(in_array($project->Count_Steps, [0, 2, 6])): ?>
+                        <?php if(in_array($project->Count_Steps, [0, 2, 3, 4, 5, 6])): ?>
                         <?php if($project->Count_Steps === 6): ?>
                         <?php if(\Carbon\Carbon::now()->gt(\Carbon\Carbon::parse($project->End_Time))): ?>
                         <form action="<?php echo e(route('projects.submitForApproval', ['id' => $project->Id_Project])); ?>"
@@ -364,6 +464,23 @@ Carbon::setLocale('th');
                         <a href="<?php echo e(route('projects.edit', ['id' => $project->Id_Project ])); ?>" class="btn btn-warning">
                             <i class='bx bx-edit'></i> แก้ไขฟอร์ม
                         </a>
+                        <?php elseif($project->Count_Steps === 3 && $project->approvals->first()->Status === 'N'): ?>
+                        <a href="<?php echo e(route('projects.edit', ['id' => $project->Id_Project ])); ?>" class="btn btn-warning">
+                            <i class='bx bx-edit'></i> แก้ไขฟอร์ม
+                        </a>
+                        <?php elseif($project->Count_Steps === 4 && $project->approvals->first()->Status === 'N'): ?>
+                        <a href="<?php echo e(route('projects.edit', ['id' => $project->Id_Project ])); ?>" class="btn btn-warning">
+                            <i class='bx bx-edit'></i> แก้ไขฟอร์ม
+                        </a>
+                        <?php elseif($project->Count_Steps === 5 && $project->approvals->first()->Status === 'N'): ?>
+                        <a href="<?php echo e(route('projects.edit', ['id' => $project->Id_Project ])); ?>" class="btn btn-warning">
+                            <i class='bx bx-edit'></i> แก้ไขฟอร์ม
+                        </a>
+                        <?php else: ?>
+                        <?php if(in_array($project->Count_Steps, [3, 4, 5]) && $project->approvals->first()->Status === 'I'): ?>
+                        <button type="button" class="btn btn-secondary" disabled>
+                            <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
+                        </button>
                         <?php else: ?>
                         <form action="<?php echo e(route('projects.submitForApproval', ['id' => $project->Id_Project])); ?>"
                             method="POST" style="display:inline;">
@@ -372,6 +489,7 @@ Carbon::setLocale('th');
                                 <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
                             </button>
                         </form>
+                        <?php endif; ?>
                         <?php endif; ?>
                         <?php endif; ?>
                         <?php elseif($project->Count_Steps === 9): ?>
@@ -395,6 +513,7 @@ Carbon::setLocale('th');
     <?php endif; ?>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
+    <?php if(session()->get('employee')->IsAdmin === 'Y'): ?>
     <?php $__currentLoopData = $quartersByFiscalYear; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $fiscalYear => $yearQuarters): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <?php $__currentLoopData = $yearQuarters->sortBy('Quarter'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $quarter): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <?php
@@ -580,12 +699,22 @@ Carbon::setLocale('th');
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </td>
                                     <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
-                                        <?php echo $Project->Success_Indicators ? nl2br(e($Project->Success_Indicators)) : '-'; ?>
-
+                                        <?php if($Project->successIndicators->isNotEmpty()): ?>
+                                        <?php $__currentLoopData = $Project->successIndicators; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $indicator): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        - <?php echo nl2br(e($indicator->Description_Indicators)); ?><br>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <?php else: ?>
+                                        -
+                                        <?php endif; ?>
                                     </td>
                                     <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>">
-                                        <?php echo $Project->Value_Target ? nl2br(e($Project->Value_Target)) : '-'; ?>
-
+                                        <?php if($Project->valueTargets->isNotEmpty()): ?>
+                                        <?php $__currentLoopData = $Project->valueTargets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $target): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        - <?php echo nl2br(e($target->Value_Target)); ?><br>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <?php else: ?>
+                                        -
+                                        <?php endif; ?>
                                     </td>
                                     <td class="<?php echo e($isStatusN && !$isStatusI ? 'text-gray' : ''); ?>"
                                         style="text-align: center;">
@@ -670,6 +799,7 @@ Carbon::setLocale('th');
     <?php endif; ?>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    <?php endif; ?>
 
 </div>
 
@@ -690,6 +820,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 projectStatus.style.maxHeight = projectStatus.scrollHeight + 'px';
                 projectStatus.classList.add('show');
                 toggleIcon.classList.add('rotate');
+            }
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[id^="employee_id-"]').forEach(function(selectElement) {
+        selectElement.addEventListener('change', function() {
+            const formId = this.id.replace('employee_id-', 'updateEmployeeForm-');
+            document.getElementById(formId).submit();
+            alert('ชื่อผู้รับผิดชอบมีการแก้ไขแล้ว');
+        });
+
+        const formId = selectElement.id.replace('employee_id-', 'updateEmployeeForm-');
+        document.getElementById(formId).addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                this.submit();
+                alert('ชื่อผู้รับผิดชอบมีการแก้ไขแล้ว');
             }
         });
     });

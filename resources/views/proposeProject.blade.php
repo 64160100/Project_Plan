@@ -45,19 +45,47 @@ Carbon::setLocale('th');
                         </div>
                         <span class="info-value">{{ $project->formattedFirstTime }}</span>
                     </div>
-                    
+
                     <div class="info-item">
-                        <div class="info-top">
-                            <i class='bx bx-group' style="width: 20px; height: 0px;"></i>
+                        <div class="info-top d-flex align-items-center">
+                            <i class='bx bx-group' style="width: 20px; height: 0px; margin-right: 10px;"></i>
                             <span class="info-label">ผู้รับผิดชอบ</span>
                         </div>
                         <span class="info-value">
-                            @if($project->employee && ($project->employee->Firstname ||
-                            $project->employee->Lastname))
-                            {{ $project->employee->Firstname ?? '' }}
-                            {{ $project->employee->Lastname ?? '' }}
+                            @if(session()->get('employee')->IsAdmin !== 'Y')
+                            @if($project->employee && ($project->employee->Firstname || $project->employee->Lastname))
+                            {{ $project->employee->Firstname ?? '' }} {{ $project->employee->Lastname ?? '' }}
                             @else
                             -
+                            @endif
+                            @endif
+
+                            @if(session()->get('employee')->IsAdmin === 'Y')
+                            <form action="{{ route('projects.updateEmployee', ['id' => $project->Id_Project]) }}"
+                                method="POST" id="updateEmployeeForm-{{ $project->Id_Project }}">
+                                @csrf
+                                <div class="form-group d-flex align-items-center">
+                                    <label for="employee_id-{{ $project->Id_Project }}" class="mb-0"></label>
+                                    <select name="employee_id" id="employee_id-{{ $project->Id_Project }}"
+                                        class="form-control ml-2"
+                                        onchange="document.getElementById('updateEmployeeForm-{{ $project->Id_Project }}').submit()">
+                                        @if($project->employee && ($project->employee->Firstname ||
+                                        $project->employee->Lastname))
+                                        <option value="{{ $project->employee_id }}" selected>
+                                            {{ $project->employee->Firstname }} {{ $project->employee->Lastname }}
+                                        </option>
+                                        @else
+                                        <option value="" disabled selected>เลือกผู้รับผิดชอบ</option>
+                                        @endif
+                                        @foreach($employees as $employee)
+                                        <option value="{{ $employee->Id_Employee }}"
+                                            {{ $project->employee_id == $employee->Id_Employee ? 'selected' : '' }}>
+                                            {{ $employee->Firstname }} {{ $employee->Lastname }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </form>
                             @endif
                         </span>
                     </div>
@@ -97,37 +125,108 @@ Carbon::setLocale('th');
                     ดูรายละเอียดโครงการ
                 </a>
 
-                <div class="dropdown">
-                    <a href="#" class="action-link dropdown-toggle" id="commentsDropdown-{{ $project->Id_Project }}"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class='bx bx-message'></i>
-                        ข้อเสนอแนะ({{ $project->approvals->first()->recordHistory->where('Status_Record', 'N')->count() }})
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="commentsDropdown-{{ $project->Id_Project }}"
-                        style="max-height: 400px; overflow-y: auto; width: 400px;">
-                        @php
-                        $filteredRecords = $project->approvals->first()->recordHistory->where('Status_Record', 'N');
-                        @endphp
-                        @if($filteredRecords->count() > 0)
-                        @foreach($filteredRecords as $record)
-                        <li class="p-2 border-bottom">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="font-weight-bold">{{ $record->Name_Record ?? 'Unknown' }}</span>
-                                <span class="text-muted small">{{ $record->formattedDateTime ?? 'N/A' }}</span>
+                <a href="#" class="action-link" data-bs-toggle="modal"
+                    data-bs-target="#commentsModal-{{ $project->Id_Project }}">
+                    <i class='bx bx-message'></i>
+                    ข้อเสนอแนะ({{ $project->approvals->first()->recordHistory->where('Status_Record', 'N')->count() }})
+                </a>
+
+                <div class="modal fade" id="commentsModal-{{ $project->Id_Project }}" tabindex="-1"
+                    aria-labelledby="commentsModalLabel-{{ $project->Id_Project }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="commentsModalLabel-{{ $project->Id_Project }}">ข้อเสนอแนะ
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
-                            <p class="mb-0">{{ $record->comment ?? 'No Comment' }}</p>
-                        </li>
-                        @endforeach
-                        @else
-                        <li class="p-2 text-center text-muted">ไม่มีข้อเสนอแนะ</li>
-                        @endif
-                    </ul>
+                            <div class="modal-body">
+                                @php
+                                $filteredRecords = $project->approvals->first()->recordHistory->where('Status_Record',
+                                'N');
+                                @endphp
+                                @if($filteredRecords->count() > 0)
+                                <ul>
+                                    @foreach($filteredRecords as $record)
+                                    <li class="p-2 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <span
+                                                class="font-weight-bold">{{ $record->Name_Record ?? 'Unknown' }}</span>
+                                            <span
+                                                class="text-muted small">{{ $record->formattedDateTime ?? 'N/A' }}</span>
+                                        </div>
+                                        <p class="mb-0">{{ $record->comment ?? 'No Comment' }}</p>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                                @else
+                                <p class="text-center text-muted">ไม่มีข้อเสนอแนะ</p>
+                                @endif
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <a href="#" class="action-link">
-                    <i class='bx bx-error warning-icon'></i>
-                    แจ้งเตือน
+                <a href="#" class="action-link" data-bs-toggle="modal"
+                    data-bs-target="#viewersModal-{{ $project->Id_Project }}">
+                    <i class='bx bxs-book-content'></i>
+                    คำสั่ง
                 </a>
+
+                @php
+                $project->viewers = collect([
+                (object) ['Firstname' => 'สมชาย', 'Lastname' => 'ใจดี', 'Position' => 'ผู้อำนวยการ'],
+                (object) ['Firstname' => 'สมหญิง', 'Lastname' => 'ใจงาม', 'Position' => 'หัวหน้าฝ่าย'],
+                (object) ['Firstname' => 'สมปอง', 'Lastname' => 'ใจเย็น', 'Position' => 'บุคลากรในฝ่าย'],
+                (object) ['Firstname' => 'สมศรี', 'Lastname' => 'ใจสบาย', 'Position' => 'บุคลากรในฝ่าย'],
+                (object) ['Firstname' => 'สมจิตร', 'Lastname' => 'ใจสงบ', 'Position' => 'บุคลากรในฝ่าย'],
+                (object) ['Firstname' => 'สมหมาย', 'Lastname' => 'ใจมั่น', 'Position' => 'บุคลากรในฝ่าย'],
+                (object) ['Firstname' => 'สมบัติ', 'Lastname' => 'ใจเพชร', 'Position' => 'บุคลากรในฝ่าย'],
+                ]);
+                @endphp
+
+                <!-- Modal -->
+                <div class="modal fade" id="viewersModal-{{ $project->Id_Project }}" tabindex="-1"
+                    aria-labelledby="viewersModalLabel-{{ $project->Id_Project }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="viewersModalLabel-{{ $project->Id_Project }}">
+                                    รายชื่อผู้ที่สามารถมองเห็นโครงการ</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ชื่อ</th>
+                                            <th>นามสกุล</th>
+                                            <th>ตำแหน่ง</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($project->viewers as $viewer)
+                                        <tr>
+                                            <td>{{ $viewer->Firstname }}</td>
+                                            <td>{{ $viewer->Lastname }}</td>
+                                            <td>{{ $viewer->Position }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="status-section">
@@ -333,7 +432,7 @@ Carbon::setLocale('th');
                     @endif
 
                     <div class="button-container">
-                        @if(in_array($project->Count_Steps, [0, 2, 6]))
+                        @if(in_array($project->Count_Steps, [0, 2, 3, 4, 5, 6]))
                         @if($project->Count_Steps === 6)
                         @if(\Carbon\Carbon::now()->gt(\Carbon\Carbon::parse($project->End_Time)))
                         <form action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
@@ -353,6 +452,23 @@ Carbon::setLocale('th');
                         <a href="{{ route('projects.edit', ['id' => $project->Id_Project ]) }}" class="btn btn-warning">
                             <i class='bx bx-edit'></i> แก้ไขฟอร์ม
                         </a>
+                        @elseif($project->Count_Steps === 3 && $project->approvals->first()->Status === 'N')
+                        <a href="{{ route('projects.edit', ['id' => $project->Id_Project ]) }}" class="btn btn-warning">
+                            <i class='bx bx-edit'></i> แก้ไขฟอร์ม
+                        </a>
+                        @elseif($project->Count_Steps === 4 && $project->approvals->first()->Status === 'N')
+                        <a href="{{ route('projects.edit', ['id' => $project->Id_Project ]) }}" class="btn btn-warning">
+                            <i class='bx bx-edit'></i> แก้ไขฟอร์ม
+                        </a>
+                        @elseif($project->Count_Steps === 5 && $project->approvals->first()->Status === 'N')
+                        <a href="{{ route('projects.edit', ['id' => $project->Id_Project ]) }}" class="btn btn-warning">
+                            <i class='bx bx-edit'></i> แก้ไขฟอร์ม
+                        </a>
+                        @else
+                        @if(in_array($project->Count_Steps, [3, 4, 5]) && $project->approvals->first()->Status === 'I')
+                        <button type="button" class="btn btn-secondary" disabled>
+                            <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
+                        </button>
                         @else
                         <form action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
                             method="POST" style="display:inline;">
@@ -361,6 +477,7 @@ Carbon::setLocale('th');
                                 <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
                             </button>
                         </form>
+                        @endif
                         @endif
                         @endif
                         @elseif($project->Count_Steps === 9)
@@ -384,6 +501,7 @@ Carbon::setLocale('th');
     @endif
     @endforeach
 
+    @if(session()->get('employee')->IsAdmin === 'Y')
     @foreach ($quartersByFiscalYear as $fiscalYear => $yearQuarters)
     @foreach ($yearQuarters->sortBy('Quarter') as $quarter)
     @php
@@ -568,11 +686,22 @@ Carbon::setLocale('th');
                                         @endforeach
                                     </td>
                                     <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        {!! $Project->Success_Indicators ? nl2br(e($Project->Success_Indicators)) : '-'
-                                        !!}
+                                        @if($Project->successIndicators->isNotEmpty())
+                                        @foreach($Project->successIndicators as $index => $indicator)
+                                        - {!! nl2br(e($indicator->Description_Indicators)) !!}<br>
+                                        @endforeach
+                                        @else
+                                        -
+                                        @endif
                                     </td>
                                     <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}">
-                                        {!! $Project->Value_Target ? nl2br(e($Project->Value_Target)) : '-' !!}
+                                        @if($Project->valueTargets->isNotEmpty())
+                                        @foreach($Project->valueTargets as $index => $target)
+                                        - {!! nl2br(e($target->Value_Target)) !!}<br>
+                                        @endforeach
+                                        @else
+                                        -
+                                        @endif
                                     </td>
                                     <td class="{{ $isStatusN && !$isStatusI ? 'text-gray' : '' }}"
                                         style="text-align: center;">
@@ -653,6 +782,7 @@ Carbon::setLocale('th');
     @endif
     @endforeach
     @endforeach
+    @endif
 
 </div>
 
@@ -673,6 +803,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 projectStatus.style.maxHeight = projectStatus.scrollHeight + 'px';
                 projectStatus.classList.add('show');
                 toggleIcon.classList.add('rotate');
+            }
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[id^="employee_id-"]').forEach(function(selectElement) {
+        selectElement.addEventListener('change', function() {
+            const formId = this.id.replace('employee_id-', 'updateEmployeeForm-');
+            document.getElementById(formId).submit();
+            alert('ชื่อผู้รับผิดชอบมีการแก้ไขแล้ว');
+        });
+
+        const formId = selectElement.id.replace('employee_id-', 'updateEmployeeForm-');
+        document.getElementById(formId).addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                this.submit();
+                alert('ชื่อผู้รับผิดชอบมีการแก้ไขแล้ว');
             }
         });
     });

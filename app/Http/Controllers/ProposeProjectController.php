@@ -13,6 +13,7 @@ use App\Models\ApproveModel;
 use App\Models\RecordHistory;
 use App\Models\SDGsModel;
 use App\Models\StrategicObjectivesModel;
+use App\Models\EmployeeModel;
 use Carbon\Carbon;
 
 class ProposeProjectController extends Controller
@@ -28,11 +29,13 @@ class ProposeProjectController extends Controller
                 $projectsQuery->where('Employee_Id', $employee->Id_Employee);
             }
     
-            $projects = $projectsQuery->whereIn('Count_Steps', [0, 1, 2, 3, 4, 5, 6, 8, 9])
+            $projects = $projectsQuery->whereIn('Count_Steps', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
                 ->with(['approvals.recordHistory', 'employee'])
                 ->get();
     
             $countStepsZero = $projects->where('Count_Steps', 0)->count();
+
+            $employees = EmployeeModel::all(); 
     
             foreach ($projects as $project) {
                 $employeeData = $project->employee;
@@ -258,7 +261,7 @@ class ProposeProjectController extends Controller
                 }
             }
     
-            return view('proposeProject', compact('projects', 'countStepsZero', 'quarters', 'filteredStrategics', 'approvals', 'strategies', 'incompleteStrategies', 'allStrategiesComplete', 'hasProjectsToPropose', 'hasStatusN', 'quarterStyles', 'quartersByFiscalYear', 'strategicName', 'logData'));
+            return view('proposeProject', compact('projects', 'countStepsZero', 'quarters', 'filteredStrategics', 'approvals', 'strategies', 'incompleteStrategies', 'allStrategiesComplete', 'hasProjectsToPropose', 'hasStatusN', 'quarterStyles', 'quartersByFiscalYear', 'strategicName', 'logData', 'employees'));
         } else {
             return redirect()->back()->with('error', 'You are not authorized to view these projects.');
         }
@@ -526,6 +529,15 @@ class ProposeProjectController extends Controller
         $approval->save();
 
         return redirect()->route('proposeProject')->with('success', 'Project status updated successfully.');
+    }
+
+    public function updateEmployee(Request $request, $id)
+    {
+        $project = ListProjectModel::findOrFail($id);
+        $project->Employee_Id = $request->input('employee_id');
+        $project->save();
+    
+        return redirect()->back()->with('success', 'อัปเดตผู้รับผิดชอบเรียบร้อยแล้ว');
     }
 
 

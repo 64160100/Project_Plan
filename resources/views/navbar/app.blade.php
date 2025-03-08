@@ -223,7 +223,8 @@
                         @endif
                         @endif
 
-                        @if($employee->IsAdmin === 'Y' || $employee->IsManager === 'Y')
+                        @if($employee->IsAdmin === 'Y' || $employee->IsManager === 'Y' || $employee->IsResponsible ===
+                        'Y')
                         @if(!$renderedItems['propose_project'])
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('proposeProject') }}">

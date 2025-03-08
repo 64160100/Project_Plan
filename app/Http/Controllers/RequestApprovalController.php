@@ -183,6 +183,8 @@ class RequestApprovalController extends Controller
         } else {
             Log::warning('No employee data found in session.');
         }
+
+        log::info($approvals);
     
         return view('requestApproval', compact('approvals', 'employee', 'strategics', 'logData'));
     }

@@ -156,7 +156,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ====== ตัวชี้วัดความสำเร็จของโครงการ =======
 document.addEventListener('DOMContentLoaded', function() {
     const successIndicatorsCheckbox = document.getElementById('Success_Indicators_Other_Checkbox');
     const successIndicatorsSelect = document.getElementById('Success_Indicators');
@@ -208,7 +207,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 form.appendChild(hiddenInput);
                 successIndicatorsOther.disabled = false;
             } else if (successIndicatorsSelect) {
-                const selectedOption = successIndicatorsSelect.options[successIndicatorsSelect.selectedIndex];
+                const selectedOption = successIndicatorsSelect.options[successIndicatorsSelect
+                    .selectedIndex];
                 if (selectedOption) {
                     const hiddenInput = document.createElement('input');
                     hiddenInput.type = 'hidden';
@@ -242,6 +242,212 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// ====== ตัวชี้วัดความสำเร็จของโครงการ =======
+document.addEventListener('DOMContentLoaded', function() {
+    // ปุ่มสลับการกรอกตัวชี้วัดด้วยตนเอง
+    document.getElementById('toggleIndicatorInput').addEventListener('click', function() {
+        const selectElement = document.getElementById('Success_Indicators');
+        const textareaElement = document.getElementById('Success_Indicators_Other');
+
+        if (textareaElement.style.display === 'none') {
+            // แสดง textarea และซ่อน select
+            textareaElement.style.display = 'block';
+            selectElement.disabled = true;
+            this.innerHTML = '<i class="bx bx-x"></i> ยกเลิกการกรอกด้วยตนเอง';
+        } else {
+            // ซ่อน textarea และแสดง select
+            textareaElement.style.display = 'none';
+            selectElement.disabled = false;
+            this.innerHTML = '<i class="bx bx-edit"></i> กรอกตัวชี้วัดด้วยตนเอง';
+        }
+    });
+
+    // ปุ่มสลับการกรอกค่าเป้าหมายด้วยตนเอง
+    document.getElementById('toggleTargetInput').addEventListener('click', function() {
+        const selectElement = document.getElementById('Value_Target');
+        const textareaElement = document.getElementById('Value_Target_Other');
+
+        if (textareaElement.style.display === 'none') {
+            // แสดง textarea และซ่อน select
+            textareaElement.style.display = 'block';
+            selectElement.disabled = true;
+            this.innerHTML = '<i class="bx bx-x"></i> ยกเลิกการกรอกด้วยตนเอง';
+        } else {
+            // ซ่อน textarea และแสดง select
+            textareaElement.style.display = 'none';
+            selectElement.disabled = false;
+            this.innerHTML = '<i class="bx bx-edit"></i> กรอกค่าเป้าหมายด้วยตนเอง';
+        }
+    });
+
+    // เมื่อเลือกตัวชี้วัด ให้เติมค่าเป้าหมายอัตโนมัติ
+    document.getElementById('Success_Indicators').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const targetValue = selectedOption.getAttribute('data-target-value');
+
+        if (targetValue) {
+            // เคลียร์ตัวเลือกค่าเป้าหมายเดิม
+            const targetSelect = document.getElementById('Value_Target');
+            targetSelect.innerHTML = '<option value="" disabled>กรอกค่าเป้าหมาย</option>';
+
+            // เพิ่มค่าเป้าหมายใหม่
+            const newOption = document.createElement('option');
+            newOption.value = targetValue;
+            newOption.text = targetValue;
+            newOption.selected = true;
+            targetSelect.appendChild(newOption);
+        }
+    });
+
+    // เพิ่มตัวชี้วัดและค่าเป้าหมายใหม่
+    document.getElementById('addIndicatorBtn').addEventListener('click', function() {
+        let indicatorValue, targetValue, targetType;
+
+        // รับค่าตัวชี้วัด
+        const indicatorTextarea = document.getElementById('Success_Indicators_Other');
+        const indicatorSelect = document.getElementById('Success_Indicators');
+
+        if (indicatorTextarea.style.display !== 'none' && indicatorTextarea.value.trim() !== '') {
+            indicatorValue = indicatorTextarea.value;
+        } else if (!indicatorSelect.disabled && indicatorSelect.selectedIndex > 0) {
+            indicatorValue = indicatorSelect.options[indicatorSelect.selectedIndex].text;
+        } else {
+            alert('กรุณาเลือกหรือกรอกตัวชี้วัดความสำเร็จ');
+            return;
+        }
+
+        // รับค่าเป้าหมาย
+        const targetTextarea = document.getElementById('Value_Target_Other');
+        const targetSelect = document.getElementById('Value_Target');
+
+        if (targetTextarea.style.display !== 'none' && targetTextarea.value.trim() !== '') {
+            targetValue = targetTextarea.value;
+            targetType = 'manual';
+        } else if (!targetSelect.disabled && targetSelect.selectedIndex > 0) {
+            targetValue = targetSelect.options[targetSelect.selectedIndex].text;
+            targetType = 'selected';
+        } else {
+            alert('กรุณาเลือกหรือกรอกค่าเป้าหมาย');
+            return;
+        }
+
+        // สร้างรายการตัวชี้วัดใหม่จาก template
+        const template = document.getElementById('indicatorItemTemplate').innerHTML;
+        const newId = Date.now(); // ใช้เวลาปัจจุบันเป็น ID ชั่วคราว
+
+        let newIndicatorHtml = template
+            .replace('__ID__', newId)
+            .replace('__INDICATOR__', indicatorValue)
+            .replace('__INDICATOR__', indicatorValue)
+            .replace('__TARGET__', targetValue)
+            .replace('__TARGET__', targetValue)
+            .replace('__TARGET_TYPE__', targetType);
+
+        // เพิ่มรายการใหม่เข้าไปใน container
+        document.getElementById('indicatorsContainer').insertAdjacentHTML('beforeend', newIndicatorHtml);
+
+        // เพิ่ม event listener สำหรับปุ่มลบ
+        document.querySelectorAll('.delete-indicator[data-id="' + newId + '"]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                this.closest('.indicator-item').remove();
+            });
+        });
+
+        // รีเซ็ตฟอร์ม
+        resetIndicatorForm();
+    });
+
+    // ติดตั้ง event listener สำหรับปุ่มลบที่มีอยู่แล้ว
+    document.querySelectorAll('.delete-indicator').forEach(function(button) {
+        button.addEventListener('click', function() {
+            this.closest('.indicator-item').remove();
+        });
+    });
+
+    // ฟังก์ชันรีเซ็ตฟอร์ม
+    function resetIndicatorForm() {
+        // รีเซ็ตตัวชี้วัด
+        document.getElementById('Success_Indicators').selectedIndex = 0;
+        document.getElementById('Success_Indicators').disabled = false;
+        document.getElementById('Success_Indicators_Other').value = '';
+        document.getElementById('Success_Indicators_Other').style.display = 'none';
+        document.getElementById('toggleIndicatorInput').innerHTML = '<i class="bx bx-edit"></i> กรอกตัวชี้วัดด้วยตนเอง';
+
+        // รีเซ็ตค่าเป้าหมาย
+        document.getElementById('Value_Target').innerHTML = '<option value="" disabled selected>กรอกค่าเป้าหมาย</option>';
+        document.getElementById('Value_Target').disabled = false;
+        document.getElementById('Value_Target_Other').value = '';
+        document.getElementById('Value_Target_Other').style.display = 'none';
+        document.getElementById('toggleTargetInput').innerHTML = '<i class="bx bx-edit"></i> กรอกค่าเป้าหมายด้วยตนเอง';
+    }
+    
+    // เพิ่มการตรวจสอบก่อนส่งฟอร์ม
+    document.querySelector('form').addEventListener('submit', function(event) {
+        // ตรวจสอบว่ามีการกรอกข้อมูลในฟอร์มตัวชี้วัดแต่ยังไม่ได้กดปุ่มเพิ่ม
+        const indicatorSelect = document.getElementById('Success_Indicators');
+        const indicatorTextarea = document.getElementById('Success_Indicators_Other');
+        const targetSelect = document.getElementById('Value_Target');
+        const targetTextarea = document.getElementById('Value_Target_Other');
+        
+        // ตรวจสอบว่ามีการกรอกข้อมูลตัวชี้วัด (ทั้งจาก select หรือ textarea)
+        let hasIndicatorValue = false;
+        let indicatorValue = '';
+        
+        if ((indicatorSelect.selectedIndex > 0 && !indicatorSelect.disabled)) {
+            hasIndicatorValue = true;
+            indicatorValue = indicatorSelect.options[indicatorSelect.selectedIndex].text;
+        } else if (indicatorTextarea.style.display !== 'none' && indicatorTextarea.value.trim() !== '') {
+            hasIndicatorValue = true;
+            indicatorValue = indicatorTextarea.value.trim();
+        }
+        
+        // ตรวจสอบว่ามีการกรอกข้อมูลค่าเป้าหมาย (ทั้งจาก select หรือ textarea)
+        let hasTargetValue = false;
+        let targetValue = '';
+        
+        if ((targetSelect.selectedIndex > 0 && !targetSelect.disabled)) {
+            hasTargetValue = true;
+            targetValue = targetSelect.options[targetSelect.selectedIndex].text;
+        } else if (targetTextarea.style.display !== 'none' && targetTextarea.value.trim() !== '') {
+            hasTargetValue = true;
+            targetValue = targetTextarea.value.trim();
+        }
+        
+        // ถ้ามีการกรอกทั้งตัวชี้วัดและค่าเป้าหมาย แต่ยังไม่ได้กดปุ่มเพิ่ม
+        if (hasIndicatorValue && hasTargetValue) {
+            event.preventDefault(); // หยุดการส่งฟอร์ม
+            
+            if (confirm('คุณได้กรอกข้อมูลตัวชี้วัดและค่าเป้าหมายแล้ว แต่ยังไม่ได้กดปุ่ม "เพิ่มตัวชี้วัดและค่าเป้าหมาย" ต้องการเพิ่มข้อมูลนี้ก่อนบันทึกหรือไม่?')) {
+                // กดปุ่มเพิ่มตัวชี้วัดให้อัตโนมัติ
+                document.getElementById('addIndicatorBtn').click();
+                
+                // ส่งฟอร์มหลังจากเพิ่มตัวชี้วัด
+                setTimeout(() => {
+                    // ล้างค่าฟอร์มเพื่อไม่ให้ส่งไปพร้อมกับ indicators[] และ targets[]
+                    document.getElementById('Success_Indicators_Other').value = '';
+                    document.getElementById('Value_Target_Other').value = '';
+                    
+                    this.submit();
+                }, 300);
+            } else {
+                // ล้างค่าฟอร์มเพื่อไม่ให้ส่งไปพร้อมกับ indicators[] และ targets[]
+                document.getElementById('Success_Indicators_Other').value = '';
+                document.getElementById('Value_Target_Other').value = '';
+                
+                this.submit();
+            }
+        } else if (hasIndicatorValue || hasTargetValue) {
+            // ถ้ากรอกเพียงบางส่วน
+            event.preventDefault();
+            alert('กรุณากรอกทั้งตัวชี้วัดและค่าเป้าหมายให้ครบถ้วน');
+        } else {
+            // ถ้าทั้งคู่ว่าง ก็ล้างค่าเพื่อไม่ให้ส่งไปที่ server
+            document.getElementById('Success_Indicators_Other').value = '';
+            document.getElementById('Value_Target_Other').value = '';
+        }
+    });
+});
+
 // Set up initial values when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Initial setup for date type selection
@@ -253,6 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.detailsContainer').forEach(container => updateRemoveButtons(container));
     updateFormTitles();
 });
+
 
 document.addEventListener('DOMContentLoaded', function() {
     // Get the search input and results list elements

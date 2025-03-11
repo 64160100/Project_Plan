@@ -21,6 +21,46 @@ Carbon::setLocale('th');
         font-weight: bold;
         src: url('<?php echo e(storage_path('fonts/THSarabunNew Bold.ttf')); ?>') format('truetype');
     }
+
+    .project-status-badge {
+        margin-left: 10px;
+    }
+
+    .project-status-badge .badge {
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 4px;
+    }
+
+    .badge-warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+
+    .badge-info {
+        background-color: #17a2b8;
+        color: #fff;
+    }
+
+    .badge-primary {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .badge-success {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .badge-danger {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    .badge-orange {
+        background-color: #fd7e14;
+        color: #fff;
+    }
     </style>
 </head>
 
@@ -33,10 +73,65 @@ Carbon::setLocale('th');
     <div class="outer-container">
         <div class="container">
             <div class="header">
-                <div class="project-title"><?php echo e($project->Name_Project); ?></div>
-                <div class="project-subtitle">
-                    <?php echo e($project->employee->department->Name_Department ?? 'ยังไม่มีผู้รับผิดชอบโครงการ'); ?>
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <div class="project-title"><?php echo e($project->Name_Project); ?></div>
+                        <div class="project-subtitle">
+                            <?php echo e($project->departmentName ?? 'ยังไม่มีผู้รับผิดชอบโครงการ'); ?>
 
+                        </div>
+                    </div>
+                    <div class="project-status-badge">
+                        <?php
+                        $statusText = '';
+                        $statusClass = '';
+
+                        if ($project->Count_Steps === 0) {
+                        $statusText = 'รอการเสนอ';
+                        $statusClass = 'badge-warning';
+                        } elseif ($project->Count_Steps === 1) {
+                        $statusText = 'รอการพิจารณาจากผู้อำนวยการ';
+                        $statusClass = 'badge-info';
+                        } elseif ($project->Count_Steps === 2) {
+                        if ($project->approvals->first()->Status === 'I') {
+                        $statusText = 'รอการเสนอโครงการ';
+                        } elseif ($project->approvals->first()->Status === 'Y') {
+                        $statusText = 'รอกรอกข้อมูล';
+                        }
+                        $statusClass = 'badge-orange';
+                        } elseif ($project->Count_Steps === 3) {
+                        $statusText = 'รอพิจารณางบประมาณ';
+                        $statusClass = 'badge-info';
+                        } elseif ($project->Count_Steps === 4) {
+                        $statusText = 'รอพิจารณาจากหัวหน้าฝ่าย';
+                        $statusClass = 'badge-info';
+                        } elseif ($project->Count_Steps === 5) {
+                        $statusText = 'รอการพิจารณาจากผู้อำนวยการ';
+                        $statusClass = 'badge-info';
+                        } elseif ($project->Count_Steps === 6) {
+                        $statusText = 'อยู่ระหว่างดำเนินการ';
+                        $statusClass = 'badge-orange';
+                        } elseif ($project->Count_Steps === 7) {
+                        $statusText = 'รอพิจารณาจากหัวหน้าฝ่าย';
+                        $statusClass = 'badge-info';
+                        } elseif ($project->Count_Steps === 8) {
+                        $statusText = 'รอการพิจารณาจากผู้อำนวยการ';
+                        $statusClass = 'badge-info';
+                        } elseif ($project->Count_Steps === 9) {
+                        $statusText = 'เสร็จสิ้น';
+                        $statusClass = 'badge-success';
+                        } elseif ($project->Count_Steps === 11) {
+                        $statusText = 'ล่าช้า';
+                        $statusClass = 'badge-danger';
+                        }
+
+                        if ($project->approvals->isNotEmpty() && $project->approvals->first()->Status === 'N') {
+                        $statusText = 'ไม่อนุมัติ';
+                        $statusClass = 'badge-danger';
+                        }
+                        ?>
+                        <span class="badge <?php echo e($statusClass); ?>"><?php echo e($statusText); ?></span>
+                    </div>
                 </div>
                 <div class="project-info">
                     <div class="info-item">
@@ -246,8 +341,12 @@ Carbon::setLocale('th');
                             <i class='bx bx-envelope' style="width: 40px;"></i>
                             <div>
                                 <div class="status-text">
+                                    <?php if($history->Status_Record === 'N'): ?>
+                                    ไม่อนุมัติโครงการ
+                                    <?php else: ?>
                                     <?php echo e($history->comment ?? 'No Comment'); ?>
 
+                                    <?php endif; ?>
                                 </div>
                                 <div class="status-text">
                                     อนุมัติโดย: <?php echo e($history->Name_Record ?? 'Unknown'); ?>
@@ -291,14 +390,14 @@ Carbon::setLocale('th');
                                 <div class="status-text">
                                     <?php if($project->Count_Steps === 0): ?>
                                     <div class="status-text">
-                                        ขั้นตอนที่ 1: เริ่มต้นการเสนอโครงการ
+                                        เริ่มต้นการเสนอโครงการ
                                     </div>
                                     <div class="status-text">
                                         ถึง: ผู้อำนวยการพิจารณาเบื้องต้น
                                     </div>
                                     <?php elseif($project->Count_Steps === 1): ?>
                                     <div class="status-text">
-                                        ขั้นตอนที่ 2: อยู่ระหว่างการพิจารณาเบื้องต้น
+                                        อยู่ระหว่างการพิจารณาเบื้องต้น
                                     </div>
                                     <div class="status-text">
                                         สถานะ: รอการพิจารณาจากผู้อำนวยการ
@@ -311,14 +410,14 @@ Carbon::setLocale('th');
                                     <?php else: ?>
                                     <?php if($project->Status_Budget === 'N'): ?>
                                     <div class="status-text">
-                                        ขั้นตอนที่ 3: การพิจารณาโดยหัวหน้าฝ่าย
+                                        การพิจารณาโดยหัวหน้าฝ่าย
                                     </div>
                                     <div class="status-text">
                                         สถานะ: อยู่ระหว่างการพิจารณาโดยหัวหน้าฝ่าย
                                     </div>
                                     <?php else: ?>
                                     <div class="status-text">
-                                        ขั้นตอนที่ 3: การพิจารณาด้านงบประมาณ
+                                        การพิจารณาด้านงบประมาณ
                                     </div>
                                     <div class="status-text">
                                         ถึง: ฝ่ายการเงินตรวจสอบงบประมาณ
@@ -327,28 +426,28 @@ Carbon::setLocale('th');
                                     <?php endif; ?>
                                     <?php elseif($project->Count_Steps === 3): ?>
                                     <div class="status-text">
-                                        ขั้นตอนที่ 4: การตรวจสอบความเหมาะสมด้านงบประมาณ
+                                        ตรวจสอบความเหมาะสมด้านงบประมาณ
                                     </div>
                                     <div class="status-text">
                                         สถานะ: อยู่ระหว่างการตรวจสอบโดยฝ่ายการเงิน
                                     </div>
                                     <?php elseif($project->Count_Steps === 4): ?>
                                     <div class="status-text">
-                                        ขั้นตอนที่ 5: การพิจารณาโดยหัวหน้าฝ่าย
+                                        การพิจารณาโดยหัวหน้าฝ่าย
                                     </div>
                                     <div class="status-text">
                                         สถานะ: อยู่ระหว่างการตรวจสอบโดยหัวหน้าฝ่าย
                                     </div>
                                     <?php elseif($project->Count_Steps === 5): ?>
                                     <div class="status-text">
-                                        ขั้นตอนที่ 6: การพิจารณาขั้นสุดท้าย
+                                        การพิจารณาโดยผู้อำนวยการ
                                     </div>
                                     <div class="status-text">
                                         สถานะ: อยู่ระหว่างการพิจารณาโดยผู้อำนวยการ
                                     </div>
                                     <?php elseif($project->Count_Steps === 6): ?>
                                     <div class="status-text">
-                                        ขั้นตอนที่ 7: การดำเนินโครงการ
+                                        การดำเนินโครงการ
                                     </div>
                                     <?php if(\Carbon\Carbon::now()->lte(\Carbon\Carbon::parse($project->End_Time))): ?>
                                     <div class="status-text text-success">
@@ -361,21 +460,21 @@ Carbon::setLocale('th');
                                     <?php endif; ?>
                                     <?php elseif($project->Count_Steps === 7): ?>
                                     <div class="status-text">
-                                        ขั้นตอนที่ 8: การตรวจสอบผลการดำเนินงาน
+                                        การตรวจสอบผลการดำเนินงาน
                                     </div>
                                     <div class="status-text">
                                         สถานะ: รอการตรวจสอบจากหัวหน้าฝ่าย
                                     </div>
                                     <?php elseif($project->Count_Steps === 8): ?>
                                     <div class="status-text">
-                                        ขั้นตอนที่ 9: การรับรองผลการดำเนินงาน
+                                        การรับรองผลการดำเนินงาน
                                     </div>
                                     <div class="status-text">
                                         สถานะ: รอการรับรองจากผู้อำนวยการ
                                     </div>
                                     <?php elseif($project->Count_Steps === 9): ?>
                                     <div class="status-text">
-                                        ขั้นตอนที่ 10: การปิดโครงการ
+                                        ปิดโครงการ
                                     </div>
                                     <div class="status-text">
                                         สถานะ: ดำเนินการเสร็จสิ้นสมบูรณ์

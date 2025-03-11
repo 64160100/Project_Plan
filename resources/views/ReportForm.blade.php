@@ -8,6 +8,8 @@ Carbon::setLocale('th');
 <head>
     <meta charset="UTF-8">
     <title>แบบรายงานผลการดำเนินงานโครงการ</title>
+    <link rel="stylesheet" href="{{ asset('css/reportResult.css') }}">
+
     <style>
     * {
         font-family: 'Sarabun', sans-serif;
@@ -29,8 +31,7 @@ Carbon::setLocale('th');
     }
 
     .header img {
-        max-width: 250px;
-        /* Increase the max-width to make the logo larger */
+        max-width: 250px; /* Increase the max-width to make the logo larger */
         margin-bottom: 20px;
     }
 
@@ -175,37 +176,79 @@ Carbon::setLocale('th');
             <div class="section-title">1. ข้อมูลโครงการ</div>
             <div class="form-group">
                 <label>ชื่อโครงการ:</label>
-                <input type="text" class="form-control" value="{{ $project->Name_Project }}">
+                <input type="text" class="form-control" value="{{ $project->Name_Project }}" readonly>
             </div>
+            
+        </div>
+
+        <div class="section">
+            <div class="section-title">2. ผู้รับผิดชอบโครงการ</div>
             <div class="form-group">
                 <label>ผู้รับผิดชอบโครงการ:</label>
-                <input type="text" class="form-control"
-                    value="{{ $project->employee ? $project->employee->Firstname . ' ' . $project->employee->Lastname : '' }}">
             </div>
         </div>
 
+
         <div class="section">
-            <div class="section-title">2. วัตถุประสงค์</div>
+            <div class="section-title">3. วัตถุประสงค์</div>
             <div class="form-group">
                 <textarea class="form-control"
-                    placeholder="ระบุวัตถุประสงค์ของโครงการ">{{ $project->Objective_Project }}</textarea>
+                rows="5"
+                 style="resize: vertical !important; min-height: 100px !important; max-height: 500px !important;"
+                placeholder="ระบุวัตถุประสงค์ของโครงการ" readonly>{{ $project->Objective_Project }}</textarea>
             </div>
         </div>
 
         <div class="section">
-            <div class="section-title">3. รายละเอียดการดำเนินงาน</div>
+            <div class="section-title">4. กลุ่มเป้าหมาย</div>
             <div class="form-group">
                 <label>กลุ่มเป้าหมาย:</label>
-                <input type="text" class="form-control" value="{{ $project->Target_Group }}">
+                @foreach($project->targets as $target)
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" class="form-control mt-2" value="{{ $target->Name_Target }}" style="flex: 2;" readonly>
+                    <input type="text" class="form-control mt-2" value="{{ $target->Quantity_Target }}" style="flex: 1; text-align: center;" readonly>
+                    <input type="text" class="form-control mt-2" value="{{ $target->Unit_Target }}" style="flex: 1;" readonly>
+                </div>
+                @endforeach
             </div>
+
             <div class="form-group">
-                <label>ระยะเวลาดำเนินงาน:</label>
-                <input type="text" class="form-control" value="{{ $project->Duration }}">
+                <label>พื้นที่/ชุมชนเป้าหมาย (ถ้ามี ระบุ)</label>
+                <div>
+                    @foreach($project->targets as $target)
+                        @foreach($target->targetDetails as $detail)
+                            <input type="text" class="form-control" value="{{ $detail->Details_Target }}" style="flex: 1;" readonly>  
+                        @endforeach
+                    @endforeach
+                </div>
+                
             </div>
+            
+        </div>
+
+        <div class="section">
+            <div class="section-title">5. ระยะเวลาดำเนินงาน</div>
+            <div class="form-group">
+                <label>ระยะเวลาดำเนินงาน</label><br>
+                <div>วันที่เริ่มต้น:</div>
+                <input type="text" class="form-control mb-2" value="{{ $project->First_Time }}" readonly>
+                <div>วันที่สิ้นสุด:</div>
+                <input type="text" class="form-control mb-2" value="{{ $project->End_Time }}" readonly>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">6. สถานที่ดำเนินงาน</div>
             <div class="form-group">
                 <label>สถานที่ดำเนินงาน:</label>
-                <input type="text" class="form-control" value="{{ $project->Location }}">
+                @foreach($project->locations as $location)
+                    <input type="text" class="form-control" value="{{ $location->Name_Location }}" readonly><br>
+                @endforeach
             </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">7. วิทยากร</div>
             <div class="form-group">
                 <label>วิทยากร:</label>
                 <input type="text" class="form-control" value="{{ $project->Speaker }}">
@@ -213,94 +256,133 @@ Carbon::setLocale('th');
         </div>
 
         <div class="section">
-            <div class="section-title">4. ตัวชี้วัดความสำเร็จ</div>
-            <div class="subsection">
-                <h4>ตัวชี้วัดเชิงปริมาณ</h4>
-                <textarea class="form-control">{{ $project->Quantitative_Indicators }}</textarea>
-            </div>
-            <div class="subsection">
-                <h4>ตัวชี้วัดเชิงคุณภาพ</h4>
-                <textarea class="form-control">{{ $project->Qualitative_Indicators }}</textarea>
-            </div>
-        </div>
+        <div class="section-title">8. รูปแบบกิจกรรมการดำเนินงาน</div>
+        <b>วิธีการดำเนินงาน</b><br>
+        <p> 
+            @foreach($project->shortProjects as $shortProject)
+                
+                    {{ $loop->iteration }}. {{ $shortProject->Details_Short_Project }}<br>
+            @endforeach
+        </p>
 
-        <div class="section">
-            <div class="section-title">5. สรุปผลการดำเนินงาน</div>
-            <div class="form-group">
-                <textarea class="form-control" rows="6">{{ $project->Summary }}</textarea>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>กิจกรรม</th>
-                            <th>วันที่จัด</th>
-                            <th>สถานที่</th>
-                            <th>จำนวนผู้เข้าร่วม</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if($project->supProjects)
-                        @foreach($project->supProjects as $activity)
-                        <tr>
-                            <td>{{ $activity->Name }}</td>
-                            <td>{{ $activity->Date }}</td>
-                            <td>{{ $activity->Location }}</td>
-                            <td>{{ $activity->Participants }}</td>
-                        </tr>
+        <p><b>ขั้นตอนและแผนการดำเนินงาน(PDCA)</b><br></p>
+        <!-- โครงการระยะยาว -->
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2" style="width: 35%; line-height: 0.6; text-align: center; vertical-align: middle;" >กิจกรรมและแผนการเบิกจ่ายงบประมาณ</th>
+                    <th colspan="12" style="text-align: center; vertical-align: middle;">
+                        <span>ปีงบประมาณ พ.ศ.</span>
+                        @php
+                            $uniqueYears = $quarterProjects->pluck('quarterProject.Fiscal_Year')->unique();
+                        @endphp
+
+                        @foreach($uniqueYears as $year)
+                            <span>{{ $year }}</span>
                         @endforeach
-                        @else
-                        <tr>
-                            <td colspan="4">No activities found.</td>
-                        </tr>
+                    </th>
+                </tr>
+                <tr>
+                    @foreach($months as $month)
+                        <th style="text-align: center; vertical-align: middle; min-width: 80px;">{{ $month }}</th>
+                    @endforeach
+                </tr>
+            </thead>
+            <tbody>
+                
+
+                
+            </tbody>
+        </table>
+
+        </div>
+
+
+        <div class="section">
+            <div class="section-title">9. ตัวชี้วัดความสำเร็จ</div>
+
+            @if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Quantitative')->isNotEmpty())
+                <label><b>เชิงปริมาณ</b></label>
+                @foreach($project->projectHasIndicators as $projectIndicator)
+                    @if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Quantitative')
+                        <input type="text" class="form-control mb-2" value="{{ $projectIndicator->Details_Indicators }}" readonly>
+                    @endif
+                @endforeach
+            @endif
+
+            @if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Qualitative')->isNotEmpty())
+                <label class="mt-3"><b>เชิงคุณภาพ</b></label>
+                @foreach($project->projectHasIndicators as $projectIndicator)
+                    @if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Qualitative')
+                        <input type="text" class="form-control mb-2" value="{{ $projectIndicator->Details_Indicators }}" readonly>
+                    @endif
+                @endforeach
+            @endif
+        </div>
+
+        <div class="section">
+            <div class="section-title">10. สรุปผลการดำเนินงาน</div>
+                <div class="form-group">
+                    <textarea class="form-control" rows="15">{{ $project->Summary }}</textarea>
+                </div>
+
+            <div class="section-title">ผลสำเร็จตามตัวชี้วัดของโครงการ</div>
+                @if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Quantitative')->isNotEmpty())
+                    <label><b>ตัวชี้วัดเชิงปริมาณ</b></label>
+                    @foreach($project->projectHasIndicators as $projectIndicator)
+                        @if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Quantitative')
+                            <input type="text" class="form-control mb-2" value="{{ $projectIndicator->Details_Indicators }}" readonly>
                         @endif
-                    </tbody>
-                </table>
-            </div>
+                    @endforeach
+                @endif
+
+                @if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Qualitative')->isNotEmpty())
+                    <label class="mt-3"><b>ตัวชี้วัดเชิงคุณภาพ</b></label>
+                    @foreach($project->projectHasIndicators as $projectIndicator)
+                        @if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Qualitative')
+                            <input type="text" class="form-control mb-2" value="{{ $projectIndicator->Details_Indicators }}" readonly>
+                        @endif
+                    @endforeach
+                @endif
+
+            <div class="section-title mt-3">การมีส่วนร่วมของหน่วยงานภายนอก/ชุมชน</div>
+                <div class="form-group">
+                    <textarea class="form-control">{{ $project->External_Participation }}</textarea>
+                </div>
+
+            <div class="section-title mt-3">งบประมาณ</div>
+                @if (!empty($project) && $project->Status_Budget == 'Y')
+                    <label>งบประมาณที่ใช้ทั้งสิ้น:</label>
+                    @foreach ($project->budgetForm as $budget)
+                        <input type="text" class="form-control" value="{{ $budget->Amount_Big }}">
+                    @endforeach
+                @else
+                    <div class="text-danger"><b>ไม่มีงบประมาณ</b></div>
+                @endif 
+
+            <div class="section-title mt-3">ข้อเสนอแนะ</div>
+                <div class="form-group">
+                    <textarea class="form-control">{{ $project->Suggestions }}</textarea>
+                </div>           
         </div>
 
-        <div class="section">
-            <div class="section-title">6. การมีส่วนร่วมของหน่วยงานภายนอก/ชุมชน</div>
-            <div class="form-group">
-                <textarea class="form-control">{{ $project->External_Participation }}</textarea>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">7. งบประมาณ</div>
-            <div class="form-group">
-                <label>งบประมาณที่ใช้ทั้งสิ้น:</label>
-                <input type="text" class="form-control" value="{{ $project->Budget }}">
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">8. ข้อเสนอแนะ</div>
-            <div class="form-group">
-                <textarea class="form-control">{{ $project->Suggestions }}</textarea>
-            </div>
-        </div>
 
         <div class="step-buttons">
-            <form id="complete-form" action="{{ route('projects.complete', ['id' => $project->Id_Project]) }}"
-                method="POST">
+            <form id="complete-form" action="{{ route('projects.complete', ['id' => $project->Id_Project]) }}" method="POST">
                 @csrf
-                <button type="submit" class="step-button primary" id="complete-button" data-step="ขั้นตอนที่ 1"
-                    {{ $project->approvals->first()->Status == 'Y' ? 'disabled' : '' }}>
+                <button type="submit" class="step-button primary" id="complete-button" data-step="ขั้นตอนที่ 1" {{ $project->approvals->first()->Status == 'Y' ? 'disabled' : '' }}>
                     <i class='bx bx-check-circle'></i> เสร็จสิ้น
                 </button>
             </form>
-            <form id="submit-form" action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}"
-                method="POST">
+            <form id="submit-form" action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}" method="POST">
                 @csrf
                 <input type="hidden" name="status" value="Y">
-                <button type="submit" class="step-button secondary" id="submit-button" data-step="ขั้นตอนที่ 2"
-                    {{ $project->approvals->first()->Status == 'Y' ? '' : 'disabled' }}>
+                <button type="submit" class="step-button secondary" id="submit-button" data-step="ขั้นตอนที่ 2" {{ $project->approvals->first()->Status == 'Y' ? '' : 'disabled' }}>
                     <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
                 </button>
             </form>
         </div>
-
+        
     </div>
 </div>
 

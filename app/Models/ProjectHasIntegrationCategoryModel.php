@@ -8,7 +8,7 @@ class ProjectHasIntegrationCategoryModel extends Model
 {
     protected $connection = 'mydb';
     protected $table = 'Project_has_Integration_Category';
-    protected $primaryKey = 'Project_Id ';
+    protected $primaryKey = 'Id_Project_has_Integration_Category';
     protected $keyType = 'int';
     public $timestamps = false;
 
@@ -17,6 +17,7 @@ class ProjectHasIntegrationCategoryModel extends Model
         'Integration_Category_Id',
         'Integration_Details'
     ];
+
 
     public function project()
     {

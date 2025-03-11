@@ -48,6 +48,7 @@ use App\Models\ExpenseModel;
 use App\Models\ExpenHasSubtopicBudgetModel;
 use App\Models\SuccessIndicatorsModel;
 use App\Models\ValueTargetModel;
+use App\Models\ObjectiveProjectModel;
 use Carbon\Carbon;
 
 class ListProjectController extends Controller
@@ -160,10 +161,10 @@ class ListProjectController extends Controller
         $projects = ListProjectModel::where('Strategic_Id', $strategicId)
             ->where('Name_Project', 'LIKE', "%{$query}%")
             ->with([
-                'successIndicators',  // ดึงข้อมูลตัวชี้วัด
-                'valueTargets',       // ดึงข้อมูลค่าเป้าหมาย
-                'employee',           // ดึงข้อมูลผู้รับผิดชอบ
-                'strategy'            // ดึงข้อมูลกลยุทธ์
+                'successIndicators',  
+                'valueTargets',       
+                'employee',           
+                'strategy'            
             ])
             ->select([
                 'Id_Project', 
@@ -171,37 +172,11 @@ class ListProjectController extends Controller
                 'Strategy_Id', 
                 'Employee_Id',
                 'Objective_Project', 
-                'Principles_Reasons'  // เพิ่มข้อมูลที่ต้องการดึงเพิ่มเติม
+                'Principles_Reasons' 
             ])
             ->get();
         
-        // บันทึก Log รายละเอียดของผลการค้นหา
-        Log::info('Search results returning to view:', [
-            'count' => $projects->count(),
-            'project_details' => $projects->map(function($project) {
-                return [
-                    'id' => $project->Id_Project,
-                    'name' => $project->Name_Project,
-                    'employee' => $project->employee ? ($project->employee->Firstname . ' ' . $project->employee->Lastname) : 'ไม่ระบุผู้รับผิดชอบ',
-                    'indicators_count' => $project->successIndicators->count(),
-                    'indicators_data' => $project->successIndicators->map(function($indicator) {
-                        return [
-                            'id' => $indicator->Id_Indicator,
-                            'description' => $indicator->Description_Indicators
-                        ];
-                    }),
-                    'targets_count' => $project->valueTargets->count(),
-                    'targets_data' => $project->valueTargets->map(function($target) {
-                        return [
-                            'id' => $target->Id_Value_Target,
-                            'value' => $target->Value_Target,
-                            'indicator_id' => $target->Indicator_Id
-                        ];
-                    })
-                ];
-            })
-        ]);
-        
+    
         return response()->json($projects);
     }
 
@@ -254,7 +229,6 @@ class ListProjectController extends Controller
         $project->Name_Project = $request->Name_Project;
         $project->Description_Project = $request->Description_Project ?? null;
         $project->Employee_Id = $request->employee_id ?? null;
-        $project->Objective_Project = $request->Objective_Project ?? $request->Objective_Project_Other ?? null;
         $project->Principles_Reasons = $request->Principles_Reasons ?? null;
         $project->Project_type = $request->Project_Type ?? null;
         $project->Status_Budget = $request->Status_Budget ?? null;
@@ -412,24 +386,25 @@ class ListProjectController extends Controller
             }
 
             if ($request->has('indicators') && is_array($request->indicators) && 
-                $request->has('targets') && is_array($request->targets) && 
-                $request->has('target_types') && is_array($request->target_types)) {
-                
-                foreach ($request->indicators as $index => $indicatorText) {
-                    if (!empty($indicatorText) && isset($request->targets[$index]) && !empty($request->targets[$index]) && isset($request->target_types[$index])) {
-                        // สร้างตัวชี้วัด
-                        $indicator = new SuccessIndicatorsModel();
-                        $indicator->Project_Id = $project->Id_Project;
-                        $indicator->Description_Indicators = $indicatorText;
-                        $indicator->Type_Indicators = $request->target_types[$index];
-                        $indicator->save();
-                        
-                        // สร้างค่าเป้าหมาย
-                        $target = new ValueTargetModel();
-                        $target->Project_Id = $project->Id_Project;
-                        $target->Value_Target = $request->targets[$index];
-                        $target->Type_Value_Target = $request->target_types[$index];
-                        $target->save();
+            $request->has('targets') && is_array($request->targets) && 
+            $request->has('target_types') && is_array($request->target_types)) {
+            
+            foreach ($request->indicators as $index => $indicatorText) {
+                if (!empty($indicatorText) && isset($request->targets[$index]) && !empty($request->targets[$index]) && isset($request->target_types[$index])) {
+                    // สร้างตัวชี้วัด
+                    $indicator = new SuccessIndicatorsModel();
+                    $indicator->Project_Id = $project->Id_Project;
+                    $indicator->Description_Indicators = $indicatorText;
+                    $indicator->Type_Indicators = $request->target_types[$index];
+                    $indicator->save();
+                    
+                    // สร้างค่าเป้าหมาย
+                    $target = new ValueTargetModel();
+                    $target->Project_Id = $project->Id_Project;
+                    $target->Value_Target = $request->targets[$index];
+                    $target->Type_Value_Target = $request->target_types[$index];
+                    $target->Success_Indicators_Id = $indicator->Id_Success_Indicators; 
+                    $target->save();
                     }
                 }
             }
@@ -963,17 +938,62 @@ class ListProjectController extends Controller
          
     public function editProject(Request $request, $Id_Project)
     {
-        $project = ListProjectModel::findOrFail($Id_Project);
-        $strategics = StrategicModel::all();
+        $project = ListProjectModel::with([
+            'subProjects', 
+            'successIndicators.valueTargets', 
+            'projectBudgetSources.budgetSource', 
+            'projectBudgetSources.budgetSourceTotal',
+            'expenseTypes.expenses.expenHasSubtopicBudgets',
+            'objectives'  
+        ])->findOrFail($Id_Project);
+    
+        $expenseStatus = $project->expenseTypes->first()->Expense_Status ?? 'O';
+        $expenses = $project->expenseTypes->first()->expenses ?? [];
+
+        $expenseSubtopics = [];
+        foreach ($expenses as $expense) {
+            if (isset($expense->expenHasSubtopicBudgets) && count($expense->expenHasSubtopicBudgets) > 0) {
+                $expenseSubtopics[$expense->Id_Expense] = $expense->expenHasSubtopicBudgets;
+                Log::info('Expense ID: ' . $expense->Id_Expense . ' has ' . count($expense->expenHasSubtopicBudgets) . ' subtopics');
+            } else {
+                $expenseSubtopics[$expense->Id_Expense] = [];
+                Log::info('Expense ID: ' . $expense->Id_Expense . ' has no subtopics');
+            }
+        }
+    
+        $strategics = StrategicModel::with(['strategies.kpis', 'strategies.strategicObjectives', 'projects'])->get();
         $strategies = StrategyModel::where('Strategic_Id', $project->Strategic_Id)->get();
         $employees = EmployeeModel::all();
         $budgetSources = BudgetSourceModel::all();
-        $subtopBudgets = SubtopBudgetModel::all();
+        $subtopBudgets = SubtopBudgetModel::orderBy('Name_Subtopic_Budget', 'asc')->get();
         $strategicObjectives = StrategicObjectivesModel::all();
         $kpis = KpiModel::all();
+        $sdgs = SDGsModel::all();
+        $integrationCategories = IntegrationModel::orderBy('Id_Integration_Category', 'asc')->get();
+        $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
+        $pdcaStages = PdcaModel::all();
+        $nameStrategicPlan = $strategics->first()->Name_Strategic_Plan ?? '';
+        $mainCategories = [];
+        $categoryIds = [];
+    
+        foreach ($subtopBudgets as $subtop) {
+            $parts = explode(' / ', $subtop->Name_Subtopic_Budget);
+            $mainCategory = trim($parts[0]);
+    
+            if (!isset($categoryIds[$mainCategory])) {
+                $categoryIds[$mainCategory] = $subtop->Id_Subtopic_Budget;
+                $mainCategories[$subtop->Id_Subtopic_Budget] = $mainCategory;
+            }
+        }
+    
         $sourcePage = $request->input('sourcePage', 'listProject');
     
-        return view('Project.editProject', compact('project', 'strategics', 'strategies', 'employees', 'budgetSources', 'subtopBudgets', 'strategicObjectives', 'kpis', 'sourcePage'));
+        return view('Project.editBigFormProject', compact(
+            'project', 'strategics', 'strategies', 'projects', 'employees', 'sdgs', 
+            'selectedSdgs', 'nameStrategicPlan', 'integrationCategories', 'selectedIntegrations',
+            'integrationDetails', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets', 
+            'kpis', 'strategicObjectives', 'mainCategories'
+        ));
     }
     
     public function updateProject(Request $request, $id)
@@ -996,7 +1016,6 @@ class ListProjectController extends Controller
         $project->Name_Strategy = $nameStrategy;
         $project->Name_Project = $request->Name_Project ?? $project->Name_Project;
         $project->Employee_Id = $request->Employee_Id ?? $project->Employee_Id;
-        $project->Objective_Project = $request->Objective_Project ?? $project->Objective_Project;
         $project->Principles_Reasons = $request->Principles_Reasons ?? $project->Principles_Reasons;
         $project->Project_Type = $request->Project_Type ?? $project->Project_Type;
         $project->Status_Budget = $request->Status_Budget ?? $project->Status_Budget;
@@ -1077,7 +1096,45 @@ class ListProjectController extends Controller
 
     public function editAllProject($Id_Project, Request $request)
     {
-        $project = ListProjectModel::findOrFail($Id_Project);
+        $project = ListProjectModel::with([
+            'subProjects', 
+            'successIndicators.valueTargets', 
+            'projectBudgetSources.budgetSource', 
+            'projectBudgetSources.budgetSourceTotal',
+            'expenseTypes.expenses.expenHasSubtopicBudgets'
+        ])->findOrFail($Id_Project);
+
+        $expenseStatus = $project->expenseTypes->first()->Expense_Status ?? 'O';
+        $expenses = $project->expenseTypes->first()->expenses ?? [];
+
+        // ดึงข้อมูล SDGs ที่เลือกสำหรับโครงการนี้
+        $selectedSdgs = ProjectHasSDGModel::where('Project_Id', $Id_Project)
+            ->pluck('SDGs_Id')
+            ->toArray();
+
+        // ดึงข้อมูล Integration Categories ที่เลือกสำหรับโครงการนี้
+        $selectedIntegrations = ProjectHasIntegrationCategoryModel::where('Project_Id', $Id_Project)
+            ->pluck('Integration_Category_Id')
+            ->toArray();
+
+        // สร้าง array เพื่อเก็บรายละเอียดของแต่ละ integration category
+        $integrationDetails = [];
+        $projectIntegrations = ProjectHasIntegrationCategoryModel::where('Project_Id', $Id_Project)->get();
+        foreach ($projectIntegrations as $integration) {
+            $integrationDetails[$integration->Integration_Category_Id] = $integration->Integration_Details;
+        }
+
+        $expenseSubtopics = [];
+        foreach ($expenses as $expense) {
+            if (isset($expense->expenHasSubtopicBudgets) && count($expense->expenHasSubtopicBudgets) > 0) {
+                $expenseSubtopics[$expense->Id_Expense] = $expense->expenHasSubtopicBudgets;
+                Log::info('Expense ID: ' . $expense->Id_Expense . ' has ' . count($expense->expenHasSubtopicBudgets) . ' subtopics');
+            } else {
+                $expenseSubtopics[$expense->Id_Expense] = [];
+                Log::info('Expense ID: ' . $expense->Id_Expense . ' has no subtopics');
+            }
+        }
+
         $strategics = StrategicModel::with(['strategies.kpis', 'strategies.strategicObjectives', 'projects'])->findOrFail($project->Strategic_Id);
         $strategies = $strategics->strategies;
         $projects = $strategics->projects; 
@@ -1091,11 +1148,27 @@ class ListProjectController extends Controller
         $subtopBudgets = SubtopBudgetModel::all();
         $kpis = KpiModel::all();
         $strategicObjectives = StrategicObjectivesModel::all();
-        $sourcePage = $request->input('sourcePage', 'listProject');
-
-        log::info($strategicObjectives);
             
-        return view('Project.editBigFormProject', compact('project', 'strategics', 'strategies', 'projects', 'employees', 'sdgs', 'nameStrategicPlan', 'integrationCategories', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets', 'kpis', 'strategicObjectives', 'sourcePage'));
+        // Define $mainCategories
+        $mainCategories = [];
+        $categoryIds = [];
+        
+        foreach ($subtopBudgets as $subtop) {
+            $parts = explode(' / ', $subtop->Name_Subtopic_Budget);
+            $mainCategory = trim($parts[0]);
+            
+            if (!isset($categoryIds[$mainCategory])) {
+                $categoryIds[$mainCategory] = $subtop->Id_Subtopic_Budget;
+                $mainCategories[$subtop->Id_Subtopic_Budget] = $mainCategory;
+            }
+        }
+                
+        return view('Project.editBigFormProject', compact(
+            'project', 'strategics', 'strategies', 'projects', 'employees', 'sdgs', 
+            'selectedSdgs', 'nameStrategicPlan', 'integrationCategories', 'selectedIntegrations',
+            'integrationDetails', 'months', 'pdcaStages', 'budgetSources', 'subtopBudgets', 
+            'kpis', 'strategicObjectives', 'mainCategories'
+        ));
     }
 
     public function resetStatus($id)
@@ -1106,12 +1179,88 @@ class ListProjectController extends Controller
     
         $project->Count_Steps = 2;
         $project->save();
+
+        // Generate and save PDF after resetting the status
+        $this->generateAndSavePDF($id);
     
         return redirect()->route('proposeProject')->with('success', 'Project status reset to I and Count_Steps reset to 2 successfully.');
     }
 
-    public function updateField(Request $request)
+    public function generateAndSavePDF($Id_Project)
     {
+        $project = ListProjectModel::with(['strategic.strategies', 'sdgs','monthlyPlans.pdca','monthlyPlans.pdca.pdcaDetail'])
+                    ->where('Id_Project', $Id_Project)
+                    ->firstOrFail();
+
+        $projectBudgetSources = ProjectHasBudgetSourceModel::with('budgetSource')
+                    ->where('Project_Id', $Id_Project)->get();
+
+        $outcome = OutcomeModel::with('project')->where('Project_Id', $Id_Project)->get();
+        $output = OutputModel::with('project')->where('Project_Id', $Id_Project)->get();
+        $expectedResult = ExpectedResultsModel::with('project')->where('Project_Id', $Id_Project)->get();
+
+        $project->formatted_first_time = formatDateThai($project->First_Time);
+        $project->formatted_end_time = formatDateThai($project->End_Time);
+
+        $projectBudgetSources = $projectBudgetSources->map(function ($budget) {
+            $budget->Amount_Total = toThaiNumber($budget->Amount_Total);
+            return $budget;
+        });
+
+        $data = [
+            'title' => $project->Name_Project,
+            'date' => toThaiNumber(date('d/m/Y')),
+            'project' => $project,
+            'projectBudgetSources' => $projectBudgetSources,
+            'outcome' => $outcome,
+            'output' => $output,
+            'expectedResult' => $expectedResult,
+        ];
+
+        $pdf = PDF::loadView('PDF.PDF', $data);
+        $pdf->setPaper('A4');
+        $pdf->getDomPDF()->set_option("fontDir", public_path('fonts/'));
+        $pdf->getDomPDF()->set_option("font_cache", public_path('fonts/'));
+        $pdf->getDomPDF()->set_option("defaultFont", "THSarabunNew");
+        $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
+
+        $filename = 'project_' . $project->Id_Project . '_summary_' . date('Y-m-d') . '.pdf';
+        $folderPath = 'uploads/project_' . $project->Id_Project;
+        $filePath = $folderPath . '/' . $filename;
+
+        $pdfContent = $pdf->output();
+        $pdfSize = strlen($pdfContent);
+        $pdfSizeInMB = round($pdfSize / (1024 * 1024), 2);
+        $maxFileSizeInMB = config('filesystems.max_upload_size', 20);
+
+        if ($pdfSizeInMB > $maxFileSizeInMB) {
+            throw new \Exception("PDF size ({$pdfSizeInMB} MB) exceeds the limit of {$maxFileSizeInMB} MB");
+        }
+
+        if (!Storage::disk('public')->exists($folderPath)) {
+            Storage::disk('public')->makeDirectory($folderPath);
+        }
+
+        if (Storage::disk('public')->put($filePath, $pdfContent)) {
+            $storageFile = StorageFileModel::create([
+                'Name_Storage_File' => $filename,
+                'Path_Storage_File' => $filePath,
+                'Type_Storage_File' => 'application/pdf',
+                'Size' => $pdfSize,
+                'Project_Id' => $project->Id_Project
+            ]);
+
+            if (!$storageFile) {
+                throw new \Exception('Failed to create storage file record');
+            }
+        } else {
+            throw new \Exception('Failed to save PDF file');
+        }
+    }
+
+    public function updateField(Request $request)
+    {   
+        log::info($request);
         $project = ListProjectModel::findOrFail($request->id);
         $field = $request->field;
         $value = $request->value;
@@ -1121,5 +1270,300 @@ class ListProjectController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function updateSdgs(Request $request, $id)
+    {
+        try {
+            $project = ListProjectModel::findOrFail($id);
+            $sdgId = $request->sdg_id;
+            $selected = $request->selected;
+            
+            // บันทึกข้อมูลความสัมพันธ์ระหว่างโครงการกับ SDGs
+            if ($selected) {
+                // เพิ่ม SDG หากมีการเลือก - ใช้ชื่อตารางและคอลัมน์ตามโมเดล
+                $existingRecord = ProjectHasSDGModel::where('Project_Id', $id)
+                    ->where('SDGs_Id', $sdgId)
+                    ->first();
+                    
+                if (!$existingRecord) {
+                    $projectSdg = new ProjectHasSDGModel();
+                    $projectSdg->Project_Id = $id;
+                    $projectSdg->SDGs_Id = $sdgId;
+                    $projectSdg->save();
+                    
+                    Log::info('SDG เพิ่มเรียบร้อย', [
+                        'project_id' => $id,
+                        'sdg_id' => $sdgId
+                    ]);
+                }
+            } else {
+                // ลบ SDG หากมีการยกเลิกการเลือก - ใช้ชื่อตารางและคอลัมน์ตามโมเดล
+                ProjectHasSDGModel::where('Project_Id', $id)
+                    ->where('SDGs_Id', $sdgId)
+                    ->delete();
+                    
+                Log::info('SDG ลบเรียบร้อย', [
+                    'project_id' => $id,
+                    'sdg_id' => $sdgId
+                ]);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => $selected ? 'เพิ่ม SDG เรียบร้อยแล้ว' : 'ลบ SDG เรียบร้อยแล้ว'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating SDGs: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateIntegration(Request $request, $id)
+    {
+        try {
+            $project = ListProjectModel::findOrFail($id);
+            $categoryId = $request->category_id;
+            $selected = $request->selected;
+            $details = $request->details;
+            
+            // ตรวจสอบว่ามีรายการนี้อยู่แล้วหรือไม่
+            $existingRecord = ProjectHasIntegrationCategoryModel::where('Project_Id', $id)
+                ->where('Integration_Category_Id', $categoryId)
+                ->first();
+            
+            if ($selected) {
+                // เพิ่มหรืออัปเดตการบูรณาการ
+                if (!$existingRecord) {
+                    $projectIntegration = new ProjectHasIntegrationCategoryModel();
+                    $projectIntegration->Project_Id = $id;
+                    $projectIntegration->Integration_Category_Id = $categoryId;
+                    $projectIntegration->Integration_Details = $details;
+                    $projectIntegration->save();
+                    
+                    Log::info('เพิ่มการบูรณาการเรียบร้อย', [
+                        'project_id' => $id,
+                        'category_id' => $categoryId
+                    ]);
+                } else {
+                    $existingRecord->Integration_Details = $details;
+                    $existingRecord->save();
+                    
+                    Log::info('อัปเดตการบูรณาการเรียบร้อย', [
+                        'project_id' => $id,
+                        'category_id' => $categoryId
+                    ]);
+                }
+            } else {
+                // ลบการบูรณาการ
+                if ($existingRecord) {
+                    $existingRecord->delete();
+                    
+                    Log::info('ลบการบูรณาการเรียบร้อย', [
+                        'project_id' => $id,
+                        'category_id' => $categoryId
+                    ]);
+                }
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => $selected ? 'เพิ่มการบูรณาการเรียบร้อยแล้ว' : 'ลบการบูรณาการเรียบร้อยแล้ว'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating integration: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateIntegrationDetails(Request $request, $id)
+    {
+        try {
+            $categoryId = $request->category_id;
+            $details = $request->details;
+            
+            // อัปเดตรายละเอียดการบูรณาการ
+            $integration = ProjectHasIntegrationCategoryModel::where('Project_Id', $id)
+                ->where('Integration_Category_Id', $categoryId)
+                ->first();
+            
+            if ($integration) {
+                $integration->Integration_Details = $details;
+                $integration->save();
+                
+                Log::info('อัปเดตรายละเอียดการบูรณาการเรียบร้อย', [
+                    'project_id' => $id,
+                    'category_id' => $categoryId
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'อัปเดตรายละเอียดเรียบร้อยแล้ว'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'ไม่พบข้อมูลการบูรณาการ'
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error updating integration details: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function addObjective(Request $request, $id)
+    {   
+        log::info($request);
+        try {
+            // ตรวจสอบว่ามีโครงการหรือไม่
+            $project = ListProjectModel::findOrFail($id);
+            
+            // สร้างวัตถุประสงค์ใหม่
+            $objective = new ObjectiveProjectModel();
+            $objective->Project_Id = $id;
+            $objective->Description_Objective = $request->description;
+            $objective->Type_Objective = $request->type ?? 'manual';
+            $objective->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'เพิ่มวัตถุประสงค์เรียบร้อยแล้ว',
+                'objective_id' => $objective->Id_Objective_Project
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateObjective(Request $request, $id)
+    {   
+        log::info($request);
+        try {
+            // ตรวจสอบว่ามีโครงการหรือไม่
+            $project = ListProjectModel::findOrFail($id);
+            
+            // ค้นหาวัตถุประสงค์ที่ต้องการแก้ไข
+            $objective = ObjectiveProjectModel::where('Project_Id', $id)
+                            ->where('Id_Objective_Project', $request->objective_id)
+                            ->first();
+            
+            if (!$objective) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'ไม่พบข้อมูลวัตถุประสงค์'
+                ], 404);
+            }
+            
+            // อัปเดตข้อมูล
+            $objective->Description_Objective = $request->description;
+            $objective->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'อัปเดตวัตถุประสงค์เรียบร้อยแล้ว'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deleteObjective(Request $request, $id, $objectiveId)
+    {   
+        log::info($request);
+        try {
+            // ตรวจสอบว่ามีโครงการหรือไม่
+            $project = ListProjectModel::findOrFail($id);
+            
+            // ค้นหาวัตถุประสงค์ที่ต้องการลบ
+            $objective = ObjectiveProjectModel::where('Project_Id', $id)
+                            ->where('Id_Objective_Project', $objectiveId)
+                            ->first();
+            
+            if (!$objective) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'ไม่พบข้อมูลวัตถุประสงค์'
+                ], 404);
+            }
+            
+            // ลบวัตถุประสงค์
+            $objective->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'ลบวัตถุประสงค์เรียบร้อยแล้ว'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'เกิดข้อผิดพลาดในการลบข้อมูล: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateOutput(Request $request, $id)
+    {   
+        log::info($request);
+        try {
+            // ตรวจสอบว่ามีโครงการหรือไม่
+            $project = ListProjectModel::findOrFail($id);
+            
+            // รับค่าจาก request
+            $value = $request->input('value');
+            $originalValue = $request->input('original_value');
+            
+            // ตรวจสอบว่าเป็นการแก้ไขหรือเพิ่มใหม่
+            if (!empty($originalValue)) {
+                // เป็นการแก้ไข - หาและอัปเดต
+                $output = OutputModel::where('Project_Id', $id)
+                            ->where('Name_Output', $originalValue)
+                            ->first();
+                            
+                if ($output) {
+                    $output->Name_Output = $value;
+                    $output->save();
+                } else {
+                    // ไม่พบข้อมูลเดิม ให้สร้างใหม่
+                    $output = new OutputModel();
+                    $output->Project_Id = $id;
+                    $output->Name_Output = $value;
+                    $output->save();
+                }
+            } else {
+                // เพิ่มใหม่
+                $output = new OutputModel();
+                $output->Project_Id = $id;
+                $output->Name_Output = $value;
+                $output->save();
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    
 
 }

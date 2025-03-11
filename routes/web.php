@@ -46,6 +46,7 @@ Route::post('/projects/reset-status/{id}', [ListProjectController::class, 'reset
 Route::post('/projects/{id}/update-responsible', 'App\Http\Controllers\ProposeProjectController@updateResponsible')->name('projects.updateResponsible');
 
 Route::post('/projects/{id}/updateEmployee', [ProposeProjectController::class, 'updateEmployee'])->name('projects.updateEmployee');
+
 // แก้ไขโครงการ
 Route::post('/createProject/{Strategic_Id}', [ListProjectController::class, 'createProject'])->name('createProject');
 Route::match(['get', 'post'],'/editProject/{Id_Project}', [ListProjectController::class, 'editProject'])->name('editProject');
@@ -69,6 +70,8 @@ Route::put('/disapprove-project/{id}', [RequestApprovalController::class, 'disap
 // คลังไฟล์ PDF
 Route::get('/storage-files/{project_id?}', [StorageFileController::class, 'index'])->name('StorageFiles.index');
 Route::post('/storage-files', [StorageFileController::class, 'store'])->name('StorageFiles.store');
+Route::post('/storage-files/update-name', [StorageFileController::class, 'updateName'])->name('StorageFiles.updateName');
+
 
 Route::delete('/storage-files/{id}', [StorageFileController::class, 'destroy'])->name('StorageFiles.destroy');
 Route::get('/{id}/download', [StorageFileController::class, 'download'])->name('StorageFiles.download');
@@ -79,9 +82,11 @@ Route::get('/statusTracking', [StatusController::class, 'statusTracking'])->name
 Route::get('/project/{Id_Project}', [StatusController::class, 'showDetails'])->name('project.details');
 
 // การแสดง PDF
-Route::get('generate-pdf/{id}', [PDFController::class, 'generatePDF']);
+Route::get('generate-pdf/{id}', [PDFController::class, 'generatePDF'])->name('PDF.generate');
 Route::get('actionplan-pdf', [PDFController::class, 'ActionPlanPDF']);
 Route::get('strategic-pdf/{Id_Strategic}', [PDFController::class, 'PDFStrategic'])->name('PDF.strategic');
+Route::get('report-pdf/{id}', [PDFController::class, 'generatePDFReportForm'])->name('PDF.generateReportForm');
+
 
 Route::get('pdfStrategic/{Id_Project}', [PDFController::class, 'ctrlpPDFStrategic'])->name('pdf.strategicCtrlP');
 
@@ -98,8 +103,6 @@ Route::get('/showProjectDepartment/{Id_Department}', [PlanDLCController::class, 
 // FiscalYearQuarter
 Route::resource('fiscalYearQuarter', FiscalYearQuarterController::class);
 
-Route::post('/projects/update-field', [ListProjectController::class, 'updateField'])->name('projects.updateField');
-
 Route::get('/report-form/{id}', [ReportFormController::class, 'showReportForm'])->name('reportForm');
 Route::post('/projects/complete/{id}', [ReportFormController::class, 'completeProject'])->name('projects.complete');
 
@@ -108,3 +111,23 @@ Route::get('showSdg', [SustainableDevelopmentGoalsController::class, 'showSdg'])
 Route::post('/showSdg', [SustainableDevelopmentGoalsController::class, 'createSDG'])->name('createSDG');
 Route::put('/editSDG/{id_SDGs}', [SustainableDevelopmentGoalsController::class, 'editSDG'])->name('editSDG');
 Route::delete('/deleteSDG/{id_SDGs}', [SustainableDevelopmentGoalsController::class, 'deleteSDG'])->name('deleteSDG');
+
+
+//
+// Project inline editing NameProject, Employee
+Route::post('/projects/{id}/update-field', [ListProjectController::class, 'updateField'])->name('projects.updateField');
+// Project inline editing SDGs
+Route::post('/projects/{id}/update-sdgs', [ListProjectController::class, 'updateSdgs'])->name('projects.updateSdgs');
+// Project inline editing Integration
+Route::post('/projects/{id}/update-integration', [ListProjectController::class, 'updateIntegration'])->name('projects.updateIntegration');
+Route::post('/projects/{id}/update-integration-details', [ListProjectController::class, 'updateIntegrationDetails'])->name('projects.updateIntegrationDetails');
+
+// Project inline editing Output, Outcome และ Expected Results
+Route::post('/projects/{id}/update-output', [ListProjectController::class, 'updateOutput'])->name('projects.updateOutput');
+Route::post('/projects/{id}/delete-output', [ListProjectController::class, 'deleteOutput'])->name('projects.deleteOutput');
+
+
+// Project inline editing Objective
+Route::post('/projects/{id}/add-objective', [ProjectController::class, 'addObjective']);
+Route::post('/projects/{id}/update-objective', [ProjectController::class, 'updateObjective']);
+Route::delete('/projects/{id}/delete-objective/{objectiveId}', [ProjectController::class, 'deleteObjective']);

@@ -4,23 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProjectHasSDGModel extends Model
+class ObjectiveProjectModel extends Model
 {
     protected $connection = 'mydb';
-    protected $table = 'Project_has_SDGs';
-    protected $primaryKey = 'Project_Id';
+    protected $table = 'Objective_Project';
+    protected $primaryKey = 'Id_Objective_Project';
     protected $keyType = 'int';
     public $timestamps = false;
 
     protected $fillable = [
         'Project_Id',
-        'SDGs_Id'
+        'Description_Objective',
+        'Type_Objective'
     ];
 
     public function project()
     {
         return $this->belongsTo(ListProjectModel::class, 'Project_Id', 'Id_Project');
     }
-
-
 }

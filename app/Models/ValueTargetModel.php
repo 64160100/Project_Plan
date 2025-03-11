@@ -15,7 +15,8 @@ class ValueTargetModel extends Model
     protected $fillable = [
         'Project_Id',
         'Value_Target',
-        'Type_Value_Target'
+        'Type_Value_Target',
+        'Success_Indicators_Id'
     ];
     
     public function project()
@@ -25,6 +26,6 @@ class ValueTargetModel extends Model
     
     public function successIndicator()
     {
-        return $this->belongsTo(SuccessIndicatorsModel::class, 'Project_Id', 'Project_Id');
+        return $this->belongsTo(SuccessIndicatorsModel::class, 'Success_Indicators_Id', 'Id_Success_Indicators');
     }
 }

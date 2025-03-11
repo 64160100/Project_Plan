@@ -39,8 +39,9 @@ class ProposeProjectController extends Controller
     
             foreach ($projects as $project) {
                 $employeeData = $project->employee;
-                $project->employeeName = $employeeData ? $employeeData->Firstname_Employee . ' ' . $employeeData->Lastname_Employee : '-';
-                $project->departmentName = $employeeData->department->Name_Department ?? 'No Department';
+                $project->employeeName = $employeeData ? $employeeData->Firstname . ' ' . $employeeData->Lastname : '-';
+                // Update this line to use Department_Name directly from the employee model
+                $project->departmentName = $employeeData ? $employeeData->Department_Name : 'ยังไม่มีผู้รับผิดชอบโครงการ';
     
                 if ($project->First_Time) {
                     $date = new \DateTime($project->First_Time);

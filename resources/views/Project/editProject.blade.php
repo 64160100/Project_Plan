@@ -2,6 +2,61 @@
 
 <hade>
     <link rel="stylesheet" href="{{ asset('css/createFirstForm.css') }}">
+    <style>
+    /* Project Search List Styling */
+    #project-list {
+        position: absolute;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-top: 5px;
+        z-index: 1000;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 0;
+    }
+
+    #project-list li {
+        padding: 8px 12px;
+        list-style: none;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    #project-list li:hover {
+        background-color: #f8f9fa;
+    }
+
+    #project-list li.loading,
+    #project-list li.error,
+    #project-list li.no-results {
+        color: #6c757d;
+        font-style: italic;
+        cursor: default;
+    }
+
+    #project-list li.error {
+        color: #dc3545;
+    }
+
+    .indicator-item {
+        transition: all 0.3s ease;
+    }
+
+    .indicator-item:hover {
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .content-box {
+        background-color: #fff;
+        border-radius: 0.25rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    </style>
 </hade>
 
 @section('content')
@@ -25,27 +80,26 @@
                     <div id="departmentStrategicDetails">
                         <div class="mb-3 col-md-6">
                             <div class="mb-3">
-                                <label for="Name_Strategic" class="form-label">ชื่อแผนยุทธศาสตร์</label>
-                                <select class="form-control" id="Name_Strategic" name="Name_Strategic"
-                                    onchange="filterStrategies()">
-                                    @foreach($strategics as $strategic)
-                                    <option value="{{ $strategic->Id_Strategic }}"
-                                        {{ $project->Strategic_Id == $strategic->Id_Strategic ? 'selected' : '' }}>
-                                        {{ $strategic->Name_Strategic_Plan }}
-                                    </option>
-                                    @endforeach
-                                </select>
+                                <label for="Name_Strategic_Plan" class="form-label">ชื่อแผนยุทธศาสตร์</label>
+                                <input type="text" class="form-control" id="Name_Strategic_Plan"
+                                    name="Name_Strategic_Plan" value="{{ $nameStrategicPlan }}" readonly>
                             </div>
                             <div class="mb-3">
-                                <label for="Name_Strategy" class="form-label">กลยุทธ์</label>
+                                <label for="Name_Strategy" class="form-label">ชื่อกลยุทธ์<span class="text-danger">
+                                        *</span></label>
                                 <select class="form-select @error('Name_Strategy') is-invalid @enderror"
                                     name="Name_Strategy" id="Name_Strategy" required>
-                                    <option value="" disabled>เลือกกลยุทธ์</option>
+                                    <option value="" selected disabled>เลือกกลยุทธ์</option>
+                                    @if($strategies->isNotEmpty())
                                     @foreach($strategies as $strategy)
                                     <option value="{{ $strategy->Id_Strategy }}"
                                         {{ $project->Strategy_Id == $strategy->Id_Strategy ? 'selected' : '' }}>
-                                        {{ $strategy->Name_Strategy }}</option>
+                                        {{ $strategy->Name_Strategy }}
+                                    </option>
                                     @endforeach
+                                    @else
+                                    <option value="" disabled>ไม่มีกลยุทธ์ที่เกี่ยวข้อง</option>
+                                    @endif
                                 </select>
                                 @error('Name_Strategy')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -66,20 +120,22 @@
                         <div class="radio-item">
                             <input type="radio" name="Description_Project" value="N" id="newProject"
                                 onchange="toggleTextbox(this, 'textbox-projectType-')"
-                                {{ $project->Description_Project == 'N' ? 'checked' : '' }}>
+                                {{ $project->Description_Project == 'N' ? 'checked' : '' }} disabled>
                             <label for="newProject">โครงการใหม่</label>
                         </div>
                         <div class="radio-item">
                             <input type="radio" name="Description_Project" value="C" id="continuousProject"
                                 onchange="toggleTextbox(this, 'textbox-projectType-')"
-                                {{ $project->Description_Project == 'C' ? 'checked' : '' }}>
+                                {{ $project->Description_Project == 'C' ? 'checked' : '' }} disabled>
                             <label for="continuousProject">โครงการต่อเนื่อง</label>
                         </div>
                     </div>
                     <div class="form-group"
                         style="{{ $project->Description_Project == 'C' ? 'display: block;' : 'display: none;' }}">
+                        <label for="textbox-projectType-2" class="form-label">ค้นหาโครงการเดิม</label>
                         <input type="text" id="textbox-projectType-2" class="form-control" data-group="projectType"
-                            placeholder="กรอกชื่อโครงการเดิม" value="{{ $project->oldProjectName }}">
+                            placeholder="กรอกชื่อโครงการเดิม" value="{{ $project->oldProjectName }}" readonly>
+                        <ul id="project-list" style="display: none;"></ul>
                     </div>
                 </div>
 
@@ -92,126 +148,142 @@
                     </div>
                     <div id="projectDetails">
                         <div class="form-group">
-                            <label for="Name_Project" class="form-label">สร้างชื่อโครงการ</label>
+                            <label for="Name_Project" class="form-label">สร้างชื่อโครงการ <span
+                                    class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('Name_Project') is-invalid @enderror"
-                                id="Name_Project" name="Name_Project" placeholder="กรอกชื่อโครงการ"
-                                value="{{ $project->Name_Project }}" required>
+                                id="Name_Project" name="Name_Project" placeholder="กรอกชื่อโครงการ" required
+                                value="{{ $project->Name_Project }}" title="กรุณากรอกชื่อโครงการ">
                             @error('Name_Project')
                             <div class="invalid-feedback">{{ $message }}</div>
+                            @else
+                            <div class="invalid-feedback">กรุณากรอกชื่อโครงการ</div>
                             @enderror
                         </div>
+
                         <div id="projectContainer">
                             @csrf
+                            @foreach($project->subProjects as $index => $subProject)
+                            <div class="form-group mb-2 dynamic-field">
+                                <div class="input-group">
+                                    <span class="input-group-text">1.{{ $index + 1 }}</span>
+                                    <input type="text" class="form-control" name="Name_Sub_Project[]"
+                                        value="{{ $subProject->Name_Sub_Project }}" readonly>
+                                    <button type="button" class="btn btn-danger" onclick="removeField(this)">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </div>
+                            </div>
+                            @endforeach
                         </div>
+
                         <div>
                             <button type="button" class="btn-addlist"
-                                onclick="addField1('projectContainer', 'Name_Sup_Project[]')">
+                                onclick="addField1('projectContainer', 'Name_Sub_Project[]')">
                                 <i class='bx bx-plus-circle'></i>เพิ่มชื่อโครงการย่อย
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- วัตถุประสงค์โครงการ -->
+                <!-- ตัวชี้วัดความสำเร็จของโครงการและค่าเป้าหมาย (รวมเป็นหัวข้อเดียว) -->
                 <div class="content-box">
                     <div class="section-header">
                         <h4>
-                            4. วัตถุประสงค์โครงการ
+                            4. ตัวชี้วัดความสำเร็จของโครงการและค่าเป้าหมาย
                         </h4>
                     </div>
-                    <div id="objectiveDetails">
-                        <div class="form-group">
-                            <select class="form-control @error('Objective_Project') is-invalid @enderror"
-                                id="Objective_Project" name="Objective_Project" required>
-                                <option value="" disabled>กรอกข้อมูลวัตถุประสงค์</option>
-                                @foreach($strategicObjectives as $objective)
-                                <option value="{{ $objective->Details_Strategic_Objectives }}"
-                                    data-strategy-id="{{ $objective->Strategy_Id_Strategy }}"
-                                    {{ $project->Objective_Project == $objective->Details_Strategic_Objectives ? 'selected' : '' }}>
-                                    {{ $objective->Details_Strategic_Objectives }}</option>
-                                @endforeach
-                            </select>
-                            @error('Objective_Project')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        @include('Project.App.ProjectObjective')
-                    </div>
-                </div>
 
-                <!-- ตัวชี้วัดความสำเร็จของโครงการ -->
-                <div class="content-box">
-                    <div class="section-header">
-                        <h4>
-                            5. ตัวชี้วัดความสำเร็จของโครงการ
-                        </h4>
-                    </div>
-                    <div id="successIndicatorsDetails">
-                        <div class="form-group">
-                            <label for="Success_Indicators"></label>
-                            <select class="form-control @error('Success_Indicators') is-invalid @enderror"
-                                id="Success_Indicators" name="Success_Indicators">
-                                <option value="" disabled>กรอกตัวชี้วัดความสำเร็จของโครงการ</option>
-                                @foreach($kpis as $kpi)
-                                <option value="{{ $kpi->Name_Kpi }}" data-strategy-id="{{ $kpi->Strategy_Id }}"
-                                    data-target-value="{{ $kpi->Target_Value }}"
-                                    {{ $project->Success_Indicators == $kpi->Name_Kpi ? 'selected' : '' }}>
-                                    {{ $kpi->Name_Kpi }}</option>
-                                @endforeach
-                            </select>
-                            @error('Success_Indicators')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ค่าเป้าหมาย -->
-                <div class="content-box">
-                    <div class="section-header">
-                        <h4>
-                            6. ค่าเป้าหมาย
-                        </h4>
-                    </div>
-                    <div id="valueTargetDetails">
-                        <div class="form-group">
-                            <label for="Value_Target"></label>
-                            <select class="form-control @error('Value_Target') is-invalid @enderror" id="Value_Target"
-                                name="Value_Target">
-                                <option value="" disabled>กรอกค่าเป้าหมาย</option>
-                                <option value="{{ $project->Value_Target }}" selected>{{ $project->Value_Target }}
-                                </option>
-                            </select>
-                            @error('Value_Target')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ระยะเวลาดำเนินโครงการ -->
-                <div class="content-box">
-                    <div class="section-header">
-                        <h4>
-                            7. ระยะเวลาดำเนินโครงการ
-                        </h4>
-                    </div>
-                    <div id="projectDurationDetails">
-                        <div class="row">
-                            <div class="col-md-6">
+                    <!-- ฟอร์มเพิ่มตัวชี้วัดและค่าเป้าหมาย -->
+                    <div id="indicatorForm">
+                        <div class="row mb-3">
+                            <div class="col-md-7">
                                 <div class="form-group">
-                                    <label for="First_Time">วันที่เริ่มต้น:</label>
-                                    <input type="date" class="form-control" id="First_Time" name="First_Time"
-                                        value="{{ $project->First_Time }}" required>
+                                    <label class="form-label fw-bold">ตัวชี้วัดความสำเร็จของโครงการ:</label>
+                                    <div class="d-flex flex-column">
+                                        <select class="form-control @error('Success_Indicators') is-invalid @enderror"
+                                            id="Success_Indicators" name="Success_Indicators">
+                                            <option value="" disabled selected>กรอกตัวชี้วัดความสำเร็จของโครงการ
+                                            </option>
+                                            @foreach($kpis as $kpi)
+                                            <option value="{{ $kpi->Name_Kpi }}"
+                                                data-strategy-id="{{ $kpi->Strategy_Id }}"
+                                                data-target-value="{{ $kpi->Target_Value }}">
+                                                {{ $kpi->Name_Kpi }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="d-flex align-items-center mt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                id="toggleIndicatorInput">
+                                                <i class='bx bx-edit'></i> กรอกตัวชี้วัดด้วยตนเอง
+                                            </button>
+                                        </div>
+                                        <textarea class="form-control mt-2" id="Success_Indicators_Other"
+                                            name="Success_Indicators_Other"
+                                            placeholder="กรอกตัวชี้วัดความสำเร็จด้วยตนเอง"
+                                            style="display: none;"></textarea>
+                                        @error('Success_Indicators')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+
+                            <!-- ส่วนของค่าเป้าหมาย -->
+                            <div class="col-md-5">
                                 <div class="form-group">
-                                    <label for="End_Time">วันที่สิ้นสุด:</label>
-                                    <input type="date" class="form-control" id="End_Time" name="End_Time"
-                                        value="{{ $project->End_Time }}" required>
+                                    <label class="form-label fw-bold">ค่าเป้าหมาย:</label>
+                                    <div class="d-flex flex-column">
+                                        <select class="form-control @error('Value_Target') is-invalid @enderror"
+                                            id="Value_Target" name="Value_Target">
+                                            <option value="" disabled selected>กรอกค่าเป้าหมาย</option>
+                                        </select>
+                                        <div class="d-flex align-items-center mt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                id="toggleTargetInput">
+                                                <i class='bx bx-edit'></i> กรอกค่าเป้าหมายด้วยตนเอง
+                                            </button>
+                                        </div>
+                                        <textarea class="form-control mt-2" id="Value_Target_Other"
+                                            name="Value_Target_Other" placeholder="กรอกค่าเป้าหมายด้วยตนเอง"
+                                            style="display: none;"></textarea>
+                                        @error('Value_Target')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <button type="button" id="addIndicatorBtn" class="btn btn-primary">
+                            <i class='bx bx-plus-circle me-1'></i> เพิ่มตัวชี้วัดและค่าเป้าหมาย
+                        </button>
+
+                        <div id="indicatorsContainer" class="mt-3">
+                            @foreach($project->successIndicators as $indicator)
+                            @foreach($indicator->valueTargets as $target)
+                            <div class="indicator-item mb-2 p-3 border rounded bg-light position-relative">
+                                <button type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-2 delete-indicator"
+                                    data-id="{{ $indicator->Id_Success_Indicators }}"></button>
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <div class="fw-bold mb-1">ตัวชี้วัดความสำเร็จ:</div>
+                                        <div class="indicator-text">{{ $indicator->Description_Indicators }}</div>
+                                        <input type="hidden" name="indicators[]"
+                                            value="{{ $indicator->Description_Indicators }}">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="fw-bold mb-1">ค่าเป้าหมาย:</div>
+                                        <div class="target-value">{{ $target->Value_Target }}</div>
+                                        <input type="hidden" name="targets[]" value="{{ $target->Value_Target }}">
+                                        <input type="hidden" name="target_types[]"
+                                            value="{{ $target->Type_Value_Target }}">
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -220,11 +292,11 @@
                 <div class="content-box">
                     <div class="section-header">
                         <h4>
-                            8. แหล่งงบประมาณ
+                            5. แหล่งงบประมาณ
                         </h4>
                     </div>
                     <div id="budgetDetails">
-                        <div class="form-group-radio">
+                        <div class="form-group-radio mb-3">
                             <div class="radio-group">
                                 <input type="radio" name="Status_Budget" value="N" id="non_income"
                                     onchange="toggleIncomeForm(this)"
@@ -240,55 +312,181 @@
 
                         <div id="incomeForm" class="income-form"
                             style="{{ $project->Status_Budget == 'Y' ? 'display: block;' : 'display: none;' }}">
-                            <div class="form-group">
-                                <label>แหล่งงบประมาณ</label>
-                                <div class="mb-4">
-                                    @foreach($budgetSources ?? collect() as $source)
-                                    <div class="form-check mb-2 d-flex align-items-center">
-                                        <input type="radio" id="{{ $source->Id_Budget_Source }}" name="budget_source"
-                                            value="{{ $source->Id_Budget_Source }}" class="form-check-input"
-                                            data-id="{{ $source->Id_Budget_Source }}"
-                                            {{ $project->budget_source == $source->Id_Budget_Source ? 'checked' : '' }}
-                                            onchange="handleSourceSelect(this)">
-                                        <label class="form-check-label d-flex align-items-center w-100"
-                                            for="{{ $source->Id_Budget_Source }}">
-                                            <span class="label-text">{{ $source->Name_Budget_Source }}</span>
-                                            <input type="number" name="amount_{{ $source->Id_Budget_Source }}"
-                                                class="form-control form-control-sm w-25 ml-2" placeholder="จำนวนเงิน"
-                                                value="{{ $project->{'amount_'.$source->Id_Budget_Source} }}"
-                                                {{ $project->budget_source == $source->Id_Budget_Source ? '' : 'disabled' }}>
-                                            <span class="ml-2">บาท</span>
-                                        </label>
-                                    </div>
-                                    @endforeach
-                                </div>
-
-                                <!-- รายละเอียดการเบิกจ่าย -->
-                                <div id="sourceDetailForm">
-                                    <div class="mb-3">
-                                        <label class="form-label">รายละเอียดค่าใช้จ่าย</label>
-                                        <textarea name="source_detail" class="form-control"
-                                            placeholder="ระบุรายละเอียดค่าใช้จ่าย">{{ $project->source_detail }}</textarea>
-                                    </div>
-                                </div>
-
-                                <div class="form-group-radio">
-                                    <label>เลือกประเภท</label>
-                                    <div class="radio-group">
-                                        <input type="radio" name="date_type" value="single" id="single_day"
-                                            onchange="toggleDateForm(this)"
-                                            {{ $project->date_type == 'single' ? 'checked' : '' }}>
-                                        <label for="single_day">วันเดียว</label>
-
-                                        <input type="radio" name="date_type" value="multiple" id="multiple_days"
-                                            onchange="toggleDateForm(this)"
-                                            {{ $project->date_type == 'multiple' ? 'checked' : '' }}>
-                                        <label for="multiple_days">หลายวัน</label>
+                            <!-- แหล่งที่มาของงบประมาณ -->
+                            <div class="form-group mb-4">
+                                <label class="form-label fw-bold">แหล่งที่มาของงบประมาณ:</label>
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        @foreach($budgetSources as $source)
+                                        <div class="form-check mb-2 d-flex align-items-center">
+                                            <input type="checkbox" id="{{ $source->Id_Budget_Source }}"
+                                                name="budget_source[]" value="{{ $source->Id_Budget_Source }}"
+                                                class="form-check-input" data-id="{{ $source->Id_Budget_Source }}"
+                                                onchange="handleSourceCheckbox(this)"
+                                                {{ in_array($source->Id_Budget_Source, $project->projectBudgetSources->pluck('Budget_Source_Id')->toArray()) ? 'checked' : '' }}>
+                                            <label class="form-check-label d-flex align-items-center w-100"
+                                                for="{{ $source->Id_Budget_Source }}">
+                                                <span class="label-text me-2">{{ $source->Name_Budget_Source }}</span>
+                                                <div class="input-group" style="max-width: 200px;">
+                                                    <input type="number" name="amount_{{ $source->Id_Budget_Source }}"
+                                                        class="form-control form-control-sm" placeholder="จำนวนเงิน"
+                                                        value="{{ $project->projectBudgetSources->firstWhere('Budget_Source_Id', $source->Id_Budget_Source)->budgetSourceTotal->Amount_Total ?? '' }}"
+                                                        {{ in_array($source->Id_Budget_Source, $project->projectBudgetSources->pluck('Budget_Source_Id')->toArray()) ? '' : 'disabled' }}>
+                                                    <span class="input-group-text">บาท</span>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-primary btn-sm" style="display: none;"
-                                onclick="addBudgetForm()">เพิ่มแบบฟอร์ม</button>
+
+                            <!-- ตารางงบประมาณแบบกรอกข้อมูล -->
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="form-group mb-4">
+                                        <label class="form-label fw-bold">รายละเอียดงบประมาณ:</label>
+                                        <div class="form-group-radio mb-3">
+                                            <label class="form-label">ระยะเวลาการใช้งบประมาณ:</label>
+                                            <div class="radio-group">
+                                                <input type="radio" name="Expense_Status" value="O" id="single_day"
+                                                    onchange="toggleDateForm(this)"
+                                                    {{ $expenseStatus == 'O' ? 'checked' : '' }}>
+                                                <label for="single_day">วันเดียว</label>
+
+                                                <input type="radio" name="Expense_Status" value="M" id="multiple_days"
+                                                    onchange="toggleDateForm(this)"
+                                                    {{ $expenseStatus == 'M' ? 'checked' : '' }}>
+                                                <label for="multiple_days">หลายวัน</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- แบบฟอร์มงบประมาณตามวันที่ (อยู่ในกรอบเดียวกัน) -->
+                                        <div class="mt-4">
+                                            <div id="budgetFormsContainer">
+                                                @foreach($expenses as $expense)
+                                                <div class="budget-form mb-4 pb-3 border-bottom"
+                                                    data-form-index="{{ $loop->index }}">
+                                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                                        <div style="flex: 1;">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="me-3">
+                                                                    <label class="form-label">วันที่ดำเนินการ</label>
+                                                                    <input type="date" name="date[]"
+                                                                        class="form-control" style="width: 200px;"
+                                                                        value="{{ $expense->Date_Expense }}">
+                                                                </div>
+                                                                <div class="flex-grow-1">
+                                                                    <label
+                                                                        class="form-label">รายละเอียดค่าใช้จ่ายสำหรับวันนี้</label>
+                                                                    <textarea name="budget_details[]"
+                                                                        class="form-control"
+                                                                        placeholder="ระบุรายละเอียดค่าใช้จ่ายสำหรับวันที่นี้"
+                                                                        rows="2">{{ $expense->Details_Expense }}</textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="ms-2">
+                                                            <button type="button"
+                                                                class="btn btn-warning btn-sm reset-form-btn"
+                                                                onclick="resetBudgetForm(this)">
+                                                                <i class="bx bx-reset"></i> รีเซ็ตข้อมูล
+                                                            </button>
+                                                            <button type="button"
+                                                                class="btn btn-danger btn-sm remove-form-btn ms-2"
+                                                                onclick="removeBudgetForm(this)" style="display: none;">
+                                                                <i class="bx bx-trash"></i> ลบวันที่นี้
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- ตารางงบประมาณรวม -->
+                                                    <div class="table-responsive mt-4">
+                                                        <table class="table table-bordered">
+                                                            <thead class="bg-light">
+                                                                <tr>
+                                                                    <th style="width: 5%;">ลำดับ</th>
+                                                                    <th style="width: 25%;">หมวดหมู่</th>
+                                                                    <th>รายการ</th>
+                                                                    <th style="width: 20%;">จำนวน (บาท)</th>
+                                                                    <th style="width: 5%;"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="budget_categories_container">
+                                                                <!-- แถวแรกสำหรับเลือกหมวดหมู่ -->
+                                                                <tr class="category-row"
+                                                                    id="category-row-{{ $loop->index }}"
+                                                                    data-row-id="{{ $loop->index }}">
+                                                                    <td class="align-middle text-center">1</td>
+                                                                    <td class="align-middle">
+                                                                        <select class="form-select category-select"
+                                                                            name="budget_category[{{ $loop->index }}][]"
+                                                                            data-row-id="{{ $loop->index }}"
+                                                                            onchange="handleCategorySelect(this)">
+                                                                            <option value="" selected disabled>
+                                                                                เลือกหมวดหมู่</option>
+                                                                            @foreach($mainCategories as $index =>
+                                                                            $categoryName)
+                                                                            <option value="{{ $index }}">
+                                                                                {{ $categoryName }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </td>
+
+                                                                    <td colspan="2" class="align-middle text-center">
+                                                                        <span
+                                                                            class="text-muted">โปรดเลือกหมวดหมู่ก่อน</span>
+                                                                    </td>
+
+                                                                    <td class="align-middle text-center">
+                                                                        <button type="button"
+                                                                            class="btn btn-sm btn-danger"
+                                                                            onclick="removeCategoryRow(this)"
+                                                                            style="display: none;">
+                                                                            <i class="bx bx-trash"></i>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <td colspan="5">
+                                                                        <button type="button"
+                                                                            class="btn btn-outline-primary"
+                                                                            onclick="addCategoryRow()">
+                                                                            <i class="bx bx-plus-circle"></i>
+                                                                            เพิ่มหมวดหมู่
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr class="bg-light font-weight-bold">
+                                                                    <td colspan="3" class="text-end">รวมทั้งสิ้น</td>
+                                                                    <td class="text-center">
+                                                                        <span id="grand_total">0</span> บาท
+                                                                    </td>
+                                                                    <td></td>
+                                                                </tr>
+                                                            </tfoot>
+                                                        </table>
+                                                    </div>
+
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <!-- ปุ่มเพิ่มแบบฟอร์ม (สำหรับหลายวัน) -->
+                                        <div class="mt-3 mb-3" id="addBudgetFormBtnContainer"
+                                            style="{{ $expenseStatus == 'M' ? 'display: block;' : 'display: none;' }}">
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                onclick="addBudgetForm()">
+                                                <i class="bx bx-plus"></i> เพิ่มข้อมูลวันอื่น
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -297,7 +495,7 @@
                 <div class="content-box">
                     <div class="section-header">
                         <h4>
-                            9. ผู้รับผิดชอบโครงการ
+                            6. ผู้รับผิดชอบโครงการ
                         </h4>
                     </div>
                     <div id="responsibleDetails">
@@ -305,10 +503,10 @@
                             <label for="employee_id" class="form-label">เลือกผู้รับผิดชอบ</label>
                             <select class="form-select @error('employee_id') is-invalid @enderror" id="employee_id"
                                 name="employee_id">
-                                <option value="" disabled>เลือกผู้รับผิดชอบ</option>
+                                <option value="" selected disabled>เลือกผู้รับผิดชอบ</option>
                                 @foreach($employees as $employee)
                                 <option value="{{ $employee->Id_Employee }}"
-                                    {{ $project->employee_id == $employee->Id_Employee ? 'selected' : '' }}>
+                                    {{ $project->Employee_Id == $employee->Id_Employee ? 'selected' : '' }}>
                                     {{ $employee->Firstname }} {{ $employee->Lastname }}
                                 </option>
                                 @endforeach
@@ -320,417 +518,20 @@
                     </div>
                 </div>
 
-                <!-- ปุ่มบันทึก -->
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class='bx bx-save'></i> บันทึกข้อมูล
+                <!-- ปุ่มเสร็จสิ้น -->
+                <div class="mt-3 mb-3">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="bx bx-check-circle"></i> เสร็จสิ้น
                     </button>
                 </div>
+
             </form>
         </div>
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
+<script src="{{ asset('js/createFirstForm.js') }}"></script>
+<script src="{{ asset('js/editProjectBugget.js') }}"></script>
 
-    const strategySelect = document.getElementById('Name_Strategy');
-    const objectiveSelect = document.getElementById('Objective_Project');
-    const kpiSelect = document.getElementById('Success_Indicators');
-    const targetSelect = document.getElementById('Value_Target');
-
-    strategySelect.addEventListener('change', function() {
-        const selectedStrategyId = this.value;
-
-        Array.from(objectiveSelect.options).forEach(option => {
-            option.style.display = option.getAttribute('data-strategy-id') ===
-                selectedStrategyId ? 'block' : 'none';
-        });
-
-        Array.from(kpiSelect.options).forEach(option => {
-            option.style.display = option.getAttribute('data-strategy-id') ===
-                selectedStrategyId ? 'block' : 'none';
-        });
-
-        targetSelect.innerHTML = '<option value="" disabled selected>กรอกค่าเป้าหมาย</option>';
-    });
-
-    kpiSelect.addEventListener('change', function() {
-        const selectedOption = kpiSelect.options[kpiSelect.selectedIndex];
-        const targetValue = selectedOption.getAttribute('data-target-value');
-
-        targetSelect.innerHTML = '<option value="" disabled selected>กรอกค่าเป้าหมาย</option>';
-
-        if (targetValue) {
-            const option = document.createElement('option');
-            option.value = targetValue;
-            option.textContent = targetValue;
-            targetSelect.appendChild(option);
-        }
-    });
-
-    // ====== ชื่อโครงการ =======
-    window.addField1 = function(containerId, fieldName) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        const index = container.children.length; // Start from 1
-        const div = document.createElement('div');
-        div.classList.add('form-group', 'mb-2', 'dynamic-field');
-        div.innerHTML = `
-        <div class="input-group">
-            <span class="input-group-text">1.${index}</span>
-            <input type="text" class="form-control" name="${fieldName}" placeholder="กรอกชื่อโครงการย่อย" required>
-            <button type="button" class="btn btn-danger" onclick="removeField(this)">
-                <i class='bx bx-trash'></i>
-            </button>
-        </div>
-    `;
-        container.appendChild(div);
-        updateRemoveButtons(container);
-    };
-
-    window.removeField = function(button) {
-        const field = button.closest('.dynamic-field');
-        const container = field.parentElement;
-        field.remove();
-        updateRemoveButtons(container);
-        updateFieldNumbers(container);
-    };
-
-    function updateRemoveButtons(container) {
-        const buttons = container.querySelectorAll('.btn-danger');
-        buttons.forEach(btn => {
-            btn.style.display = buttons.length > 0 ? 'block' : 'none';
-        });
-    }
-
-    function updateFieldNumbers(container) {
-        const fields = container.querySelectorAll('.dynamic-field .input-group-text');
-        fields.forEach((field, index) => {
-            field.textContent = `1.${index + 1}`;
-        });
-    }
-
-    // ====== ลักษณะโครงการ =======
-    window.toggleTextbox = function(radio, prefix) {
-        const textboxContainer = document.querySelector(`#${prefix}2`).closest('.form-group');
-        const textbox = document.getElementById(`${prefix}2`);
-
-        if (radio.value === 'C') {
-            textboxContainer.style.display = 'block';
-            textbox.classList.remove('hidden');
-            textbox.required = true;
-        } else {
-            textboxContainer.style.display = 'none';
-            textbox.classList.add('hidden');
-            textbox.required = false;
-            textbox.value = '';
-        }
-    };
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const newProjectRadio = document.getElementById('newProject');
-        const continuousProjectRadio = document.getElementById('continuousProject');
-        const textbox = document.getElementById('textbox-projectType-2');
-
-        if (newProjectRadio.checked) {
-            textbox.classList.add('hidden');
-            textbox.closest('.form-group').style.display = 'none';
-        }
-
-        if (continuousProjectRadio.checked) {
-            textbox.classList.remove('hidden');
-            textbox.closest('.form-group').style.display = 'block';
-            textbox.required = true;
-        }
-
-        const projectTypeDetails = document.querySelector('.form-group-radio');
-        const toggleIcon = document.getElementById('toggleIconProjectType');
-        projectTypeDetails.style.display = 'none';
-        toggleIcon.classList.remove('bx-chevron-down');
-        toggleIcon.classList.add('bx-chevron-up');
-    });
-
-    // ============ จัดการความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย============
-
-    // ============ ความสอดคล้องกับยุทธศาสตร์ส่วนงาน ============
-
-    // ============ วัตถุประสงค์โครงการ ============
-    const form = document.querySelector('form'); // Adjust the selector to target your form
-    form.addEventListener('submit', function(event) {
-        const select = document.getElementById('Objective_Project');
-        const selectedOption = select.options[select.selectedIndex];
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'Details_Strategic_Objectives';
-        hiddenInput.value = selectedOption.value;
-        form.appendChild(hiddenInput);
-        select.disabled = true; // Disable the select to avoid sending its value
-    });
-
-    // ============ ตัวชี้วัดความสำเร็จของโครงการ ============
-
-
-    // ============ ค่าเป้าหมาย ============
-
-    // ============ แหล่งงบประมาณ ============
-    window.toggleIncomeForm = function(radio) {
-        const incomeForm = document.getElementById('incomeForm');
-        incomeForm.style.display = radio.value === 'Y' ? 'block' : 'none';
-    }
-
-    window.handleSourceSelect = function(radio) {
-        const selectedId = radio.getAttribute('data-id');
-        const budgetSources = document.querySelectorAll('input[name="budget_source"]');
-        budgetSources.forEach(source => {
-            const amountInput = document.querySelector(`input[name="amount_${source.value}"]`);
-            const isSelected = source.value === selectedId;
-            amountInput.disabled = !isSelected;
-            if (!isSelected) amountInput.value = '';
-        });
-    }
-
-    window.toggleDateForm = function(radio) {
-        // Find the "เพิ่มแบบฟอร์ม" button
-        const addBudgetFormBtn = document.querySelector(
-            '.btn.btn-primary.btn-sm[onclick="addBudgetForm()"]');
-
-        if (radio.value === 'single') {
-            // Hide the add form button for single day
-            if (addBudgetFormBtn) {
-                addBudgetFormBtn.style.display = 'none';
-            }
-
-            // Keep only the first form and remove others when switching to single day
-            const budgetForms = document.querySelectorAll('.budget-form');
-            budgetForms.forEach((form, index) => {
-                if (index === 0) {
-                    form.style.display = 'block';
-                } else {
-                    form.remove();
-                }
-            });
-        } else {
-            // Show the add form button for multiple days
-            if (addBudgetFormBtn) {
-                addBudgetFormBtn.style.display = 'block';
-            }
-        }
-    }
-
-    window.addDateForm = function() {
-        const container = document.getElementById('multipleDaysContainer');
-        const newDateForm = document.createElement('div');
-        newDateForm.className = 'mb-3 d-flex align-items-start';
-        newDateForm.innerHTML = `
-        <div style="flex: 1;">
-            <label class="form-label">วันที่</label>
-            <input type="date" name="date[]" class="form-control">
-        </div>
-    `;
-        container.appendChild(newDateForm);
-    }
-
-    window.removeDateForm = function(button) {
-        const dateForm = button.closest('.mb-3');
-        dateForm.remove();
-    }
-
-    window.addBudgetForm = function() {
-        const budgetFormsContainer = document.getElementById('budgetFormsContainer');
-        const formCount = budgetFormsContainer.getElementsByClassName('budget-form').length;
-
-        const newBudgetForm = document.createElement('div');
-        newBudgetForm.className = 'budget-form card mb-3';
-        newBudgetForm.innerHTML = `
-        <div class="card-body">
-            <button type="button" class="btn btn-danger btn-sm remove-form-btn" onclick="removeBudgetForm(this)">ลบแบบฟอร์ม</button>
-
-            <!-- Date and Details -->
-            <div class="mb-3 d-flex justify-content-between align-items-start">
-                <div style="flex: 1;">
-                    <label class="form-label">วันที่</label>
-                    <input type="date" name="date[]" class="form-control" style="width: 150px;">
-                </div>
-            </div>
-            <div class="mb-3 d-flex align-items-center">
-                <div style="flex: 3; margin-right: 1rem;">
-                    <label class="form-label">รายละเอียด</label>
-                    <textarea name="details[]" class="form-control" placeholder="ระบุรายละเอียด"></textarea>
-                </div>
-                <div style="flex: 1;">
-                    <label class="form-label">จำนวนเงินทั้งหมด</label>
-                    <div class="input-group">
-                        <input type="number" name="total_amount[]" class="form-control" placeholder="จำนวนเงิน">
-                        <span class="input-group-text">บาท</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Category and Sub-Items -->
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">หมวดหมู่</label>
-                        <select name="category[${formCount}][]" class="form-control">
-                            <option value="" disabled selected>เลือกหมวดหมู่</option>
-                            ${getSubtopBudgetsOptions()}
-                        </select>
-                    </div>
-                    <div id="subActivityContainer">
-                        <div class="sub-activity mb-3">
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <div class="mb-3 d-flex align-items-center">
-                                        <div style="flex: 3;">
-                                            <label class="form-label">รายละเอียดของหมวดหมู่</label>
-                                            <textarea name="description[${formCount}][]" class="form-control" placeholder="เช่น ค่าอาหารว่างสำหรับการจัดประชุมคณะกรรมการจัดการความรู้"></textarea>
-                                        </div>
-                                        <div style="flex: 1; margin-left: 1rem;">
-                                            <label class="form-label">จำนวนเงิน</label>
-                                            <div class="input-group">
-                                                <input type="number" name="amount[${formCount}][]" class="form-control" placeholder="880">
-                                                <span class="input-group-text">บาท</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="btn btn-success btn-sm" onclick="addDetail(this)">เพิ่มรายละเอียด</button>
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeDetail(this)">ลบรายละเอียด</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="addSubActivity(this)">เพิ่มหัวข้อย่อยพร้อมรายละเอียด</button>
-                </div>
-            </div>
-        </div>
-    `;
-
-        budgetFormsContainer.appendChild(newBudgetForm);
-    }
-
-    window.removeBudgetForm = function(button) {
-        const budgetForm = button.closest('.budget-form');
-        budgetForm.remove();
-    }
-
-    window.addDetail = function(button) {
-        const subActivity = button.closest('.sub-activity');
-        const formCount = button.closest('.budget-form').getAttribute('data-form-index') || '0';
-
-        const newDetail = document.createElement('div');
-        newDetail.className = 'card mb-3';
-        newDetail.innerHTML = `
-        <div class="card-body">
-            <div class="mb-3 d-flex align-items-center">
-                <div style="flex: 3;">
-                    <label class="form-label">รายละเอียดของหมวดหมู่</label>
-                    <textarea name="description[${formCount}][]" class="form-control" placeholder="เช่น ค่าอาหารว่างสำหรับการจัดประชุมคณะกรรมการจัดการความรู้"></textarea>
-                </div>
-                <div style="flex: 1; margin-left: 1rem;">
-                    <label class="form-label">จำนวนเงิน</label>
-                    <div class="input-group">
-                        <input type="number" name="amount[${formCount}][]" class="form-control" placeholder="880">
-                        <span class="input-group-text">บาท</span>
-                    </div>
-                </div>
-            </div>
-            <button type="button" class="btn btn-danger btn-sm" onclick="removeDetail(this)">ลบรายละเอียด</button>
-        </div>
-    `;
-        subActivity.appendChild(newDetail);
-    }
-
-    window.addSubActivity = function(button) {
-        const subActivityContainer = button.closest('.budget-form').querySelector('#subActivityContainer');
-        const formCount = button.closest('.budget-form').getAttribute('data-form-index') || '0';
-
-        const newSubActivity = document.createElement('div');
-        newSubActivity.className = 'sub-activity mb-3';
-        newSubActivity.innerHTML = `
-        <div class="card mb-3">
-            <div class="card-body">
-                <div class="mb-3">
-                    <label class="form-label">หมวดหมู่</label>
-                    <select name="category[${formCount}][]" class="form-control">
-                        <option value="" disabled selected>เลือกหมวดหมู่</option>
-                        ${getSubtopBudgetsOptions()}
-                    </select>
-                </div>
-                <div class="mb-3 d-flex align-items-center">
-                    <div style="flex: 3;">
-                        <label class="form-label">รายละเอียดของหมวดหมู่</label>
-                        <textarea name="description[${formCount}][]" class="form-control" placeholder="เช่น ค่าอาหารว่างสำหรับการจัดประชุมคณะกรรมการจัดการความรู้"></textarea>
-                    </div>
-                    <div style="flex: 1; margin-left: 1rem;">
-                        <label class="form-label">จำนวนเงิน</label>
-                        <div class="input-group">
-                            <input type="number" name="amount[${formCount}][]" class="form-control" placeholder="880">
-                            <span class="input-group-text">บาท</span>
-                        </div>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-success btn-sm" onclick="addDetail(this)">เพิ่มรายละเอียด</button>
-                <button type="button" class="btn btn-danger btn-sm" onclick="removeSubActivity(this)">ลบหัวข้อย่อย</button>
-            </div>
-        </div>
-    `;
-        subActivityContainer.appendChild(newSubActivity);
-    }
-
-    // Helper function to get subtopBudgets options
-    function getSubtopBudgetsOptions() {
-        const subtopBudgetsSelect = document.querySelector('select[name="category[]"]');
-        return subtopBudgetsSelect ? subtopBudgetsSelect.innerHTML : '';
-    }
-
-    window.removeDetail = function(button) {
-        const detailItem = button.closest('.card');
-        detailItem.remove();
-    }
-
-    window.removeSubActivity = function(button) {
-        const subActivityItem = button.closest('.sub-activity');
-        subActivityItem.remove();
-    }
-
-    window.updateRemoveButtons = function(detailsContainer) {
-        if (!detailsContainer) return;
-
-        const detailItems = detailsContainer.querySelectorAll('.detail-item');
-        const removeButtons = detailsContainer.querySelectorAll('.remove-btn');
-        removeButtons.forEach(button => {
-            button.style.display = detailItems.length > 1 ? 'inline-block' : 'none';
-        });
-    }
-
-    window.updateFormTitles = function() {
-        const budgetForms = document.querySelectorAll('.budget-form');
-        budgetForms.forEach((form, index) => {
-            form.setAttribute('data-form-index', index);
-            const titleElement = form.querySelector('h5');
-            if (titleElement) {
-                titleElement.innerText = `แบบฟอร์มที่ ${index + 1}`;
-            }
-        });
-    }
-
-    // Initialize when the document is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initial setup for date type selection
-        const singleDayRadio = document.getElementById('single_day');
-        if (singleDayRadio) {
-            toggleDateForm(singleDayRadio);
-        }
-
-        document.querySelectorAll('.detailsContainer').forEach(container => updateRemoveButtons(
-            container));
-        updateFormTitles();
-    });
-    // ============ ผู้รับผิดชอบโครงการ============
-
-});
-</script>
 
 @endsection

@@ -22,4 +22,8 @@ class ExpenseModel extends Model
     {
         return $this->belongsTo(ExpenseTypesModel::class, 'Expense_Types_Id', 'Id_Expense_Types');
     }
+    public function expenHasSubtopicBudgets()
+    {
+        return $this->hasMany(ExpenHasSubtopicBudgetModel::class, 'Expense_Id', 'Id_Expense');
+    }
 }

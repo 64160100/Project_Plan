@@ -25,6 +25,6 @@ class SuccessIndicatorsModel extends Model
     
     public function valueTargets()
     {
-        return $this->hasMany(ValueTargetModel::class, 'Id_Success_Indicators', 'Id_Success_Indicators');
+        return $this->hasMany(ValueTargetModel::class, 'Success_Indicators_Id', 'Id_Success_Indicators');
     }
 }

@@ -10,17 +10,23 @@ use Illuminate\Support\Facades\Log;
 
 class StorageFileController extends Controller
 {
-    public function index($project_id = null)
+    public function index($project_id = null, Request $request)
     {
-        
+        $employee = $request->session()->get('employee');
+
         if ($project_id) {
             $files = StorageFileModel::where('Project_Id', $project_id)->get();
+            $project = ListProjectModel::findOrFail($project_id);
         } else {
             $files = StorageFileModel::all();
+            $project = null;
         }
 
-        return view('StorageFiles.index', compact('files', 'project_id'));
+        log::info($project_id);
+
+        return view('StorageFiles.index', compact('files', 'project_id', 'employee', 'project'));
     }
+
 
     public function view($id)
     {
@@ -156,5 +162,14 @@ class StorageFileController extends Controller
         }
 
         return redirect()->back()->with('error', 'File not found');
+    }
+
+    public function updateName(Request $request)
+    {
+        $file = StorageFileModel::findOrFail($request->id);
+        $file->Name_Storage_File = $request->name;
+        $file->save();
+
+        return response()->json(['success' => true]);
     }
 }

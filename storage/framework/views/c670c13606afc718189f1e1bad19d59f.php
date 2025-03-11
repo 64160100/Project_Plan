@@ -3,35 +3,35 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" href="{{ public_path('css/pdf.css') }}">
-    <title>{{ $project->Name_Project }}</title>
+    <link rel="stylesheet" href="<?php echo e(public_path('css/pdf.css')); ?>">
+    <title><?php echo e($project->Name_Project); ?></title>
     <style>
     @font-face {
         font-family: 'THSarabunNew';
         font-style: normal;
         font-weight: normal;
-        src: url('{{ public_path('fonts/THSarabunNew.ttf') }}') format('truetype');
+        src: url('<?php echo e(public_path('fonts/THSarabunNew.ttf')); ?>') format('truetype');
     }
 
     @font-face {
         font-family: 'THSarabunNew';
         font-style: normal;
         font-weight: bold;
-        src: url('{{ public_path('fonts/THSarabunNew Bold.ttf') }}') format('truetype');
+        src: url('<?php echo e(public_path('fonts/THSarabunNew Bold.ttf')); ?>') format('truetype');
     }
 
     @font-face {
         font-family: 'THSarabunNew';
         font-style: italic;
         font-weight: normal;
-        src: url('{{ public_path('fonts/THSarabunNew Italic.ttf') }}') format('truetype');
+        src: url('<?php echo e(public_path('fonts/THSarabunNew Italic.ttf')); ?>') format('truetype');
     }
 
     @font-face {
         font-family: 'THSarabunNew';
         font-style: italic;
         font-weight: bold;
-        src: url('{{ public_path('fonts/THSarabunNew BoldItalic.ttf') }}') format('truetype');
+        src: url('<?php echo e(public_path('fonts/THSarabunNew BoldItalic.ttf')); ?>') format('truetype');
     }
 
     body {
@@ -91,24 +91,26 @@
 
 <body>
 
-    <h1>{{ toThaiNumber($project->Name_Project) }}</h1>
+    <h1><?php echo e(toThaiNumber($project->Name_Project)); ?></h1>
     <div class="line"></div>
-    <p><b>๑. ชื่อโครงการ: </b>{{ toThaiNumber($project->Name_Project) }}</p>
+    <p><b>๑. ชื่อโครงการ: </b><?php echo e(toThaiNumber($project->Name_Project)); ?></p>
 
     <p class="space"><b style="color:#f00">๒. ลักษณะโครงการ:</b>
-        @if ($project->Description_Project == 'N')
+        <?php if($project->Description_Project == 'N'): ?>
         <span class="checkbox">&#9745;</span><span style="margin-left:5px;">โครงการใหม่</span>
         <span class="checkbox">&#9744;</span><span style="margin-left:5px;">โครงการต่อเนื่อง</span>
-        @else
+        <?php else: ?>
         <span class="checkbox">&#9744;</span><span style="margin-left:5px;">โครงการใหม่</span>
         <span class="checkbox">&#9745;</span><span style="margin-left:5px;">โครงการต่อเนื่อง</span>
-        @endif
+        <?php endif; ?>
     </p>
 
     <p class="space"><b>๓. ผู้รับผิดชอบโครงการ</b>
     <p class='paragraph'>
-        {{ $project->employee->Firstname ?? '-' }}
-        {{ $project->employee->Lastname ?? '' }}
+        <?php echo e($project->employee->Firstname ?? '-'); ?>
+
+        <?php echo e($project->employee->Lastname ?? ''); ?>
+
     </p>
     </p>
 
@@ -120,61 +122,62 @@
 
         )
 
-        @foreach ($project->platforms as $platform)
+        <?php $__currentLoopData = $project->platforms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $platform): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <p class="paragraph-tab">
         <span class="checkbox">&#9744;</span>
-        <span><b>แพลตฟอร์ม {{ toThaiNumber($loop->iteration) }} {{ toThaiNumber($platform->Name_Platform) }}</b></span>
+        <span><b>แพลตฟอร์ม <?php echo e(toThaiNumber($loop->iteration)); ?> <?php echo e(toThaiNumber($platform->Name_Platform)); ?></b></span>
     </p>
 
-    @foreach ($platform->programs as $program)
+    <?php $__currentLoopData = $platform->programs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <p class="paragraph">
         <span class="checkbox">&#9745;</span>
-        <span>{{ toThaiNumber($program->Name_Program) }}</span>
+        <span><?php echo e(toThaiNumber($program->Name_Program)); ?></span>
     </p>
 
-    @foreach ($program->kpis as $kpi)
+    <?php $__currentLoopData = $program->kpis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kpi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <p class="paragraph">
         <span class="checkbox">&#9745;</span>
-        <span>{{ toThaiNumber($kpi->Name_KPI) }}</span>
+        <span><?php echo e(toThaiNumber($kpi->Name_KPI)); ?></span>
     </p>
-    @endforeach
-    @endforeach
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
 
     <p class="space"><b>๕. ความสอดคล้องกับยุทธศาสตร์ส่วนงาน</b>
     <p class='paragraph-tab'>
         <span class="checkbox">&#9745;</span>
-        <span><b>{{ toThaiNumber($project->strategic->Name_Strategic_Plan)  }}</b></span>
+        <span><b><?php echo e(toThaiNumber($project->strategic->Name_Strategic_Plan)); ?></b></span>
     </p>
     <p class='paragraph'>
         <span class="checkbox">&#9745;</span>
-        <span>{{ toThaiNumber($project->Name_Strategy) }}</span>
+        <span><?php echo e(toThaiNumber($project->Name_Strategy)); ?></span>
     </p>
     </p>
 
     <p class="space"><b>๖. สอดคล้องกับ (SDGs) (เลือกได้มากกว่า ๑ หัวข้อ)</b>
-        @foreach($project->projectHasSDGs as $project_has_sdgs)
+        <?php $__currentLoopData = $project->projectHasSDGs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $project_has_sdgs): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <p class='paragraph'>
         <span class="checkbox">&#9745;</span><span style="margin-left:5px;">
         </span>
     </p>
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
 
     <p class="space"><b>๗. การบูรณาการงานโครงการ/กิจกรรม กับ</b>
     <p class='paragraph'>
-        @foreach ($project->projectHasIntegrationCategories as $projectHasIntegrationCategorie)
-        <span>๗.{{ toThaiNumber($loop->iteration) }}</span>
+        <?php $__currentLoopData = $project->projectHasIntegrationCategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $projectHasIntegrationCategorie): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <span>๗.<?php echo e(toThaiNumber($loop->iteration)); ?></span>
         <span class="checkbox">&#9745;</span>
-        <span><b>{{ $projectHasIntegrationCategorie->integrationCategory->Name_Integration_Category }}</b></span><br>
+        <span><b><?php echo e($projectHasIntegrationCategorie->integrationCategory->Name_Integration_Category); ?></b></span><br>
 
-        @if($projectHasIntegrationCategorie->Integration_Details)
+        <?php if($projectHasIntegrationCategorie->Integration_Details): ?>
         <span class="paragraph">
-            {{ $projectHasIntegrationCategorie->Integration_Details }}
+            <?php echo e($projectHasIntegrationCategorie->Integration_Details); ?>
+
         </span><br>
-        @endif
-        @endforeach
+        <?php endif; ?>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
     </p>
 
@@ -182,87 +185,94 @@
         <span><b>๘. หลักการและเหตุผล</b></span>
         <span>(ระบุที่มา เหตุผล/ปัญหา/ความจำเป็น/ความสำคัญ/องค์ความรู้และความเชี่ยวชาญ ของสาขาวิชา)</span>
     <p class="paragraph-content">
-        {{ toThaiNumber($project->Principles_Reasons ?? '-') }}
+        <?php echo e(toThaiNumber($project->Principles_Reasons ?? '-')); ?>
+
     </p>
     </p>
 
     <p class="space"><b>๙. วัตถุประสงค์โครงการ</b>
     <p class="paragraph-content">
-        {{ toThaiNumber($project->Objective_Project ?? '-') }}
+        <?php echo e(toThaiNumber($project->Objective_Project ?? '-')); ?>
+
     </p>
     </p>
 
     <p class="space"><b>๑๐. กลุ่มเป้าหมาย</b>
     <p class="paragraph"><b>๑๐.๑ กลุ่มผู้รับบริการ</b>
-        @foreach($project->targets as $target)
+        <?php $__currentLoopData = $project->targets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $target): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <table style="border-collapse: collapse; width:100%; border: none;">
         <tr>
             <td style="width: 18%; border: none;"></td>
-            <td style="width: 35%; text-align: left; padding: 5px; border: none;">- {{ $target->Name_Target }}</td>
+            <td style="width: 35%; text-align: left; padding: 5px; border: none;">- <?php echo e($target->Name_Target); ?></td>
             <td style="text-align: left; padding: 5px; border: none;">
                 <span>จำนวน </span>
                 <span class="line" style="width: 50px; line-height: 0.8;">
-                    {{ toThaiNumber($target->Quantity_Target) }}
+                    <?php echo e(toThaiNumber($target->Quantity_Target)); ?>
+
                 </span>
-                {{ toThaiNumber($target->Unit_Target) }}
+                <?php echo e(toThaiNumber($target->Unit_Target)); ?>
+
             </td>
         </tr>
     </table>
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
 
     <p class="paragraph" style="margin-top: 20px;"><b>๑๐.๒ พื้นที่/ชุมชนเป้าหมาย (ถ้ามี ระบุ) </b>
-        @foreach($project->targets as $target)
-        @foreach($target->targetDetails as $detail)
+        <?php $__currentLoopData = $project->targets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $target): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php $__currentLoopData = $target->targetDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <p class="paragraph-two">
-        {{ toThaiNumber($detail->Details_Target) }}
+        <?php echo e(toThaiNumber($detail->Details_Target)); ?>
+
     </p>
-    @endforeach
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
     </p>
 
     <p class="space">
         <span><b>๑๑. สถานที่ดำเนินงาน</b></span>
     <p class="paragraph-content">
-        @foreach($project->locations as $location)
-        ๑๑.{{ toThaiNumber($loop->iteration) }} {{ toThaiNumber($location->Name_Location) }}
-        @endforeach
+        <?php $__currentLoopData = $project->locations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $location): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        ๑๑.<?php echo e(toThaiNumber($loop->iteration)); ?> <?php echo e(toThaiNumber($location->Name_Location)); ?>
+
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
     </p>
 
     <!-- ตัวชี้วัด -->
     <p class="space">
         <span><b>๑๒. ตัวชี้วัด</b></span>
-        @php
+        <?php
         $groupedIndicators = collect($project->projectHasIndicators)
         ->groupBy(fn($indicator) => $indicator->indicators->Type_Indicators);
-        @endphp
+        ?>
 
-        @foreach (['Quantitative' => 'เชิงปริมาณ', 'Qualitative' => 'เชิงคุณภาพ'] as $type => $label)
-        @if (!empty($groupedIndicators[$type]))
-    <p class="paragraph"><b>๑๒.{{ toThaiNumber($loop->iteration) }}. {{ $label }}</b></p>
-    @foreach ($groupedIndicators[$type] as $index => $indicator)
-    <p class="paragraph-two {{ $loop->last ? 'loop_last' : '' }}">
-        ({{ toThaiNumber($loop->iteration) }}) {{ toThaiNumber($indicator->Details_Indicators) }}
+        <?php $__currentLoopData = ['Quantitative' => 'เชิงปริมาณ', 'Qualitative' => 'เชิงคุณภาพ']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php if(!empty($groupedIndicators[$type])): ?>
+    <p class="paragraph"><b>๑๒.<?php echo e(toThaiNumber($loop->iteration)); ?>. <?php echo e($label); ?></b></p>
+    <?php $__currentLoopData = $groupedIndicators[$type]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $indicator): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <p class="paragraph-two <?php echo e($loop->last ? 'loop_last' : ''); ?>">
+        (<?php echo e(toThaiNumber($loop->iteration)); ?>) <?php echo e(toThaiNumber($indicator->Details_Indicators)); ?>
+
     </p>
-    @endforeach
-    @endif
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    <?php endif; ?>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
 
 
     <p class="space">
         <span><b>๑๓. ระยะเวลาดำเนินโครงการ</b></span>
     <p class="paragraph">
-        @if (!empty($project->First_Time) && !empty($project->End_Time))
+        <?php if(!empty($project->First_Time) && !empty($project->End_Time)): ?>
         <span>
-            กำหนดการจัดโครงการ <b>{{ $project->formatted_first_time }}</b><br>
-            ถึง <b style="margin-left: 6px">{{ $project->formatted_end_time }}</b>
+            กำหนดการจัดโครงการ <b><?php echo e($project->formatted_first_time); ?></b><br>
+            ถึง <b style="margin-left: 6px"><?php echo e($project->formatted_end_time); ?></b>
         </span>
-        @else
+        <?php else: ?>
         <span>-</span>
-        @endif
+        <?php endif; ?>
     </p>
     </p>
 
@@ -309,17 +319,19 @@
 
     <p class="space">
         <span><b style="color:#f00">๑๕. แหล่งงบประมาณ</b></span><br>
-        @if($project->Status_Budget != 'Y')
+        <?php if($project->Status_Budget != 'Y'): ?>
         <b class="paragraph">-</b>
-        @else
-        @foreach($projectBudgetSources as $budget)
+        <?php else: ?>
+        <?php $__currentLoopData = $projectBudgetSources; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $budget): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <span class="checkbox" style="margin-left:25px;">&#9745;</span>
-        <span style="margin-left:5px;">{{ $budget->budgetSource->Name_Budget_Source }}
+        <span style="margin-left:5px;"><?php echo e($budget->budgetSource->Name_Budget_Source); ?>
+
             <b class="line" style="display: inline-block; padding-left: 20px; padding-right: 20px; width: auto;">
-                {{ $budget->Amount_Total }}
+                <?php echo e($budget->Amount_Total); ?>
+
             </b>บาท
         </span>
-    <p class="paragraph-content">{{ $budget->Details_Expense }}</p>
+    <p class="paragraph-content"><?php echo e($budget->Details_Expense); ?></p>
     <div class="head-table">รายละเอียดค่าใช้จ่าย (แตกตัวคูณโดยใช้อัตราตามหลักเกณฑ์อัตราค่าใช้จ่าย)</div>
     <table>
         <thead>
@@ -331,16 +343,16 @@
         </thead>
 
     </table>
-    @endforeach
-    @endif
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    <?php endif; ?>
     </p>
 
     <p class="space">
         <span><b>๑๖. เป้าหมายเชิงผลผลิต (Output)</b></span>
     <p class="paragraph">
-        @foreach($output as $outputs)
-    <p class="paragraph-content">๑๖.{{ toThaiNumber($loop->iteration) }} {{ toThaiNumber($outputs->Name_Output) }}</p>
-    @endforeach
+        <?php $__currentLoopData = $output; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $outputs): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <p class="paragraph-content">๑๖.<?php echo e(toThaiNumber($loop->iteration)); ?> <?php echo e(toThaiNumber($outputs->Name_Output)); ?></p>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
     </p>
 
@@ -348,36 +360,37 @@
     <p class="space">
         <span><b>๑๗. เป้าหมายเชิงผลลัพธ์ (Outcome)</b></span>
     <p class="paragraph">
-        @foreach($outcome as $outcomes)
-    <p class="paragraph-content">๑๗.{{ toThaiNumber($loop->iteration) }} {{ toThaiNumber($outcomes->Name_Outcome) }}</p>
-    @endforeach
+        <?php $__currentLoopData = $outcome; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $outcomes): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <p class="paragraph-content">๑๗.<?php echo e(toThaiNumber($loop->iteration)); ?> <?php echo e(toThaiNumber($outcomes->Name_Outcome)); ?></p>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
     </p>
 
     <p class="space">
         <span><b>๑๘. ผลที่คาดว่าจะได้รับ</b></span>
     <p class="paragraph">
-        @foreach($expectedResult as $expectedResults)
-    <p class="paragraph-content">๑๘.{{ toThaiNumber($loop->iteration) }}
-        {{ toThaiNumber($expectedResults->Name_Expected_Results) }}</p>
-    @endforeach
+        <?php $__currentLoopData = $expectedResult; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $expectedResults): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <p class="paragraph-content">๑๘.<?php echo e(toThaiNumber($loop->iteration)); ?>
+
+        <?php echo e(toThaiNumber($expectedResults->Name_Expected_Results)); ?></p>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </p>
     </p>
 
     <p class="space">
         <span><b>๑๙. ตัวชี้วัดความสำเร็จของโครงการ</b></span>
     <p class="paragraph-content">
-        <span>{{ toThaiNumber($project->Success_Indicators ?? '-') }}</span>
+        <span><?php echo e(toThaiNumber($project->Success_Indicators ?? '-')); ?></span>
     </p>
     </p>
     <p class="space">
         <span><b>๒๐. ค่าเป้าหมาย</b></span>
     <p class="paragraph-content">
-        <span>{{ toThaiNumber($project->Value_Target ?? '-') }}</span>
+        <span><?php echo e(toThaiNumber($project->Value_Target ?? '-')); ?></span>
     </p>
     </p>
 
 
 </body>
 
-</html>
+</html><?php /**PATH /var/www/resources/views/PDF/PDF.blade.php ENDPATH**/ ?>

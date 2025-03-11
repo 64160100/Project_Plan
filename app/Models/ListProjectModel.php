@@ -60,24 +60,25 @@ class ListProjectModel extends Model
         return $this->hasMany(StorageFileModel::class, 'Project_Id', 'Id_Project');
     }
 
-    public function sdgs()
-    {
-        return $this->belongsToMany(SDGsModel::class, 'Project_has_SDGs', 'Project_Id', 'SDGs_Id');
-    }
-
+    
     public function indicators()
     {
         return $this->hasMany(IndicatorsModel::class, 'Project_Id', 'Id_Project');
     }
-
+    
     public function platforms()
     {
         return $this->hasMany(PlatformModel::class, 'Project_Id', 'Id_Project');
     }
-
+    
     public function projectHasSDGs()
     {
         return $this->hasMany(ProjectHasSDGModel::class, 'Project_Id', 'Id_Project');
+    }
+    
+    public function sdgs()
+    {
+        return $this->belongsToMany(SDGsModel::class, 'Project_has_SDGs', 'Project_Id', 'SDGs_Id');
     }
 
     public function projectHasIntegrationCategories()
@@ -123,6 +124,26 @@ class ListProjectModel extends Model
     public function valueTargets()
     {
         return $this->hasMany(ValueTargetModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function expenseTypes()
+    {
+        return $this->hasMany(ExpenseTypesModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function objectives()
+    {
+        return $this->hasMany(ObjectiveProjectModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function monthlyPlans()
+    {
+        return $this->hasMany(MonthlyPlansModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function shortProjects()
+    {
+        return $this->hasMany(ShortProjectModel::class, 'Project_Id', 'Id_Project');
     }
 
 }

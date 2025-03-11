@@ -11,9 +11,10 @@ class KpiModel extends Model
     protected $primaryKey = 'Id_Kpi';
     protected $fillable = [
         'Id_Kpi',
-        'Strategy_Id',
         'Name_Kpi',
         'Target_Value',
+        'Strategy_Id',
+        'Strategy_Strategic_Id'
     ];
     public $timestamps = false;
 

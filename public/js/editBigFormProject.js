@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ============ ผู้รับผิดชอบโครงการ============
 
-    // ============ จัดการความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย============
+    // ============ จัดการความสอดคล้องกับยุทธศาสตร์มหาวิทยาลัย ============
     let platformCount = 1;
 
     window.addPlatform = function() {
@@ -115,14 +115,14 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addKpi = function(btn) {
         const kpiContainer = btn.closest('.kpi-container');
         const kpiGroup = kpiContainer.querySelector('.kpi-group').cloneNode(true);
-
+    
         kpiGroup.querySelector('input').value = '';
-
+    
         const removeBtn = kpiGroup.querySelector('.btn-danger');
         if (!removeBtn) {
             const newRemoveBtn = document.createElement('button');
             newRemoveBtn.type = 'button';
-            newRemoveBtn.className = 'btn btn-danger';
+            newRemoveBtn.className = 'btn btn-danger btn-sm remove-field';
             newRemoveBtn.innerHTML = "<i class='bx bx-trash'></i>";
             newRemoveBtn.onclick = function() {
                 removeKpi(this);
@@ -131,30 +131,36 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             removeBtn.style.display = 'block';
         }
-
+    
         kpiContainer.appendChild(kpiGroup);
+        updateKpiNumbers(kpiContainer);
+        updateRemoveButtons(kpiContainer);
     }
-
+    
     window.removeKpi = function(btn) {
         const kpiGroup = btn.closest('.kpi-group');
         const kpiContainer = kpiGroup.closest('.kpi-container');
-
+    
         if (kpiContainer.querySelectorAll('.kpi-group').length > 1) {
             kpiGroup.remove();
+            updateKpiNumbers(kpiContainer);
+            updateRemoveButtons(kpiContainer);
         }
     }
-
-    function updatePlatformNumbers() {
-        const platformCards = document.querySelectorAll('.platform-card');
-        platformCards.forEach((card, index) => {
-            card.querySelector('.card-title').textContent = `แพลตฟอร์มที่ ${index + 1}`;
-            const inputs = card.querySelectorAll('input');
-            inputs.forEach(input => {
-                const name = input.name.replace(/\[\d+\]/, `[${index}]`);
-                input.name = name;
-            });
+    
+    function updateKpiNumbers(kpiContainer) {
+        const kpiGroups = kpiContainer.querySelectorAll('.kpi-group');
+        kpiGroups.forEach((group, index) => {
+            group.querySelector('.location-number').textContent = `${index + 1}`;
         });
-        platformCount = platformCards.length;
+    }
+    
+    function updateRemoveButtons(kpiContainer) {
+        const kpiGroups = kpiContainer.querySelectorAll('.kpi-group');
+        const removeButtons = kpiContainer.querySelectorAll('.remove-field');
+        removeButtons.forEach(btn => {
+            btn.style.display = kpiGroups.length > 1 ? 'block' : 'none';
+        });
     }
 
     // ============ ความสอดคล้องกับยุทธศาสตร์ส่วนงาน ============
@@ -236,6 +242,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    window.toggleTargetAreaDetails = function() {
+        const targetAreaDetails = document.getElementById('targetAreaDetails');
+        const checkbox = document.getElementById('targetAreaCheckbox');
+
+        if (checkbox.checked) {
+            targetAreaDetails.style.display = 'block';
+        } else {
+            targetAreaDetails.style.display = 'none';
+        }
+    }
+
     // ============ สถานที่ ============
     window.toggleLocationDetails = function() {
         const locationDetails = document.getElementById('locationDetails');
@@ -265,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="input-group">
                         <span class="input-group-text location-number">11.${locationCount}</span>
                         <input type="text" class="form-control" name="location[]" 
-                            placeholder="กรอกสถานที่" style="min-width: 1000px;">
+                            placeholder="กรอกสถานที่" style="min-width: 800px;">
                         <button type="button" class="btn btn-danger btn-sm remove-location">
                             <i class='bx bx-trash'></i>
                         </button>
@@ -488,21 +505,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.addMethodItem = function() {
         const newMethod = document.createElement('div');
-        newMethod.className = 'form-group mt-2';
+        newMethod.className = 'form-group location-item mt-2';
+        const itemNumber = methodContainer.children.length + 1;
         newMethod.innerHTML = `
-        <input type="text" class="form-control" name="Details_Short_Project[]" placeholder="เพิ่มรายการ">
-        <button type="button" class="btn btn-danger btn-sm remove-method mt-2">
-            <i class='bx bx-trash'></i>
-        </button>
-    `;
+            <div class="d-flex align-items-center">
+                <div class="input-group">
+                    <span class="input-group-text location-number">${itemNumber}</span>
+                    <input type="text" class="form-control" name="Details_Short_Project[]" placeholder="เพิ่มรายการ">
+                    <button type="button" class="btn btn-danger btn-sm remove-method" style="display: none;">
+                        <i class='bx bx-trash'></i>
+                    </button>
+                </div>
+            </div>
+        `;
         methodContainer.appendChild(newMethod);
         updateMethodButtons();
     }
 
     methodContainer.addEventListener('click', function(e) {
         if (e.target.closest('.remove-method')) {
-            e.target.closest('.form-group').remove();
+            e.target.closest('.location-item').remove();
             updateMethodButtons();
+            updateMethodNumbers();
         }
     });
 
@@ -510,6 +534,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const buttons = methodContainer.querySelectorAll('.remove-method');
         buttons.forEach(btn => {
             btn.style.display = buttons.length > 1 ? 'block' : 'none';
+        });
+    }
+
+    function updateMethodNumbers() {
+        const items = methodContainer.querySelectorAll('.location-item');
+        items.forEach((item, index) => {
+            item.querySelector('.location-number').textContent = `${index + 1}`;
         });
     }
 
@@ -664,22 +695,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============ เป้าหมายเชิงผลผลิต (Output) ============
     window.addField = function(containerId, fieldName) {
         const container = document.getElementById(containerId);
+        const items = container.querySelectorAll('.location-item');
+        const newIndex = items.length + 1;
+
         const newField = document.createElement('div');
-        newField.className = 'form-group mt-2';
+        newField.className = 'form-group location-item mt-2';
         newField.innerHTML = `
-        <input type="text" class="form-control" name="${fieldName}" placeholder="เพิ่มรายการ">
-        <button type="button" class="btn btn-danger btn-sm remove-field mt-2">
-            <i class='bx bx-trash'></i>
-        </button>
-    `;
+            <div class="d-flex align-items-center">
+                <div class="input-group">
+                    <span class="input-group-text location-number">${newIndex}</span>
+                    <input type="text" class="form-control" name="${fieldName}" placeholder="เพิ่มรายการ">
+                    <button type="button" class="btn btn-danger btn-sm remove-field" style="display: none;">
+                        <i class='bx bx-trash'></i>
+                    </button>
+                </div>
+            </div>
+        `;
         container.appendChild(newField);
         updateFieldButtons(containerId);
+        updateFieldNumbers(containerId);
     }
 
     document.addEventListener('click', function(e) {
         if (e.target.closest('.remove-field')) {
-            e.target.closest('.form-group').remove();
-            updateFieldButtons(e.target.closest('.dynamic-container').id);
+            const item = e.target.closest('.location-item');
+            const container = item.parentElement;
+            item.remove();
+            updateFieldButtons(container.id);
+            updateFieldNumbers(container.id);
         }
     });
 
@@ -688,6 +731,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const buttons = container.querySelectorAll('.remove-field');
         buttons.forEach(btn => {
             btn.style.display = buttons.length > 1 ? 'block' : 'none';
+        });
+    }
+
+    function updateFieldNumbers(containerId) {
+        const container = document.getElementById(containerId);
+        const items = container.querySelectorAll('.location-item');
+        items.forEach((item, index) => {
+            item.querySelector('.location-number').textContent = `${index + 1}`;
         });
     }
 

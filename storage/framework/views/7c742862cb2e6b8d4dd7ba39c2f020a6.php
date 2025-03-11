@@ -2,12 +2,17 @@
 
 <?php $__env->startSection('content'); ?>
 <div class="container">
-    <h1>แก้ไขกลยุทธ์และตัวชี้วัด</h1>
+    <div class="d-flex justify-content-start align-items-center">
+        <a href="<?php echo e(route('strategy.index',  $strategy->Strategic_Id)); ?>" class="back-btn">
+            <i class='bx bxs-left-arrow-square'></i>
+        </a>
+        <h1 class="ms-3">แก้ไขกลยุทธ์และตัวชี้วัด</h1>
+    </div>
     <form action="<?php echo e(route('strategy.update', $strategy->Id_Strategy)); ?>" method="POST">
         <?php echo csrf_field(); ?>
         <?php echo method_field('PUT'); ?>
 
-        <div class="card p-3">
+        <div class="card p-3 mt-3">
             <div class="form-group">
                 <label for="Name_Strategy">ชื่อกลยุทธ์</label>
                 <div class="input-group">

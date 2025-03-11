@@ -1,6 +1,7 @@
 <head>
     <link rel="stylesheet" href="<?php echo e(asset('css/setting.css')); ?>">
 </head>
+<title>ตั้งค่าระบบ</title>
 
 <?php $__env->startSection('content'); ?>
 <div class="container">

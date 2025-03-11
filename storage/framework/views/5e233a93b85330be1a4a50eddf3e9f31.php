@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>เป้าหมายการพัฒนาที่ยั่งยืน</title>
     <link rel="stylesheet" href="<?php echo e(asset('css/sdg.css')); ?>">
 
 
@@ -11,14 +11,46 @@
 <body>
 <?php $__env->startSection('content'); ?>
     <div class="container">
-        <h3 class="head-project">
-            <b>เป้าหมายการพัฒนาที่ยั่งยืน (Sustainable Development Goals: SDGs)</b>
-        </h3>
-        <button type="button" class="btn-add" data-bs-toggle="modal" data-bs-target="#addSdg">
-            <i class='bx bx-plus'></i>เพิ่มข้อมูล
-        </button>
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="<?php echo e(route('setting')); ?>" class="back-btn">
+                <i class='bx bxs-left-arrow-square'></i>
+            </a>
+            <h1 class="ms-3">เป้าหมายการพัฒนาที่ยั่งยืน (Sustainable Development Goals: SDGs)</h1>
+            <button type="button" class="btn-add" data-bs-toggle="modal" data-bs-target="#addSdg">
+                เพิ่มข้อมูล
+            </button>
+        </div>
+        
+        <div>
+            <table class="table table-striped">
+                <thead class="table-header">
+                    <tr>
+                        <th>ลำดับ</th>
+                        <th>ชื่อเป้าหมาย</th>
+                        <th>การจัดการ</th>
+                    </tr>
+                </thead>
+                <?php $__currentLoopData = $sdg; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $Sdg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <tr>
+                        <td><?php echo e($Sdg->id_SDGs); ?></td>
+                        <td><?php echo e($Sdg->Name_SDGs); ?></td>
+                        <td class="btn-manage">
+                            <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#editSdg<?php echo e($Sdg->id_SDGs); ?>" id="<?php echo e($Sdg->id_SDGs); ?>">
+                                <i class='bx bx-edit'></i>&nbsp;แก้ไข
+                            </button>
+                            <form action="<?php echo e(route('deleteSDG', $Sdg->id_SDGs)); ?>" method="POST" style="display: inline;">
+                                <?php echo csrf_field(); ?>
+                                <?php echo method_field('DELETE'); ?> 
+                                <button type="submit" class="btn-delete" onclick="return confirm('คุณต้องการลบเป้าหมายการพัฒนา(SDGs)นี้ใช่หรือไม่?')">
+                                    <i class='bx bx-trash'></i>&nbsp;ลบ
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </table>
+        </div>
     </div>
-    <br>
 
     <!-- modal create -->
     <div class="modal fade" id="addSdg" tabindex="-1" aria-labelledby="addSdgLabel" aria-hidden="true">
@@ -47,33 +79,10 @@
         </div>
     </div>
     <!-- end modal -->
+    <?php echo $__env->make('SDG.editSDG', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     
 
-    <table id="sdg">
-        <tr>
-            <th>ลำดับ</th>
-            <th>ชื่อเป้าหมาย</th>
-            <th>จัดการ</th>
-        </tr>
-        <?php $__currentLoopData = $sdg; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $Sdg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <tr>
-                <td><?php echo e($Sdg->id_SDGs); ?></td>
-                <td><?php echo e($Sdg->Name_SDGs); ?></td>
-                <td class="btn-manage">
-                    <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#editSdg<?php echo e($Sdg->id_SDGs); ?>" id="<?php echo e($Sdg->id_SDGs); ?>">
-                        <i class='bx bx-edit'></i>แก้ไข
-                    </button>
-                    <form action="<?php echo e(route('deleteSDG', $Sdg->id_SDGs)); ?>" method="POST" style="display: inline;">
-                        <?php echo csrf_field(); ?>
-                        <?php echo method_field('DELETE'); ?> 
-                        <button type="submit" class="btn-delete" onclick="return confirm('คุณต้องการลบเป้าหมายการพัฒนา(SDGs)นี้ใช่หรือไม่?')">
-                            <i class='bx bx-trash'></i>ลบ
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-    </table>
+    
 <?php $__env->stopSection(); ?>    
 </body>
 </html>

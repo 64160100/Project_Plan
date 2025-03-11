@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" href="{{ asset('css/setting.css') }}">
 </head>
+<title>ตั้งค่าระบบ</title>
 
 @section('content')
 <div class="container">

@@ -1,5 +1,5 @@
 .header-bar {
-    background-color: #7C3AED; 
+    background: linear-gradient(to right, #6a1b9a, #9c27b0) !important;
     color: white;
     padding: 10px 15px 3px;
     font-weight: bold; 
@@ -11,6 +11,37 @@
     margin: 0 auto;
     font-size: 18px;
 }
+
+/* back button */
+.back-btn {
+    background: linear-gradient(180deg, #8729DA 0%, #AC2BDD 100%);
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: auto;
+    max-width: 300px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  .back-btn:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .back-btn:active {
+    transform: translateX(-2px) scale(0.98);
+  }
+  
+  .back-btn i {
+    color: white;
+    font-size: 24px;
+  }
 
 .text-box {
     border: 1px solid #7C3AED;
@@ -30,36 +61,40 @@ table {
     table-layout: auto;
     margin-top: 7px;
     border-collapse: collapse;
-    border: 1px solid #7C3AED;  
+    border: 1px solid #6a1b9a;  
     border-radius: 15px; 
     overflow: hidden; 
-    background-color: #7C3AED; 
+    background-color: #6a1b9a;   
   }
   
 th, td {
     padding: 8px; 
     background-color: #ffffff; 
     border-collapse: collapse;
-    border: 1px solid #7C3AED !important;
+    border: 1px solid #6a1b9a !important;
     word-wrap: break-word;
     white-space: normal;
     overflow-wrap: break-word;
 }
 
 th {
-    background: #7C3AED;
+    /* background: linear-gradient(to right, #6a1b9a, #9c27b0); */
+    background-color: #6a1b9a; 
     color: white;
     text-align: center;
+    border: none;
+    position: relative;
+    border: none !important;
 }
 
 .strategy-start {
-    border-top: 2px solid #7C3AED !important;
-    border: 1px solid #7C3AED;
+    border-top: 2px solid #6a1b9a !important;
+    border: 1px solid #6a1b9a;
     vertical-align: top;
 }
 
 .strategy-row {
-    border: 1px solid #7C3AED;
+    border: 1px solid #6a1b9a;
     vertical-align: top;
 }
 
@@ -74,7 +109,7 @@ th {
 /* button */
 .btn-add {
     background-color: initial;
-    background-image: linear-gradient(#7C3AED, #472187 100%);
+    background: linear-gradient(135deg, #7c3aed 0%, #472187 100%);
     border-radius: 10px;
     border-style: none;
     box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
@@ -87,15 +122,18 @@ th {
     line-height: 40px;
     display: inline-flex; 
     align-items: center;
+    transition: all 0.2s ease;
+
   }
   .btn-add:hover {
-    color: black;
-    opacity: .8;
+    background-color: #6a1b9a;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(123, 31, 162, 0.2);
   }
 
   .btn-edit {
     background-color: initial;
-    background-image: linear-gradient(#EEE605, #A78B02);
+    background-image: linear-gradient(#f7aa4d, #c06a02);
     border-radius: 10px;
     border-style: none;
     box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
@@ -108,10 +146,12 @@ th {
     line-height: 40px;
     display: inline-flex; 
     align-items: center;
+    transition: all 0.2s ease;
   }
   .btn-edit:hover {
-    color: black;
-    opacity: .8;
+    background-color: #6a1b9a;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(123, 31, 162, 0.2);
   }
   
   .btn-delete {
@@ -129,11 +169,24 @@ th {
     line-height: 40px;
     display: inline-flex; 
     align-items: center;
+    transition: all 0.2s ease;
   }
   .btn-delete:hover {
-    color: black;
-    opacity: .8;
+    background-color: #6a1b9a;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(123, 31, 162, 0.2);
   }
+
+  .btn-manage {
+    display: flex;
+    gap: 5px;  
+  }
+
+  .btn-edit:hover {
+    background-color: #6a1b9a;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(123, 31, 162, 0.2);
+}
 
 
   @media screen and (max-width: 768px) {
@@ -162,17 +215,6 @@ th {
 
     th {
         font-size: 14px; 
-    }
-
-    .btn-add {
-        font-size: 0; 
-        padding: 8px 12px;
-        line-height: 30px; 
-        border-radius: 50px;
-    }
-    
-    .btn-add i { 
-    font-size: 20px;
     }
 
     .btn-edit {

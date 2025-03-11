@@ -28,7 +28,7 @@
         <table class="table table-striped">
             <thead class="table-header">
                 <tr>
-                    <th>รหัสพนักงาน</th>
+                    <th style="white-space: nowrap;">รหัสพนักงาน</th>
                     <th>ชื่อ</th>
                     <th>นามสกุล</th>
                     <th>ตำแหน่ง</th>
@@ -67,12 +67,15 @@
                     <td class="department"><?php echo e($employee->Department_Name); ?></td>
                     <td>
                         <div class="actions">
-                            <a href="<?php echo e(route('account.showemployee', $employee->Id_Employee)); ?>" class="btn btn-primary">
-                                <i class="fas fa-eye"></i> รายละเอียด
-                            </a>
+                            <form action="<?php echo e(route('account.showemployee', $employee->Id_Employee)); ?>" method="GET">
+                                <button type="submit" class="btn-infom">
+                                    <i class='bx bx-info-circle'></i>&nbsp;รายละเอียด
+                                </button>
+                            </form>
+
                             <form action="<?php echo e(route('account.editUser', $employee->Id_Employee)); ?>" method="GET" style="display:inline;">
-                                <button type="submit" class="btn btn-warning">
-                                    <i class="fas fa-edit"></i> แก้ไข
+                                <button type="submit" class="btn-edit">
+                                    <i class='bx bx-edit'></i>&nbsp;แก้ไข
                                 </button>
                             </form>
                         </div>

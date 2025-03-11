@@ -1,10 +1,15 @@
-<link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
-<link rel="stylesheet" href="<?php echo e(asset('css/viewStrategic.css')); ?>">
+<!DOCTYPE html>
+<html lang="en">
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="<?php echo e(asset('css/viewStrategic.css')); ?>">
 
 <?php $__env->startSection('content'); ?>
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center">
-        <h1>แผนยุทธศาสตร์</h1>
+    <div class="d-flex justify-content-start align-items-center">
+        <a href="<?php echo e(route('setting')); ?>" class="back-btn">
+            <i class='bx bxs-left-arrow-square'></i>
+        </a>
+        <h1 class="ms-3">แผนยุทธศาสตร์</h1>
     </div>
 
     <div class="grid gap-4 mt-4">
@@ -49,13 +54,13 @@
 
                     <hr>
                     <div class="action-buttons">
-                        <a href="#" class='bx bx-edit-alt' data-bs-toggle="modal"
+                        <a href="#" class='bx bx-edit-alt' data-bs-toggle="modal" title="แก้ไข"
                             data-bs-target="#ModalEditStrategic<?php echo e($Strategic->Id_Strategic); ?>"></a>
                         <form action="<?php echo e(route('strategic.destroy', $Strategic->Id_Strategic)); ?>" method="POST"
                             style="display:inline;">
                             <?php echo csrf_field(); ?>
                             <?php echo method_field('DELETE'); ?>
-                            <button type="submit" class='bx bx-trash'
+                            <button type="submit" class='bx bx-trash' title="ลบ"
                                 onclick="return confirm('คุณยืนยันที่จะลบข้อมูลนี้หรือไม่');"></button>
                         </form>
                     </div>

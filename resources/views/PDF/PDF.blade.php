@@ -364,7 +364,7 @@
     </p>
     </p>
 
-    <p class="space">
+    <p class="space"> 
         <span><b>๑๙. ตัวชี้วัดความสำเร็จของโครงการ</b></span>
     <p class="paragraph-content">
         <span>{{ toThaiNumber($project->Success_Indicators ?? '-') }}</span>

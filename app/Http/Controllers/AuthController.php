@@ -25,12 +25,10 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('username', 'password');
-
-        $apiResponse = self::CheckUser($credentials['username']);
         
         $employee = EmployeeModel::where('username', $credentials['username'])->first();
 
-        if (empty($apiResponse) || !$employee) {
+        if (!$employee) {
             return redirect()->back()->withErrors(['error' => 'ไม่พบบัญชีผู้ใช้ในระบบ กรุณาตรวจสอบชื่อผู้ใช้ของคุณ']);
         }
 

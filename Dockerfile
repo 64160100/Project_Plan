@@ -1,5 +1,6 @@
 FROM php:8.2-cli
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -8,18 +9,28 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     default-mysql-client
 
-RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql
 
+# Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /app
+# Set working directory
+WORKDIR /var/www
 
 COPY . .
 
+# Remove existing vendor directory and composer.lock file
 RUN rm -rf vendor composer.lock
 
+# Clear Composer cache
+RUN composer clear-cache
+
+# Install dependencies
 RUN composer install
 
+# Expose port 8000
 EXPOSE 8000
 
+# Start PHP built-in server
 CMD php artisan serve --host=0.0.0.0 --port=8000

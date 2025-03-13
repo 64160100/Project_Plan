@@ -26,6 +26,9 @@ class ListProjectModel extends Model
         'Lecturer',
         'First_Time',
         'End_Time',
+        'Summary',
+        'External_Participation',
+        'Suggestions',
         'Count_Steps',
     ];
     public $timestamps = false;

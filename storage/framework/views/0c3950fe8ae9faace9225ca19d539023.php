@@ -351,9 +351,7 @@ Carbon::setLocale('th');
             <div class="section-title mt-3">งบประมาณ</div>
                 <?php if(!empty($project) && $project->Status_Budget == 'Y'): ?>
                     <label>งบประมาณที่ใช้ทั้งสิ้น:</label>
-                    <?php $__currentLoopData = $project->budgetForm; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $budget): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <input type="text" class="form-control" value="<?php echo e($budget->Amount_Big); ?>">
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    
                 <?php else: ?>
                     <div class="text-danger"><b>ไม่มีงบประมาณ</b></div>
                 <?php endif; ?> 

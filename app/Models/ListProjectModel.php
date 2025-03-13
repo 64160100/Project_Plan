@@ -101,7 +101,7 @@ class ListProjectModel extends Model
         return $this->hasMany(ProjectHasIndicatorsModel::class, 'Project_Id', 'Id_Project');
     }
 
-    public function pdca()
+    public function pdcaDetails()
     {
         return $this->hasMany(PdcaDetailsModel::class, 'Project_Id', 'Id_Project');
     }
@@ -145,5 +145,11 @@ class ListProjectModel extends Model
     {
         return $this->hasMany(ShortProjectModel::class, 'Project_Id', 'Id_Project');
     }
+
+    // public function targetProject()
+    // {
+    //     return $this->hasMany(TargetModel::class, 'Project_Id', 'Id_Project');
+    // }
+
 
 }

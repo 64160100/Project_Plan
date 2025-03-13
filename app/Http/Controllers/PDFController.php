@@ -21,6 +21,7 @@ use App\Models\SubtopicBudgetHasBudgetFormModel;
 use App\Models\ProjectHasSDGModel;
 use App\Models\SubtopBudgetModel;
 use App\Models\MonthsModel;
+use App\Models\MonthlyPlansModel;
 use App\Models\PdcaModel;
 use App\Models\StrategicHasQuarterProjectModel;
 
@@ -158,8 +159,8 @@ class PDFController extends Controller
     {
 
         $project = ListProjectModel::with(['employee', 'targets.targetDetails', 'locations', 
-                            'projectHasIndicators.indicators','shortProjects',
-                            'monthlyPlans','monthlyPlans.month', 'monthlyPlans.pdca',])->findOrFail($id);
+                            'projectHasIndicators.indicators','shortProjects','objectives',
+                            'monthlyPlans','monthlyPlans.pdca','monthlyPlans.pdca.pdcaDetail', 'expenseTypes.expenses.expenHasSubtopicBudgets'])->findOrFail($id);
 
                             log::info($project);
         $projectBudgetSources = ProjectHasBudgetSourceModel::with('budgetSource')
@@ -168,10 +169,15 @@ class PDFController extends Controller
         $months = MonthsModel::orderBy('Id_Months', 'asc')->pluck('Name_Month', 'Id_Months');
         $pdcaStages = PdcaModel::all();
 
-        $quarterProjectId = request()->input('quarter_project_id', StrategicHasQuarterProjectModel::pluck('Quarter_Project_Id')->first() ?? 1);
-        $quarterProjects = StrategicHasQuarterProjectModel::with(['strategic', 'quarterProject'])
-                    ->where('Quarter_Project_Id', $quarterProjectId)
-                    ->get();
+        $quarterProjects = MonthlyPlansModel::where('Project_Id', $id)
+            ->pluck('Fiscal_Year')
+            ->unique();
+
+        $totalExpense = $project->expenseTypes->sum(function ($expenseType) {
+            return $expenseType->expenses->sum(function ($expense) {
+                return $expense->expenHasSubtopicBudgets->sum('Amount_Expense_Budget');
+            });
+        });
 
         // app/Helpers.php
         $project->formatted_first_time = formatDateThai($project->First_Time);
@@ -184,6 +190,7 @@ class PDFController extends Controller
             'months' => $months,
             'pdcaStages' => $pdcaStages,
             'quarterProjects' => $quarterProjects,
+            'totalExpense' => $totalExpense,
         ];
     
         $pdf = PDF::loadView('PDF.PDFReportForm', $data);

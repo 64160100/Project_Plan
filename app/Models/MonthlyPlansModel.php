@@ -25,7 +25,7 @@ class MonthlyPlansModel extends Model
 
     public function month()
     {
-        return $this->belongsTo(MonthModel::class, 'Months_Id', 'Id_Months');
+        return $this->belongsTo(MonthsModel::class, 'Months_Id', 'Id_Months');
     }
 
     public function pdca()

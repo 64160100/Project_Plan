@@ -80,7 +80,12 @@ class AuthController extends Controller
                     ->get();
             
                 $statusNCount = RecordHistory::whereHas('approvals', function ($query) {
-                        $query->where('Status', 'N');
+                    $query->where('Status', 'N');
+                })
+                    ->whereIn('Id_Record_History', function ($subQuery) {
+                        $subQuery->selectRaw('MAX(Id_Record_History)')
+                            ->from('Record_History')
+                            ->groupBy('Approve_Project_Id');
                     })
                     ->count();
             } else {
@@ -93,12 +98,15 @@ class AuthController extends Controller
                     ->with('approvals.project')
                     ->orderBy('Id_Record_History', 'desc')
                     ->get();
-            
-                $statusNCount = RecordHistory::whereHas('approvals', function ($query) {
+        
+                $statusNCount = RecordHistory::where('Status_Record', 'N')
+                    ->whereHas('approvals', function ($query) {
                         $query->where('Status', 'N');
                     })
-                    ->whereHas('approvals.project', function ($query) use ($employee) {
-                        $query->where('Employee_Id', $employee->Id_Employee);
+                    ->whereIn('Id_Record_History', function ($subQuery) {
+                        $subQuery->selectRaw('MAX(Id_Record_History)')
+                            ->from('Record_History')
+                            ->groupBy('Approve_Project_Id');
                     })
                     ->count();
             }

@@ -56,12 +56,38 @@
         white-space: normal;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
+    .noit-detail {
+        padding: 2px;
+        padding-left: 8px;
+        margin: 4px;
+        width: 293px;
+        font-size: 13px
+    }
+
+    [id] {
+    scroll-margin-top: 80px;
+    }
+
+    .link-project {
+        color: black;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .link-project:hover {
+        color:rgb(128, 18, 223);;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
     </style>
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="{{asset('kaiadmin/assets/css/bootstrap.min.css')}}" />
     <link rel="stylesheet" href="{{asset('kaiadmin/assets/css/plugins.min.css')}}" />
     <link rel="stylesheet" href="{{asset('kaiadmin/assets/css/kaiadmin.min.css')}}" />
+    <link rel="stylesheet" href="{{asset('kaiadmin/assets/css/kaiadmin.css')}}" />
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
 
 </head>
@@ -309,7 +335,7 @@
                             <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
                                     aria-expanded="false" aria-haspopup="true">
-                                    <i class="fa fa-search"></i>
+                                    <i class="bx bx-search-alt-2"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-search animated fadeIn">
                                     <form class="navbar-left navbar-form nav-search">
@@ -322,45 +348,59 @@
 
                             <!-- แจ้งเตือน -->
                             @if(session('employee'))
-                            @if(session('employee')->IsAdmin === 'Y')
-                            <!-- แจ้งสถานะ(จดหมาย)แอดมิน -->
-                            <li class="nav-item topbar-icon dropdown hidden-caret">
-                                <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class='bx bx-envelope'></i>
-                                </a>
-                                <ul class="dropdown-menu animated fadeIn"
-                                    style="max-height: 500px; width: 300px; overflow-y: auto; overflow-x: hidden;">
-                                    @php
-                                    \Carbon\Carbon::setLocale('th');
-                                    $groupedHistories = collect(session('recordHistories', []))
-                                    ->groupBy(function($history) {
-                                    return \Carbon\Carbon::parse($history->Time_Record)->format('Y-m-d');
-                                    }) ->sortKeysDesc();
-                                    @endphp
-                                    @if(count($groupedHistories) > 0)
-                                    @foreach($groupedHistories as $date => $histories)
-                                    <li class="noitAppove" style="font-weight: bold; background-color:#e6faff;">
-                                        {{ \Carbon\Carbon::parse($date)->addYears(543)->translatedFormat('d F พ.ศ. Y') }}
-                                    </li>
-                                    @foreach($histories as $history)
-                                    <!-- <li class="noitAppove noitAppove-detail"> -->
-                                    <li class="noitAppove noitAppove-detail"
-                                        style="{{ $history->Status_Record === 'N' && $history->approvals->Status === 'N' ? 'background-color:ffc4c4;' : '' }}">
-                                        <b
-                                            style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
-                                            {{ $history->approvals->project->Name_Project }}
-                                        </b>
-                                        {{ $history->comment }} <br>(โดย:{{ $history->Permission_Record }})
-                                    </li>
-                                    @endforeach
-                                    @endforeach
-                                    @else
-                                    <li style="text-align: center;">
-                                        ไม่มีข้อมูล
-                                    </li>
-                                    @endif
-                                </ul>
-                            </li>
+                            @if(session('employee')->IsAdmin === 'Y' || session('employee')->IsResponsible === 'Y')
+                            <!-- แจ้งสถานะ(จดหมาย) -->
+                                <li class="nav-item topbar-icon dropdown hidden-caret">
+                                    <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                        @php
+                                            $color = session('statusNCount') > 0 ? '#ff0000' : 'inherit';
+                                        @endphp
+                                        <i class='bx bx-envelope me-1' style='color: {{ $color }}'></i>
+                                        <span style='color: {{ $color }}'>{{ session('statusNCount') }}</span>
+                                    </a>
+                                    <ul class="dropdown-menu animated fadeIn" style="max-height: 500px; width: 300px; overflow-y: auto; overflow-x: hidden;">
+                                        @php
+                                            \Carbon\Carbon::setLocale('th');
+                                            $groupedHistories = collect(session('recordHistories', [])) ->groupBy(function($history) {
+                                                    return \Carbon\Carbon::parse($history->Time_Record)->format('Y-m-d');
+                                                }) ->sortKeysDesc();
+                                        @endphp
+                                        @if(count($groupedHistories) > 0)
+                                            @foreach($groupedHistories as $date => $histories)
+                                            <li class="noitAppove" style="font-weight: bold; background-color:#e6faff;">
+                                                {{ \Carbon\Carbon::parse($date)->addYears(543)->translatedFormat('d F พ.ศ. Y') }}
+                                            </li>
+                                                @php
+                                                    $groupedByProject = $histories
+                                                        ->where('Status_Record', 'N')
+                                                        ->where('approvals.Status', 'N')
+                                                        ->groupBy('approvals.project.Id_Project')
+                                                        ->map(function ($group) {
+                                                            return $group->max('Time_Record');
+                                                        });
+                                                @endphp
+                                            @foreach($histories as $history)
+                                                @php
+                                                    $latestTimeRecord = $groupedByProject[$history->approvals->project->Id_Project] ?? null;
+                                                @endphp
+                                                <li class="noitAppove noitAppove-detail"
+                                                    style="{{ ($history->Status_Record === 'N' && $history->approvals->Status === 'N' && $history->Time_Record === $latestTimeRecord) ? 'background-color:#ffc4c4;' : '' }}">
+                                                    <a>
+                                                        <b style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; width: 260px;">
+                                                            {{ $history->approvals->project->Name_Project }}
+                                                        </b>
+                                                        {{ $history->comment }} <br>(โดย:{{ $history->Permission_Record }}) <br>
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        @endforeach
+                                        @else
+                                            <li style="text-align: center;">
+                                                ไม่มีข้อมูล
+                                            </li>
+                                        @endif
+                                    </ul>
+                                </li>
                             @endif
 
                             <!-- แจ้งสถานะทั่วไป -->
@@ -400,24 +440,63 @@
                                     @endif
                                 </ul>
                                 @else
-                                @if(session('pendingApprovalsCount', 0) > 0 )
-                                <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class='bx bxs-bell-ring me-1' style='color:#ff0000'></i>
-                                    <span style='color:#ff0000'>{{ session('pendingApprovalsCount') }}</span>
-                                </a>
-                                <ul class="dropdown-menu animated fadeIn">
-                                    <li class="dropdown-item" style="white-space: normal; width: 300px;">
-                                        <a href="{{ route('requestApproval') }}" style="color:#000;">
-                                            รายการโครงการรอการอนุมัติ ({{ session('pendingApprovalsCount') }})
+                                    @if(session('pendingApprovalsCount', 0) > 0 && session('employee')->IsAdmin != 'Y')
+                                    <li class="nav-item topbar-icon dropdown hidden-caret">
+                                        <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class='bx bxs-bell-ring me-1' style='color:#ff0000'></i>
+                                            <span style='color:#ff0000'>{{ session('pendingApprovalsCount') }}</span>
                                         </a>
+                                        <ul class="dropdown-menu animated fadeIn" style="max-height: 500px; width: 300px; overflow-y: auto; overflow-x: hidden;" >
+                                            <!-- อนุมัติชุดรายการโครงการ -->
+                                            @php
+                                                $countSteps = session('countSteps', []);
+                                                $projectIds = session('projectIds', []);
+                                                $projectNames = session('projectNames', []);
+                                                $filteredProjects = [];
+
+                                                foreach ($projectIds as $index => $projectId) {
+                                                    if (!isset($countSteps[$index]) || $countSteps[$index] != 1) {
+                                                        $filteredProjects[] = [
+                                                            'id' => $projectId,
+                                                            'name' => $projectNames[$index] ?? 'Unknown Project',
+                                                        ];
+                                                    }
+                                                }
+                                            @endphp
+
+                                            @if (!empty($countSteps) && in_array(1, $countSteps))     
+                                                <li class="noit-detail" style="white-space: normal; width: 292px; background:rgb(252, 230, 255);">
+                                                    <a class="link-project" href="{{ route('requestApproval') }}" 
+                                                        style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; width: 260px;" >
+                                                        เสนอโครงการรายปีงบประมาณ
+                                                    </a>
+                                                </li>
+                                            @endif
+                                            @if(count($filteredProjects) > 0)
+                                                <li class="noit-detail" style="white-space: normal; width: 292px; background:rgb(218, 248, 255);" >
+                                                    รายการโครงการรอการอนุมัติ ({{ count($filteredProjects) }})<br>
+                                                </li>
+                                                <ul>
+                                                    @foreach($filteredProjects as $project)
+                                                        <li>
+                                                            <a class="link-project" href="{{ route('requestApproval', ['projectId' => $project['id']]) }}#{{ $project['id'] }}" 
+                                                                style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; width: 260px;" >
+                                                                {{ $project['name'] }}
+                                                            </a>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            @endif
+                                        </ul>
                                     </li>
-                                </ul>
-                                @else
-                                <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class='bx bxs-bell-ring me-1'></i>
-                                    <span>{{ session('pendingApprovalsCount', 0) }}</span>
-                                </a>
-                                @endif
+                                    @elseif (session('employee')->IsAdmin === 'Y' || session('employee')->IsResponsible === 'Y')
+                                    <!-- ไม่แสดง -->
+                                    @else
+                                    <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class='bx bxs-bell-ring me-1'></i>
+                                        <span>{{ session('pendingApprovalsCount', 0) }}</span>
+                                    </a>
+                                    @endif
                                 @endif
                             </li>
                             @endif

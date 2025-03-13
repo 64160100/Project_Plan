@@ -28,8 +28,8 @@ class RequestApprovalController extends Controller
         }
     
         $request->session()->forget('pendingApprovalsCount');
-        $pendingApprovals = collect();
-    
+        $pendingApprovals = $this->getPendingApprovals($employee);
+
         if ($employee->IsDirector === 'Y') {
             $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
                 $query->whereIn('Count_Steps', [1, 5, 8]);
@@ -38,10 +38,13 @@ class RequestApprovalController extends Controller
     
         $pendingApprovalsCount = $pendingApprovals->count();
         $request->session()->put('pendingApprovalsCount', $pendingApprovalsCount);
-    
-        $pendingProjectIds = $pendingApprovals->pluck('Project_Id');
-        $request->session()->put('pendingProjectIds', $pendingProjectIds);
-    
+        $this->storeProjectIdsAndNamesInSession($request, $pendingApprovals);
+
+        //แจ้งเตือนจดหมาย
+        $results = $this->getRecordHistoriesAndStatusNCount($employee);
+        $recordHistories = $results['recordHistories'];
+        $statusNCount = $results['statusNCount'];
+        
         if ($employee) {
             if ($employee->IsAdmin === 'Y') {
                 $approvals = ApproveModel::with(['project.employee', 'recordHistory'])
@@ -183,8 +186,8 @@ class RequestApprovalController extends Controller
         } else {
             Log::warning('No employee data found in session.');
         }
-
-        log::info($approvals);
+        $request->session()->put('recordHistories', $recordHistories ?? null);
+        $request->session()->put('statusNCount', $statusNCount);
     
         return view('requestApproval', compact('approvals', 'employee', 'strategics', 'logData'));
     }
@@ -533,6 +536,93 @@ class RequestApprovalController extends Controller
         }
     
         return redirect()->back()->with('success', 'โครงการทั้งหมดถูกเสนอไปยังผู้อำนวยการเรียบร้อยแล้ว');
+    }
+
+    private function getPendingApprovals($employee)
+    {
+        $pendingApprovals = collect();
+        if ($employee) {
+            if ($employee->IsAdmin === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereNotIn('Count_Steps', [0, 2, 6, 9]);
+                })->where('Status', 'I')->get();
+            } elseif ($employee->IsManager === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereIn('Count_Steps', [4, 7]);
+                })->where('Status', 'I')->get();
+            } elseif ($employee->IsDirector === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereIn('Count_Steps', [1, 5, 8]);
+                    // $query->whereIn('Count_Steps', [5, 8, 11]);
+                })->where('Status', 'I')->get();
+            } elseif ($employee->IsFinance === 'Y') {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) {
+                    $query->whereIn('Count_Steps', [3]);
+                })->where('Status', 'I')->get();
+            } else {
+                $pendingApprovals = ApproveModel::whereHas('project', function ($query) use ($employee) {
+                    $query->whereIn('Count_Steps', [0, 2, 6, 9])
+                        ->where('Employee_Id', $employee->Id_Employee);
+                })->where('Status', 'I')->get();
+            }
+        }
+        return $pendingApprovals;
+    }
+
+    private function storeProjectIdsAndNamesInSession($request, $pendingApprovals)
+    {
+        // id
+        $projectIds = $pendingApprovals->pluck('Project_Id');
+        $request->session()->put('projectIds', $projectIds);
+        // Project names
+        $projectNames = ListProjectModel::whereIn('Id_Project', $projectIds)->pluck('Name_Project');
+        $request->session()->put('projectNames', $projectNames);
+        // Count_Steps
+        $countSteps = ListProjectModel::whereIn('Id_Project', $projectIds)->pluck('Count_Steps')
+        ->toArray();
+        $request->session()->put('countSteps', $countSteps);
+    }
+
+    private function getRecordHistoriesAndStatusNCount($employee)
+    {
+        if ($employee->IsAdmin === 'Y') {
+            $recordHistories = RecordHistory::with('approvals.project')
+                ->whereHas('approvals', function ($query) {
+                    $query->where('Status', '!=', 'Y');
+                })
+                ->orderBy('Id_Record_History', 'desc')->get();
+    
+            $statusNCount = RecordHistory::whereHas('approvals', function ($query) {
+                $query->where('Status', 'N');
+            })
+                ->whereIn('Id_Record_History', function ($subQuery) {
+                    $subQuery->selectRaw('MAX(Id_Record_History)')
+                        ->from('Record_History')
+                        ->groupBy('Approve_Project_Id');
+                })
+                ->count();
+        } else {
+            $recordHistories = RecordHistory::whereHas('approvals', function ($query) {
+                    $query->where('Status', '!=', 'Y');
+                })
+                ->whereHas('approvals.project', function ($query) use ($employee) {
+                    $query->where('Employee_Id', $employee->Id_Employee);
+                })
+                ->with('approvals.project')
+                ->orderBy('Id_Record_History', 'desc')->get();
+    
+            $statusNCount = RecordHistory::where('Status_Record', 'N')
+                ->whereHas('approvals', function ($query) {
+                    $query->where('Status', 'N');
+                })
+                ->whereIn('Id_Record_History', function ($subQuery) {
+                    $subQuery->selectRaw('MAX(Id_Record_History)')
+                        ->from('Record_History')
+                        ->groupBy('Approve_Project_Id');
+                })
+                ->count();
+        }
+        return compact('recordHistories', 'statusNCount');
     }
 
 }

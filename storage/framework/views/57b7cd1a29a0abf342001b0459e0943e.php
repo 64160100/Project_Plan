@@ -56,12 +56,38 @@
         white-space: normal;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
+    .noit-detail {
+        padding: 2px;
+        padding-left: 8px;
+        margin: 4px;
+        width: 293px;
+        font-size: 13px
+    }
+
+    [id] {
+    scroll-margin-top: 80px;
+    }
+
+    .link-project {
+        color: black;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .link-project:hover {
+        color:rgb(128, 18, 223);;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
     </style>
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="<?php echo e(asset('kaiadmin/assets/css/bootstrap.min.css')); ?>" />
     <link rel="stylesheet" href="<?php echo e(asset('kaiadmin/assets/css/plugins.min.css')); ?>" />
     <link rel="stylesheet" href="<?php echo e(asset('kaiadmin/assets/css/kaiadmin.min.css')); ?>" />
+    <link rel="stylesheet" href="<?php echo e(asset('kaiadmin/assets/css/kaiadmin.css')); ?>" />
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
 
 </head>
@@ -309,7 +335,7 @@
                             <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
                                     aria-expanded="false" aria-haspopup="true">
-                                    <i class="fa fa-search"></i>
+                                    <i class="bx bx-search-alt-2"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-search animated fadeIn">
                                     <form class="navbar-left navbar-form nav-search">
@@ -322,47 +348,61 @@
 
                             <!-- แจ้งเตือน -->
                             <?php if(session('employee')): ?>
-                            <?php if(session('employee')->IsAdmin === 'Y'): ?>
-                            <!-- แจ้งสถานะ(จดหมาย)แอดมิน -->
-                            <li class="nav-item topbar-icon dropdown hidden-caret">
-                                <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class='bx bx-envelope'></i>
-                                </a>
-                                <ul class="dropdown-menu animated fadeIn"
-                                    style="max-height: 500px; width: 300px; overflow-y: auto; overflow-x: hidden;">
-                                    <?php
-                                    \Carbon\Carbon::setLocale('th');
-                                    $groupedHistories = collect(session('recordHistories', []))
-                                    ->groupBy(function($history) {
-                                    return \Carbon\Carbon::parse($history->Time_Record)->format('Y-m-d');
-                                    }) ->sortKeysDesc();
-                                    ?>
-                                    <?php if(count($groupedHistories) > 0): ?>
-                                    <?php $__currentLoopData = $groupedHistories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $date => $histories): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <li class="noitAppove" style="font-weight: bold; background-color:#e6faff;">
-                                        <?php echo e(\Carbon\Carbon::parse($date)->addYears(543)->translatedFormat('d F พ.ศ. Y')); ?>
+                            <?php if(session('employee')->IsAdmin === 'Y' || session('employee')->IsResponsible === 'Y'): ?>
+                            <!-- แจ้งสถานะ(จดหมาย) -->
+                                <li class="nav-item topbar-icon dropdown hidden-caret">
+                                    <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <?php
+                                            $color = session('statusNCount') > 0 ? '#ff0000' : 'inherit';
+                                        ?>
+                                        <i class='bx bx-envelope me-1' style='color: <?php echo e($color); ?>'></i>
+                                        <span style='color: <?php echo e($color); ?>'><?php echo e(session('statusNCount')); ?></span>
+                                    </a>
+                                    <ul class="dropdown-menu animated fadeIn" style="max-height: 500px; width: 300px; overflow-y: auto; overflow-x: hidden;">
+                                        <?php
+                                            \Carbon\Carbon::setLocale('th');
+                                            $groupedHistories = collect(session('recordHistories', [])) ->groupBy(function($history) {
+                                                    return \Carbon\Carbon::parse($history->Time_Record)->format('Y-m-d');
+                                                }) ->sortKeysDesc();
+                                        ?>
+                                        <?php if(count($groupedHistories) > 0): ?>
+                                            <?php $__currentLoopData = $groupedHistories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $date => $histories): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <li class="noitAppove" style="font-weight: bold; background-color:#e6faff;">
+                                                <?php echo e(\Carbon\Carbon::parse($date)->addYears(543)->translatedFormat('d F พ.ศ. Y')); ?>
 
-                                    </li>
-                                    <?php $__currentLoopData = $histories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $history): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <!-- <li class="noitAppove noitAppove-detail"> -->
-                                    <li class="noitAppove noitAppove-detail"
-                                        style="<?php echo e($history->Status_Record === 'N' && $history->approvals->Status === 'N' ? 'background-color:ffc4c4;' : ''); ?>">
-                                        <b
-                                            style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
-                                            <?php echo e($history->approvals->project->Name_Project); ?>
+                                            </li>
+                                                <?php
+                                                    $groupedByProject = $histories
+                                                        ->where('Status_Record', 'N')
+                                                        ->where('approvals.Status', 'N')
+                                                        ->groupBy('approvals.project.Id_Project')
+                                                        ->map(function ($group) {
+                                                            return $group->max('Time_Record');
+                                                        });
+                                                ?>
+                                            <?php $__currentLoopData = $histories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $history): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php
+                                                    $latestTimeRecord = $groupedByProject[$history->approvals->project->Id_Project] ?? null;
+                                                ?>
+                                                <li class="noitAppove noitAppove-detail"
+                                                    style="<?php echo e(($history->Status_Record === 'N' && $history->approvals->Status === 'N' && $history->Time_Record === $latestTimeRecord) ? 'background-color:#ffc4c4;' : ''); ?>">
+                                                    <a>
+                                                        <b style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; width: 260px;">
+                                                            <?php echo e($history->approvals->project->Name_Project); ?>
 
-                                        </b>
-                                        <?php echo e($history->comment); ?> <br>(โดย:<?php echo e($history->Permission_Record); ?>)
-                                    </li>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    <?php else: ?>
-                                    <li style="text-align: center;">
-                                        ไม่มีข้อมูล
-                                    </li>
-                                    <?php endif; ?>
-                                </ul>
-                            </li>
+                                                        </b>
+                                                        <?php echo e($history->comment); ?> <br>(โดย:<?php echo e($history->Permission_Record); ?>) <br>
+                                                    </a>
+                                                </li>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <?php else: ?>
+                                            <li style="text-align: center;">
+                                                ไม่มีข้อมูล
+                                            </li>
+                                        <?php endif; ?>
+                                    </ul>
+                                </li>
                             <?php endif; ?>
 
                             <!-- แจ้งสถานะทั่วไป -->
@@ -404,24 +444,64 @@
                                     <?php endif; ?>
                                 </ul>
                                 <?php else: ?>
-                                <?php if(session('pendingApprovalsCount', 0) > 0 ): ?>
-                                <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class='bx bxs-bell-ring me-1' style='color:#ff0000'></i>
-                                    <span style='color:#ff0000'><?php echo e(session('pendingApprovalsCount')); ?></span>
-                                </a>
-                                <ul class="dropdown-menu animated fadeIn">
-                                    <li class="dropdown-item" style="white-space: normal; width: 300px;">
-                                        <a href="<?php echo e(route('requestApproval')); ?>" style="color:#000;">
-                                            รายการโครงการรอการอนุมัติ (<?php echo e(session('pendingApprovalsCount')); ?>)
+                                    <?php if(session('pendingApprovalsCount', 0) > 0 && session('employee')->IsAdmin != 'Y'): ?>
+                                    <li class="nav-item topbar-icon dropdown hidden-caret">
+                                        <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class='bx bxs-bell-ring me-1' style='color:#ff0000'></i>
+                                            <span style='color:#ff0000'><?php echo e(session('pendingApprovalsCount')); ?></span>
                                         </a>
+                                        <ul class="dropdown-menu animated fadeIn" style="max-height: 500px; width: 300px; overflow-y: auto; overflow-x: hidden;" >
+                                            <!-- อนุมัติชุดรายการโครงการ -->
+                                            <?php
+                                                $countSteps = session('countSteps', []);
+                                                $projectIds = session('projectIds', []);
+                                                $projectNames = session('projectNames', []);
+                                                $filteredProjects = [];
+
+                                                foreach ($projectIds as $index => $projectId) {
+                                                    if (!isset($countSteps[$index]) || $countSteps[$index] != 1) {
+                                                        $filteredProjects[] = [
+                                                            'id' => $projectId,
+                                                            'name' => $projectNames[$index] ?? 'Unknown Project',
+                                                        ];
+                                                    }
+                                                }
+                                            ?>
+
+                                            <?php if(!empty($countSteps) && in_array(1, $countSteps)): ?>     
+                                                <li class="noit-detail" style="white-space: normal; width: 292px; background:rgb(252, 230, 255);">
+                                                    <a class="link-project" href="<?php echo e(route('requestApproval')); ?>" 
+                                                        style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; width: 260px;" >
+                                                        เสนอโครงการรายปีงบประมาณ
+                                                    </a>
+                                                </li>
+                                            <?php endif; ?>
+                                            <?php if(count($filteredProjects) > 0): ?>
+                                                <li class="noit-detail" style="white-space: normal; width: 292px; background:rgb(218, 248, 255);" >
+                                                    รายการโครงการรอการอนุมัติ (<?php echo e(count($filteredProjects)); ?>)<br>
+                                                </li>
+                                                <ul>
+                                                    <?php $__currentLoopData = $filteredProjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $project): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                        <li>
+                                                            <a class="link-project" href="<?php echo e(route('requestApproval', ['projectId' => $project['id']])); ?>#<?php echo e($project['id']); ?>" 
+                                                                style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; width: 260px;" >
+                                                                <?php echo e($project['name']); ?>
+
+                                                            </a>
+                                                        </li>
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                </ul>
+                                            <?php endif; ?>
+                                        </ul>
                                     </li>
-                                </ul>
-                                <?php else: ?>
-                                <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class='bx bxs-bell-ring me-1'></i>
-                                    <span><?php echo e(session('pendingApprovalsCount', 0)); ?></span>
-                                </a>
-                                <?php endif; ?>
+                                    <?php elseif(session('employee')->IsAdmin === 'Y' || session('employee')->IsResponsible === 'Y'): ?>
+                                    <!-- ไม่แสดง -->
+                                    <?php else: ?>
+                                    <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class='bx bxs-bell-ring me-1'></i>
+                                        <span><?php echo e(session('pendingApprovalsCount', 0)); ?></span>
+                                    </a>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </li>
                             <?php endif; ?>

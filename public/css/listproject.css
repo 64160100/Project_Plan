@@ -1,11 +1,48 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,400i,700");
 
-.container-vp {
-  display: flex;
-  justify-content: space-between; 
-  align-items: center; 
-  width: auto;
+
+.card-style {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transition: color 0.3s;
+  background-color: #ffffff;
+  border-left: 4px solid #007bff; 
 }
+.collapse.show .card-style {
+  background-color: #f0f8ff; 
+  border-left: 4px solid #0056b3; 
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.quarter-text{
+  font-size: 18px;
+}
+
+a.view-info {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #007bff;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+}
+
+a.view-info:hover {
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(123, 31, 162, 0.2);
+}
+
+.list-project:hover{
+  text-shadow: 2px 2px 5px rgba(0, 103, 212, 0.3); 
+}
+
 
 /* button */
 .btn-add {
@@ -23,10 +60,12 @@
   line-height: 40px;
   display: inline-flex; 
   align-items: center;
+  transition: all 0.2s ease;
 }
 .btn-add:hover {
-  color: black;
-  opacity: .8;
+  background-color: #6a1b9a;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(123, 31, 162, 0.2);
 }
 
 .btn-edit {
@@ -93,6 +132,19 @@
   border-color: #650893;
   outline: none;
 }
+
+.bx-edit-alt,
+.bx-trash {
+  font-size: 1.25rem !important;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.bx-edit-alt:hover {
+  background: #f5f3ff;
+  color: #6d28d9 !important;
+}
 /* end button */
 
 /* รายการโครงการ */
@@ -119,9 +171,10 @@ h1 {
 
 .accordion-btn {
   position: relative;
-  background-color: #fff;
+  background-color: #ffffff;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+  border: 1px solid #ccc;
   padding: 15px 20px;
   text-align: left;
   cursor: pointer;
@@ -140,10 +193,12 @@ h1 {
 
 .accordion-content {
   background-color: #ffffff;
+  border: 1px solid #ccc;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   overflow: visible;
   padding: 5px 20px;
+  transition: all 0.2s ease;
 }
 
 .accordion[open] .accordion-btn::after {
@@ -164,6 +219,9 @@ h1 {
     max-height: 2000px; 
   }
 }
+
+
+
 
 /* วัตถุประสงค์โครงการ */
 .form-group {
@@ -398,12 +456,6 @@ input[type="checkbox"] {
 .btn-submit:hover {
   background-color: #0056b3; /* สีเมื่อ hover */
   transform: scale(1.05); /* ขยายเล็กน้อยเมื่อ hover */
-}
-
-.container {
-  display: flex; /* ใช้ flexbox */
-  justify-content: flex-end; /* จัดเนื้อหาไปชิดขวา */
-  padding: 10px; /* เพิ่มระยะห่างรอบๆ container */
 }
 
 /* plan project */

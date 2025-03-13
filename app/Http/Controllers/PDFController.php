@@ -23,6 +23,7 @@ use App\Models\SubtopBudgetModel;
 use App\Models\MonthsModel;
 use App\Models\PdcaModel;
 use App\Models\StrategicHasQuarterProjectModel;
+use App\Models\MonthlyPlansModel;
 
 use Carbon\Carbon;
 
@@ -54,6 +55,10 @@ class PDFController extends Controller
             return $budget;
         });
 
+        $quarterProjects = MonthlyPlansModel::where('Project_Id', $Id_Project)
+        ->pluck('Fiscal_Year')
+        ->unique();
+
         $data = [
             'title' => $project->Name_Project,
             'date' => toThaiNumber(date('d/m/Y')),
@@ -62,6 +67,7 @@ class PDFController extends Controller
             'outcome' => $outcome,
             'output' => $output,
             'expectedResult' => $expectedResult,
+            'quarterProjects' => $quarterProjects,
         ];
 
         $pdf = PDF::loadView('PDF.PDF', $data);

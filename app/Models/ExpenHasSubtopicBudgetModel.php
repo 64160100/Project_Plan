@@ -24,6 +24,11 @@ class ExpenHasSubtopicBudgetModel extends Model
         return $this->belongsTo(SubtopBudgetModel::class, 'Subtopic_Budget_Id', 'Id_Subtop_Budget');
     }
     
+    public function subtopicBudgets()
+    {
+        return $this->hasMany(SubtopBudgetModel::class, 'Id_Subtopic_Budget', 'Subtopic_Budget_Id');
+    } 
+
     public function expense()
     {
         return $this->belongsTo(ExpenseModel::class, 'Expense_Id', 'Id_Expense');

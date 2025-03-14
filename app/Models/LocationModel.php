@@ -16,10 +16,8 @@ class LocationModel extends Model
 
     public $timestamps = false;
 
-
     public function project()
     {
         return $this->belongsTo(ListProjectModel::class, 'Project_Id', 'Id_Project');
     }
-
 }

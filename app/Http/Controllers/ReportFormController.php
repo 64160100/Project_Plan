@@ -48,16 +48,38 @@ class ReportFormController extends Controller
 
     public function completeProject(Request $request, $id)
     {
+        $request->validate([
+            'Summary' => 'nullable|string',
+            'External_Participation' => 'nullable|string',
+            'Suggestions' => 'nullable|string',
+        ]);
+
         $project = ListProjectModel::with('approvals')->findOrFail($id);
 
-        $approval = $project->approvals->first();
-        $approval->Status = 'Y';
-        $approval->save();
+        $project->update([
+            'Summary' => $request->input('Summary'),
+            'External_Participation' => $request->input('External_Participation'),
+            'Suggestions' => $request->input('Suggestions'),
+        ]);
+
+        if ($request->input('action') === 'complete') {
+            $approval = $project->approvals->first();
+            if ($approval) {
+                $approval->Status = 'Y';
+                $approval->save();
+            }
 
         // Generate and save PDF after marking the project as complete
         $this->generateAndSavePDF($id);
 
-        return redirect()->back()->with('success', 'Project marked as complete and PDF generated successfully.');
+        return redirect()->back()->with('success', 'โครงการเสร็จสิ้นและสร้าง PDF สำเร็จ!');
+        } elseif ($request->input('action') === 'submit') {
+            // ส่งโครงการเพื่อพิจารณา
+            return redirect()->route('projects.submitForApproval', ['id' => $id])
+                ->with('success', 'โครงการถูกเสนอเพื่อพิจารณาเรียบร้อย!');
+        }
+
+        return redirect()->back()->with('success', 'บันทึกข้อมูลสำเร็จ!');
     }
 
     public function generateAndSavePDF($id)

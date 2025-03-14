@@ -23,9 +23,12 @@ class ListProjectModel extends Model
         'Status_Budget',
         'Name_Creator',
         'Role_Creator',
-        'Lecturer',
+        'Name_Speaker',
         'First_Time',
         'End_Time',
+        'Summary',
+        'External_Participation',
+        'Suggestions',
         'Count_Steps',
     ];
     public $timestamps = false;
@@ -79,6 +82,11 @@ class ListProjectModel extends Model
     public function sdgs()
     {
         return $this->belongsToMany(SDGsModel::class, 'Project_has_SDGs', 'Project_Id', 'SDGs_Id');
+    }
+
+    public function pdcaDetails()
+    {
+        return $this->hasMany(PdcaDetailsModel::class, 'Project_Id', 'Id_Project');
     }
 
     public function projectHasIntegrationCategories()
@@ -144,6 +152,11 @@ class ListProjectModel extends Model
     public function shortProjects()
     {
         return $this->hasMany(ShortProjectModel::class, 'Project_Id', 'Id_Project');
+    }
+
+    public function recordHistory()
+    {
+        return $this->hasMany(RecordHistory::class, 'Approve_Project_Id', 'Id_Project');
     }
 
 }

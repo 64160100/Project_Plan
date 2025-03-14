@@ -457,18 +457,20 @@
                                     <div class="dropdown-user-scroll scrollbar-outer">
                                         <li>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">My Profile</a>
-                                            <a class="dropdown-item" href="#">My Balance</a>
-                                            <a class="dropdown-item" href="#">Inbox</a>
+                                            <a class="dropdown-item"
+                                                href="<?php echo e(route('account.showemployee', ['Id_Employee' => session('employee')->Id_Employee])); ?>">
+                                                โปรไฟล์</a>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Account Setting</a>
-                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item"
+                                                href="<?php echo e(route('account.editUser', ['Id_Employee' => session('employee')->Id_Employee])); ?>">
+                                                ตั้งค่าโปรไฟล์
+                                            </a>
                                             <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST"
                                                 style="display: none;">
                                                 <?php echo csrf_field(); ?>
                                             </form>
                                             <a class="dropdown-item" href="#"
-                                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ออกจากระบบ</a>
                                         </li>
                                     </div>
                                 </ul>

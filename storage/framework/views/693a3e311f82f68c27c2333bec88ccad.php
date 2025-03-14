@@ -20,6 +20,17 @@
         </div>
     </div>
 
+    <?php
+    $employee = session('employee');
+    $hasPermission = $employee && ($employee->IsManager == 'Y' ||
+    $employee->IsDirector == 'Y' ||
+    $employee->IsFinance == 'Y' ||
+    $employee->IsResponsible == 'Y' ||
+    $employee->IsAdmin == 'Y' ||
+    $employee->IsGeneralEmployees == 'Y');
+    ?>
+
+    <?php if($hasPermission): ?>
     <!-- Dashboard Overview Section -->
     <div class="dashboard-overview">
         <div class="stat-card">
@@ -195,9 +206,24 @@
             <?php endif; ?>
         </div>
     </div>
+    <?php else: ?>
+    <!-- No Permissions Message -->
+    <div class="no-permission-container">
+        <!-- <div class="no-permission-content">
+            <div class="no-permission-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2>ไม่มีสิทธิ์เข้าถึง</h2>
+            <p>คุณไม่มีสิทธิ์เข้าถึงข้อมูลในระบบนี้</p>
+            <p>กรุณาติดต่อผู้ดูแลระบบเพื่อขอสิทธิ์ในการเข้าถึงข้อมูล</p>
+            <p class="contact-admin">ติดต่อผู้ดูแลระบบ: <a href="mailto:admin@example.com">admin@example.com</a></p>
+        </div> -->
+    </div>
+    <?php endif; ?>
 </div>
 
 <!-- Add/Edit Project Modal -->
+<?php if($hasPermission): ?>
 <div id="projectModal" class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -327,6 +353,7 @@
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- Include jQuery, Bootstrap, and Font Awesome -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

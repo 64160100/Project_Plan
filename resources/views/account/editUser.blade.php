@@ -44,6 +44,100 @@
         color: white;
         font-size: 24px;
     }
+
+    /* Password section styles */
+    .password-section {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .password-section h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 18px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+    }
+
+    .password-form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .password-form-group {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .password-toggle {
+        position: relative;
+    }
+
+    .password-toggle i {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #999;
+    }
+
+    .update-password-btn {
+        background: linear-gradient(180deg, #8729DA 0%, #AC2BDD 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .update-password-btn:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .update-password-btn i {
+        font-size: 18px;
+    }
+
+    .password-feedback {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        display: none;
+    }
+
+    .password-feedback.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .password-feedback.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .password-requirements {
+        margin-top: 10px;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .form-control.error {
+        border-color: #dc3545;
+    }
     </style>
 </head>
 
@@ -101,6 +195,9 @@
         <div class="form-row">
             <div class="form-group">
                 <label>สิทธิ์การเข้าถึง:</label>
+
+                @if(isset($currentUser) && $currentUser->IsAdmin === 'Y')
+                <!-- Admin can edit permissions -->
                 <ul style="list-style-type: none; padding-left: 0;">
                     <li>
                         <input type="checkbox" id="IsManager" name="IsManager" value="Y"
@@ -139,7 +236,88 @@
                         <label for="IsGeneralEmployees">พนักงานทั่วไป</label>
                     </li>
                 </ul>
+                @else
+                <!-- Non-admin can only view permissions -->
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li>
+                        <i
+                            class="bx {{ $employee->IsManager === 'Y' ? 'bx-check-square text-success' : 'bx-square text-muted' }}"></i>
+                        <span>หัวหน้าฝ่าย</span>
+                    </li>
+                    <li>
+                        <i
+                            class="bx {{ $employee->IsDirector === 'Y' ? 'bx-check-square text-success' : 'bx-square text-muted' }}"></i>
+                        <span>ผู้อำนวยการ</span>
+                    </li>
+                    <li>
+                        <i
+                            class="bx {{ $employee->IsFinance === 'Y' ? 'bx-check-square text-success' : 'bx-square text-muted' }}"></i>
+                        <span>การเงิน</span>
+                    </li>
+                    <li>
+                        <i
+                            class="bx {{ $employee->IsResponsible === 'Y' ? 'bx-check-square text-success' : 'bx-square text-muted' }}"></i>
+                        <span>ผู้รับผิดชอบ</span>
+                    </li>
+                    <li>
+                        <i
+                            class="bx {{ $employee->IsAdmin === 'Y' ? 'bx-check-square text-success' : 'bx-square text-muted' }}"></i>
+                        <span>ผู้ดูแลระบบ</span>
+                    </li>
+                    <li>
+                        <i
+                            class="bx {{ $employee->IsGeneralEmployees === 'Y' ? 'bx-check-square text-success' : 'bx-square text-muted' }}"></i>
+                        <span>พนักงานทั่วไป</span>
+                    </li>
+                </ul>
+                @if($isOwnProfile)
+                <div class="alert alert-info mt-2" style="font-size: 0.9em;">
+                    <i class='bx bx-info-circle'></i> หากต้องการเปลี่ยนแปลงสิทธิ์การเข้าถึง กรุณาติดต่อผู้ดูแลระบบ
+                </div>
+                @endif
+                @endif
             </div>
+        </div>
+
+        <!-- Password Change Section -->
+        <div class="password-section">
+            <h3>เปลี่ยนรหัสผ่าน</h3>
+            <div class="password-form-row">
+                <div class="password-form-group">
+                    <label for="current_password">รหัสผ่านปัจจุบัน:</label>
+                    <div class="password-toggle">
+                        <input type="password" class="form-control" id="current_password" name="current_password">
+                        <i class="bx bx-hide" onclick="togglePasswordVisibility('current_password', this)"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="password-form-row">
+                <div class="password-form-group">
+                    <label for="new_password">รหัสผ่านใหม่:</label>
+                    <div class="password-toggle">
+                        <input type="password" class="form-control" id="new_password" name="new_password">
+                        <i class="bx bx-hide" onclick="togglePasswordVisibility('new_password', this)"></i>
+                    </div>
+                    <div class="password-requirements">
+                        รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร และประกอบด้วยตัวอักษรตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก และตัวเลข
+                    </div>
+                </div>
+
+                <div class="password-form-group">
+                    <label for="confirm_password">ยืนยันรหัสผ่านใหม่:</label>
+                    <div class="password-toggle">
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                        <i class="bx bx-hide" onclick="togglePasswordVisibility('confirm_password', this)"></i>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="update-password-btn" onclick="updatePassword()">
+                <i class='bx bx-lock-alt'></i> อัปเดตรหัสผ่าน
+            </button>
+
+            <div id="password-feedback" class="password-feedback"></div>
         </div>
     </div>
 
@@ -158,6 +336,89 @@
             },
             error: function(xhr) {
                 console.log('Error updating permission');
+            }
+        });
+    }
+
+    function togglePasswordVisibility(inputId, icon) {
+        const input = document.getElementById(inputId);
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove('bx-hide');
+            icon.classList.add('bx-show');
+        } else {
+            input.type = "password";
+            icon.classList.remove('bx-show');
+            icon.classList.add('bx-hide');
+        }
+    }
+
+    function updatePassword() {
+        const currentPassword = $('#current_password').val();
+        const newPassword = $('#new_password').val();
+        const confirmPassword = $('#confirm_password').val();
+        const feedback = $('#password-feedback');
+
+        // Reset form states
+        $('.form-control').removeClass('error');
+        feedback.removeClass('success error').hide();
+
+        // Validate inputs
+        if (!currentPassword) {
+            $('#current_password').addClass('error');
+            feedback.addClass('error').text('กรุณากรอกรหัสผ่านปัจจุบัน').show();
+            return;
+        }
+
+        if (!newPassword) {
+            $('#new_password').addClass('error');
+            feedback.addClass('error').text('กรุณากรอกรหัสผ่านใหม่').show();
+            return;
+        }
+
+        // Validate password strength
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            $('#new_password').addClass('error');
+            feedback.addClass('error').text(
+                'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร และประกอบด้วยตัวอักษรตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก และตัวเลข')
+            .show();
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            $('#confirm_password').addClass('error');
+            feedback.addClass('error').text('รหัสผ่านใหม่และยืนยันรหัสผ่านไม่ตรงกัน').show();
+            return;
+        }
+
+        // Submit password change request
+        $.ajax({
+            url: '{{ route("account.updatePassword", $employee->Id_Employee) }}',
+            type: 'PUT',
+            data: {
+                _token: '{{ csrf_token() }}',
+                current_password: currentPassword,
+                new_password: newPassword,
+                confirm_password: confirmPassword
+            },
+            success: function(response) {
+                feedback.addClass('success').text('อัปเดตรหัสผ่านเรียบร้อยแล้ว').show();
+
+                // Clear password fields
+                $('#current_password').val('');
+                $('#new_password').val('');
+                $('#confirm_password').val('');
+            },
+            error: function(xhr) {
+                let errorMessage = 'เกิดข้อผิดพลาดในการอัปเดตรหัสผ่าน';
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+
+                feedback.addClass('error').text(errorMessage).show();
             }
         });
     }

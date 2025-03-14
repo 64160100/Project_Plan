@@ -20,9 +20,9 @@
                 <input type="text" placeholder="ค้นหาพนักงาน..." id="employee-search">
             </div>
 
-            <!-- <a href="<?php echo e(route('account.create')); ?>" class="add-button">
+            <a href="<?php echo e(route('account.create')); ?>" class="add-button">
                 <i class="fas fa-user-plus"></i> เพิ่มพนักงาน
-            </a> -->
+            </a>
         </div>
 
         <table class="table table-striped">

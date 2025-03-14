@@ -319,68 +319,84 @@ Carbon::setLocale('th');
         </div>
 
         <div class="section">
-            <div class="section-title">10. สรุปผลการดำเนินงาน</div>
-                <div class="form-group">
-                    <textarea class="form-control" rows="15"><?php echo e($project->Summary); ?></textarea>
-                </div>
-
-            <div class="section-title">ผลสำเร็จตามตัวชี้วัดของโครงการ</div>
-                <?php if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Quantitative')->isNotEmpty()): ?>
-                    <label><b>ตัวชี้วัดเชิงปริมาณ</b></label>
-                    <?php $__currentLoopData = $project->projectHasIndicators; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $projectIndicator): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Quantitative'): ?>
-                            <input type="text" class="form-control mb-2" value="<?php echo e($projectIndicator->Details_Indicators); ?>" readonly>
-                        <?php endif; ?>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                <?php endif; ?>
-
-                <?php if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Qualitative')->isNotEmpty()): ?>
-                    <label class="mt-3"><b>ตัวชี้วัดเชิงคุณภาพ</b></label>
-                    <?php $__currentLoopData = $project->projectHasIndicators; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $projectIndicator): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Qualitative'): ?>
-                            <input type="text" class="form-control mb-2" value="<?php echo e($projectIndicator->Details_Indicators); ?>" readonly>
-                        <?php endif; ?>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                <?php endif; ?>
-
-            <div class="section-title mt-3">การมีส่วนร่วมของหน่วยงานภายนอก/ชุมชน</div>
-                <div class="form-group">
-                    <textarea class="form-control"><?php echo e($project->External_Participation); ?></textarea>
-                </div>
-
-            <div class="section-title mt-3">งบประมาณ</div>
-                <?php if(!empty($project) && $project->Status_Budget == 'Y'): ?>
-                    <label>งบประมาณที่ใช้ทั้งสิ้น:</label>
-                    <?php $__currentLoopData = $project->budgetForm; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $budget): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <input type="text" class="form-control" value="<?php echo e($budget->Amount_Big); ?>">
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                <?php else: ?>
-                    <div class="text-danger"><b>ไม่มีงบประมาณ</b></div>
-                <?php endif; ?> 
-
-            <div class="section-title mt-3">ข้อเสนอแนะ</div>
-                <div class="form-group">
-                    <textarea class="form-control"><?php echo e($project->Suggestions); ?></textarea>
-                </div>           
-        </div>
-
-
-        <div class="step-buttons">
-            <form id="complete-form" action="<?php echo e(route('projects.complete', ['id' => $project->Id_Project])); ?>" method="POST">
+            <form action="<?php echo e(route('projects.complete', ['id' => $project->Id_Project])); ?>" method="POST">
                 <?php echo csrf_field(); ?>
-                <button type="submit" class="step-button primary" id="complete-button" data-step="ขั้นตอนที่ 1" <?php echo e($project->approvals->first()->Status == 'Y' ? 'disabled' : ''); ?>>
-                    <i class='bx bx-check-circle'></i> เสร็จสิ้น
-                </button>
+                <?php echo method_field('POST'); ?>
+
+                <div class="section-title">10. สรุปผลการดำเนินงาน</div>
+                    <div class="form-group">
+                        <label><b>สรุปผล</b></label>
+                        <?php if($project->approvals->first()->Status == 'Y'): ?>
+                            <textarea class="form-control" rows="15" readonly><?php echo e($project->Summary); ?></textarea>
+                        <?php else: ?>
+                            <textarea class="form-control" name="Summary" rows="15"><?php echo e(old('Summary', $project->Summary)); ?></textarea>
+                        <?php endif; ?>
+                    </div>
+
+                <div class="section-title">ผลสำเร็จตามตัวชี้วัดของโครงการ</div>
+                    <?php if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Quantitative')->isNotEmpty()): ?>
+                        <label><b>ตัวชี้วัดเชิงปริมาณ</b></label>
+                        <?php $__currentLoopData = $project->projectHasIndicators; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $projectIndicator): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Quantitative'): ?>
+                                <input type="text" class="form-control mb-2" value="<?php echo e($projectIndicator->Details_Indicators); ?>" readonly>
+                            <?php endif; ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php endif; ?>
+
+                    <?php if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Qualitative')->isNotEmpty()): ?>
+                        <label class="mt-3"><b>ตัวชี้วัดเชิงคุณภาพ</b></label>
+                        <?php $__currentLoopData = $project->projectHasIndicators; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $projectIndicator): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Qualitative'): ?>
+                                <input type="text" class="form-control mb-2" value="<?php echo e($projectIndicator->Details_Indicators); ?>" readonly>
+                            <?php endif; ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php endif; ?>
+
+                    <div class="section-title mt-3">การมีส่วนร่วมของหน่วยงานภายนอก/ชุมชน</div>
+                        <div class="form-group">
+                            <label><b>การมีส่วนร่วมของบุคคลภายนอก</b></label>
+                            <?php if($project->approvals->first()->Status == 'Y' ): ?>
+                                <input type="text" class="form-control" value="<?php echo e($project->External_Participation); ?>" readonly>
+                            <?php else: ?>
+                                <textarea class="form-control" name="External_Participation"><?php echo e(old('External_Participation', $project->External_Participation)); ?></textarea>
+                            <?php endif; ?>
+                        </div>
+
+                    <div class="section-title mt-3">งบประมาณ</div>
+                    <?php if(!empty($project) && $project->Status_Budget == 'Y'): ?>
+                        <label>งบประมาณที่ใช้ทั้งสิ้น:</label>
+                    <?php else: ?>
+                        <div class="text-danger"><b>ไม่มีงบประมาณ</b></div>
+                    <?php endif; ?> 
+
+                    <div class="section-title mt-3">ข้อเสนอแนะ</div>
+                    <div class="form-group">
+                        <label><b>ข้อเสนอแนะ</b></label>
+                        <?php if( $project->approvals->first()->Status == 'Y' ): ?>
+                            <input type="text" class="form-control" value="<?php echo e($project->Suggestions); ?>" readonly>
+                        <?php else: ?>
+                            <textarea class="form-control" name="Suggestions"><?php echo e(old('Suggestions', $project->Suggestions)); ?></textarea>
+                        <?php endif; ?>
+                    </div>
+
+                <div class="step-buttons">
+                    <button type="submit" class="step-button primary" name="action" value="complete" style="height: 48px;" 
+                        data-step="ขั้นตอนที่ 1" <?php echo e($project->approvals->first()->Status == 'Y' ? 'disabled' : ''); ?>>
+                        <i class='bx bx-check-circle'></i> เสร็จสิ้น
+                    </button>
             </form>
             <form id="submit-form" action="<?php echo e(route('projects.submitForApproval', ['id' => $project->Id_Project])); ?>" method="POST">
                 <?php echo csrf_field(); ?>
                 <input type="hidden" name="status" value="Y">
-                <button type="submit" class="step-button secondary" id="submit-button" data-step="ขั้นตอนที่ 2" <?php echo e($project->approvals->first()->Status == 'Y' ? '' : 'disabled'); ?>>
+                
+                <button type="submit" class="step-button secondary" id="submit-button" data-step="ขั้นตอนที่ 2" 
+                    <?php echo e($project->approvals->first()->Status == 'Y' ? '' : 'disabled'); ?>>
                     <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
                 </button>
             </form>
+                </div>
+            
         </div>
-        
     </div>
 </div>
 

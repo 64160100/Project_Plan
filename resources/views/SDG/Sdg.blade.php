@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>เป้าหมายการพัฒนาที่ยั่งยืน</title>
     <link rel="stylesheet" href="{{ asset('css/sdg.css') }}">
 
 
@@ -13,14 +13,46 @@
 <body>
 @section('content')
     <div class="container">
-        <h3 class="head-project">
-            <b>เป้าหมายการพัฒนาที่ยั่งยืน (Sustainable Development Goals: SDGs)</b>
-        </h3>
-        <button type="button" class="btn-add" data-bs-toggle="modal" data-bs-target="#addSdg">
-            <i class='bx bx-plus'></i>เพิ่มข้อมูล
-        </button>
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ route('setting') }}" class="back-btn">
+                <i class='bx bxs-left-arrow-square'></i>
+            </a>
+            <h1 class="ms-3">เป้าหมายการพัฒนาที่ยั่งยืน (Sustainable Development Goals: SDGs)</h1>
+            <button type="button" class="btn-add" data-bs-toggle="modal" data-bs-target="#addSdg">
+                เพิ่มข้อมูล
+            </button>
+        </div>
+        
+        <div>
+            <table class="table table-striped">
+                <thead class="table-header">
+                    <tr>
+                        <th>ลำดับ</th>
+                        <th>ชื่อเป้าหมาย</th>
+                        <th>การจัดการ</th>
+                    </tr>
+                </thead>
+                @foreach ( $sdg as $Sdg )
+                    <tr>
+                        <td>{{$Sdg->id_SDGs}}</td>
+                        <td>{{$Sdg->Name_SDGs}}</td>
+                        <td class="btn-manage">
+                            <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#editSdg{{$Sdg->id_SDGs}}" id="{{$Sdg->id_SDGs}}">
+                                <i class='bx bx-edit'></i>&nbsp;แก้ไข
+                            </button>
+                            <form action="{{ route('deleteSDG', $Sdg->id_SDGs) }}" method="POST" style="display: inline;">
+                                @csrf
+                                @method('DELETE') 
+                                <button type="submit" class="btn-delete" onclick="return confirm('คุณต้องการลบเป้าหมายการพัฒนา(SDGs)นี้ใช่หรือไม่?')">
+                                    <i class='bx bx-trash'></i>&nbsp;ลบ
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
     </div>
-    <br>
 
     <!-- modal create -->
     <div class="modal fade" id="addSdg" tabindex="-1" aria-labelledby="addSdgLabel" aria-hidden="true">
@@ -49,33 +81,10 @@
         </div>
     </div>
     <!-- end modal -->
+    @include('SDG.editSDG')
     
 
-    <table id="sdg">
-        <tr>
-            <th>ลำดับ</th>
-            <th>ชื่อเป้าหมาย</th>
-            <th>จัดการ</th>
-        </tr>
-        @foreach ( $sdg as $Sdg )
-            <tr>
-                <td>{{$Sdg->id_SDGs}}</td>
-                <td>{{$Sdg->Name_SDGs}}</td>
-                <td class="btn-manage">
-                    <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#editSdg{{$Sdg->id_SDGs}}" id="{{$Sdg->id_SDGs}}">
-                        <i class='bx bx-edit'></i>แก้ไข
-                    </button>
-                    <form action="{{ route('deleteSDG', $Sdg->id_SDGs) }}" method="POST" style="display: inline;">
-                        @csrf
-                        @method('DELETE') 
-                        <button type="submit" class="btn-delete" onclick="return confirm('คุณต้องการลบเป้าหมายการพัฒนา(SDGs)นี้ใช่หรือไม่?')">
-                            <i class='bx bx-trash'></i>ลบ
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        @endforeach
-    </table>
+    
 @endsection    
 </body>
 </html>

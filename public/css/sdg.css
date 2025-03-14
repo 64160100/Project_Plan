@@ -1,35 +1,69 @@
-.container {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    width: 100%; 
-  }
-  
-.btn-add {
-  background-color: initial;
-  background-image: linear-gradient(#7C3AED, #472187 100%);
-  border-radius: 10px;
-  border-style: none;
-  box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
-  color: #fff;
-  cursor: pointer;
-  font-size: 16px;
-  text-align: center;
-  width: auto; 
-  padding: 0 10px; 
-  line-height: 40px;
-  display: inline-flex; 
+.back-btn {
+  background: linear-gradient(180deg, #8729DA 0%, #AC2BDD 100%);
+  border: 1px solid #ccc;
+  padding: 10px 20px;
+  border-radius: 5px;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: auto;
+  max-width: 300px;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
+
+.back-btn:hover {
+  transform: translateX(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.back-btn:active {
+  transform: translateX(-2px) scale(0.98);
+}
+
+.back-btn i {
+  color: white;
+  font-size: 24px;
+}
+
+.card-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.btn-add {
+  background: linear-gradient(135deg, #7c3aed 0%, #472187 100%);
+  border-radius: 12px;
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 6px rgba(124, 58, 237, 0.2);
+}
+
 .btn-add:hover {
-  color: black;
-  opacity: .8;
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px rgba(124, 58, 237, 0.3);
+  color: white;
 }
 
 
 .btn-edit {
   background-color: initial;
-  background-image: linear-gradient(#EEE605, #A78B02);
+  background-image: linear-gradient(#f7aa4d, #c06a02);
   border-radius: 10px;
   border-style: none;
   box-shadow: rgba(245, 244, 247, .25) 0 1px 1px inset;
@@ -42,10 +76,12 @@
   line-height: 40px;
   display: inline-flex; 
   align-items: center;
+  transition: all 0.2s ease;
 }
 .btn-edit:hover {
-  color: black;
-  opacity: .8;
+  background-color: #6a1b9a;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(123, 31, 162, 0.2);
 }
 
 .btn-delete {
@@ -63,85 +99,81 @@
   line-height: 40px;
   display: inline-flex; 
   align-items: center;
+  transition: all 0.2s ease;
 }
 .btn-delete:hover {
-  color: black;
-  opacity: .8;
+  background-color: #6a1b9a;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(123, 31, 162, 0.2);
+}
+
+.btn-manage {
+  display: flex;
+  gap: 5px;  
 }
 
 /* table */
+
+.table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  width: 100% !important;
+  margin: 20px 0 !important;
+}
+
+.table th {
+  background-color: rgba(165, 43, 220, 0.1) !important;
+  color: rgb(255, 255, 255) !important;
+  text-align: left !important;
+}
 table{
-  border-radius: 15px;
-  overflow: hidden;
-  border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
-
-#sdg {
-  font-family: Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-#sdg td, #sdg th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-#sdg tr:nth-child(even){
-  background-color: #ffffff;
-}
-
-#sdg th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: center;
-  background-color: #7C3AED;
+.table-header {
+  background: linear-gradient(to right, #6a1b9a, #9c27b0) !important;
   color: white;
 }
-
-.btn-manage{
-    display: flex;
-    justify-content: center;
-    align-items: center; 
-    gap: 10px; 
+.table-header th {
+  padding: 15px;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  font-size: 15px;
 }
 
 
 @media screen and (max-width: 768px) {
   table {
       width: 100%;
-      table-layout: fixed; 
   }
   h3{
       font-size: 18px; 
   }
 
-  #sdg td, #sdg th{
-      padding: 10px 8px;
-      font-size: 12px; 
-  }
-
-  #sdg th {
-      font-size: 14px; 
+  .d-flex {
+    flex-direction: column; 
+    align-items: flex-start;
+    gap: 10px; 
   }
 
   .btn-add {
-      font-size: 0; 
-      padding: 8px 12px;
-      line-height: 30px; 
-      border-radius: 50px;
-    }
-  
-  .btn-add i { 
-  font-size: 20px;
+    font-size: 16px;
+    padding: 8px 16px;
+    line-height: 30px;
   }
-
+  
   .btn-edit {
       font-size: 0;
       padding: 8px 12px; 
       line-height: 30px;
       border-radius: 50px;
   }
+
 
   .btn-edit i {
       font-size: 20px;

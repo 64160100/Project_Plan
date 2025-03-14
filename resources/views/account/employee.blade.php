@@ -21,9 +21,9 @@
                 <input type="text" placeholder="ค้นหาพนักงาน..." id="employee-search">
             </div>
 
-            <!-- <a href="{{ route('account.create') }}" class="add-button">
+            <a href="{{ route('account.create') }}" class="add-button">
                 <i class="fas fa-user-plus"></i> เพิ่มพนักงาน
-            </a> -->
+            </a>
         </div>
 
         <table class="table table-striped">

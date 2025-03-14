@@ -321,68 +321,84 @@ Carbon::setLocale('th');
         </div>
 
         <div class="section">
-            <div class="section-title">10. สรุปผลการดำเนินงาน</div>
-                <div class="form-group">
-                    <textarea class="form-control" rows="15">{{ $project->Summary }}</textarea>
-                </div>
-
-            <div class="section-title">ผลสำเร็จตามตัวชี้วัดของโครงการ</div>
-                @if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Quantitative')->isNotEmpty())
-                    <label><b>ตัวชี้วัดเชิงปริมาณ</b></label>
-                    @foreach($project->projectHasIndicators as $projectIndicator)
-                        @if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Quantitative')
-                            <input type="text" class="form-control mb-2" value="{{ $projectIndicator->Details_Indicators }}" readonly>
-                        @endif
-                    @endforeach
-                @endif
-
-                @if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Qualitative')->isNotEmpty())
-                    <label class="mt-3"><b>ตัวชี้วัดเชิงคุณภาพ</b></label>
-                    @foreach($project->projectHasIndicators as $projectIndicator)
-                        @if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Qualitative')
-                            <input type="text" class="form-control mb-2" value="{{ $projectIndicator->Details_Indicators }}" readonly>
-                        @endif
-                    @endforeach
-                @endif
-
-            <div class="section-title mt-3">การมีส่วนร่วมของหน่วยงานภายนอก/ชุมชน</div>
-                <div class="form-group">
-                    <textarea class="form-control">{{ $project->External_Participation }}</textarea>
-                </div>
-
-            <div class="section-title mt-3">งบประมาณ</div>
-                @if (!empty($project) && $project->Status_Budget == 'Y')
-                    <label>งบประมาณที่ใช้ทั้งสิ้น:</label>
-                    @foreach ($project->budgetForm as $budget)
-                        <input type="text" class="form-control" value="{{ $budget->Amount_Big }}">
-                    @endforeach
-                @else
-                    <div class="text-danger"><b>ไม่มีงบประมาณ</b></div>
-                @endif 
-
-            <div class="section-title mt-3">ข้อเสนอแนะ</div>
-                <div class="form-group">
-                    <textarea class="form-control">{{ $project->Suggestions }}</textarea>
-                </div>           
-        </div>
-
-
-        <div class="step-buttons">
-            <form id="complete-form" action="{{ route('projects.complete', ['id' => $project->Id_Project]) }}" method="POST">
+            <form action="{{ route('projects.complete', ['id' => $project->Id_Project]) }}" method="POST">
                 @csrf
-                <button type="submit" class="step-button primary" id="complete-button" data-step="ขั้นตอนที่ 1" {{ $project->approvals->first()->Status == 'Y' ? 'disabled' : '' }}>
-                    <i class='bx bx-check-circle'></i> เสร็จสิ้น
-                </button>
+                @method('POST')
+
+                <div class="section-title">10. สรุปผลการดำเนินงาน</div>
+                    <div class="form-group">
+                        <label><b>สรุปผล</b></label>
+                        @if ($project->approvals->first()->Status == 'Y')
+                            <textarea class="form-control" rows="15" readonly>{{ $project->Summary }}</textarea>
+                        @else
+                            <textarea class="form-control" name="Summary" rows="15">{{ old('Summary', $project->Summary) }}</textarea>
+                        @endif
+                    </div>
+
+                <div class="section-title">ผลสำเร็จตามตัวชี้วัดของโครงการ</div>
+                    @if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Quantitative')->isNotEmpty())
+                        <label><b>ตัวชี้วัดเชิงปริมาณ</b></label>
+                        @foreach($project->projectHasIndicators as $projectIndicator)
+                            @if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Quantitative')
+                                <input type="text" class="form-control mb-2" value="{{ $projectIndicator->Details_Indicators }}" readonly>
+                            @endif
+                        @endforeach
+                    @endif
+
+                    @if($project->projectHasIndicators->where('indicators.Type_Indicators', 'Qualitative')->isNotEmpty())
+                        <label class="mt-3"><b>ตัวชี้วัดเชิงคุณภาพ</b></label>
+                        @foreach($project->projectHasIndicators as $projectIndicator)
+                            @if($projectIndicator->indicators && $projectIndicator->indicators->Type_Indicators === 'Qualitative')
+                                <input type="text" class="form-control mb-2" value="{{ $projectIndicator->Details_Indicators }}" readonly>
+                            @endif
+                        @endforeach
+                    @endif
+
+                    <div class="section-title mt-3">การมีส่วนร่วมของหน่วยงานภายนอก/ชุมชน</div>
+                        <div class="form-group">
+                            <label><b>การมีส่วนร่วมของบุคคลภายนอก</b></label>
+                            @if ($project->approvals->first()->Status == 'Y' )
+                                <input type="text" class="form-control" value="{{ $project->External_Participation }}" readonly>
+                            @else
+                                <textarea class="form-control" name="External_Participation">{{ old('External_Participation', $project->External_Participation) }}</textarea>
+                            @endif
+                        </div>
+
+                    <div class="section-title mt-3">งบประมาณ</div>
+                    @if (!empty($project) && $project->Status_Budget == 'Y')
+                        <label>งบประมาณที่ใช้ทั้งสิ้น:</label>
+                    @else
+                        <div class="text-danger"><b>ไม่มีงบประมาณ</b></div>
+                    @endif 
+
+                    <div class="section-title mt-3">ข้อเสนอแนะ</div>
+                    <div class="form-group">
+                        <label><b>ข้อเสนอแนะ</b></label>
+                        @if ( $project->approvals->first()->Status == 'Y' )
+                            <input type="text" class="form-control" value="{{ $project->Suggestions }}" readonly>
+                        @else
+                            <textarea class="form-control" name="Suggestions">{{ old('Suggestions', $project->Suggestions) }}</textarea>
+                        @endif
+                    </div>
+
+                <div class="step-buttons">
+                    <button type="submit" class="step-button primary" name="action" value="complete" style="height: 48px;" 
+                        data-step="ขั้นตอนที่ 1" {{ $project->approvals->first()->Status == 'Y' ? 'disabled' : '' }}>
+                        <i class='bx bx-check-circle'></i> เสร็จสิ้น
+                    </button>
             </form>
             <form id="submit-form" action="{{ route('projects.submitForApproval', ['id' => $project->Id_Project]) }}" method="POST">
                 @csrf
                 <input type="hidden" name="status" value="Y">
-                <button type="submit" class="step-button secondary" id="submit-button" data-step="ขั้นตอนที่ 2" {{ $project->approvals->first()->Status == 'Y' ? '' : 'disabled' }}>
+                
+                <button type="submit" class="step-button secondary" id="submit-button" data-step="ขั้นตอนที่ 2" 
+                    {{ $project->approvals->first()->Status == 'Y' ? '' : 'disabled' }}>
                     <i class='bx bx-log-in-circle'></i> เสนอเพื่อพิจารณา
                 </button>
             </form>
+                </div>
+            
         </div>
-        
     </div>
 </div>
 

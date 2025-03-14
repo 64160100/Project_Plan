@@ -20,7 +20,6 @@ require __DIR__.'/strategic.php';
 Route::get('/setting', [SettingController::class, 'settings'])->name('setting');
 
 Route::get('/listProject', [ListProjectController::class, 'project'])->name('project');
-// Route::get('/projects/{Id_Project}/edit', [ProjectController::class, 'editProject'])->name('editProject');
 
 // ฟอร์มเริ่มต้น [count-step-0,1]
 
@@ -39,6 +38,7 @@ Route::post('/projects/update-status/{id}', [ProposeProjectController::class, 'u
 
 Route::post('/submit-for-all-approval', [ProposeProjectController::class, 'submitForAllApproval'])->name('projects.submitForAllApproval');
 
+// Routes แก้ไขฟอร์มใหญ๋
 Route::get('/project/{id}/edit', [ListProjectController::class, 'editAllProject'])->name('projects.edit');
 
 Route::post('/projects/reset-status/{id}', [ListProjectController::class, 'resetStatus'])->name('projects.resetStatus');
@@ -113,7 +113,6 @@ Route::put('/editSDG/{id_SDGs}', [SustainableDevelopmentGoalsController::class, 
 Route::delete('/deleteSDG/{id_SDGs}', [SustainableDevelopmentGoalsController::class, 'deleteSDG'])->name('deleteSDG');
 
 
-//
 // Project inline editing NameProject, Employee
 Route::post('/projects/{id}/update-field', [ListProjectController::class, 'updateField'])->name('projects.updateField');
 // Project inline editing SDGs
@@ -122,12 +121,57 @@ Route::post('/projects/{id}/update-sdgs', [ListProjectController::class, 'update
 Route::post('/projects/{id}/update-integration', [ListProjectController::class, 'updateIntegration'])->name('projects.updateIntegration');
 Route::post('/projects/{id}/update-integration-details', [ListProjectController::class, 'updateIntegrationDetails'])->name('projects.updateIntegrationDetails');
 
+// Routes for Target Group
+Route::post('/create-empty-target/{projectId}', [ListProjectController::class, 'createEmptyTargetGroup'])->name('target.create-empty');
+Route::post('/create-target-with-value/{projectId}', [ListProjectController::class, 'createTargetGroupWithValue'])->name('target.create-with-value');
+Route::post('/update-target-by-id/{id}', [ListProjectController::class, 'updateTargetGroupById'])->name('target.update-by-id');
+Route::delete('/delete-target-by-id/{id}', [ListProjectController::class, 'deleteTargetGroupById'])->name('target.delete-by-id');
+Route::get('/get-targets/{projectId}', [ListProjectController::class, 'getTargetGroups'])->name('target.get');
+
+// Project inline editing Logcation
+Route::post('/create-empty-location/{projectId}', [ListProjectController::class, 'createEmptyLocation'])->name('location.create-empty');
+Route::post('/create-location-with-value/{projectId}', [ListProjectController::class, 'createLocationWithValue'])->name('location.create-with-value');
+Route::post('/update-location-by-id/{id}', [ListProjectController::class, 'updateLocationById'])->name('location.update-by-id');
+Route::delete('/delete-location-by-id/{id}', [ListProjectController::class, 'deleteLocationById'])->name('location.delete-by-id');
+Route::get('/get-locations/{projectId}', [ListProjectController::class, 'getLocations'])->name('location.get');
+
 // Project inline editing Output, Outcome และ Expected Results
-Route::post('/projects/{id}/update-output', [ListProjectController::class, 'updateOutput'])->name('projects.updateOutput');
-Route::post('/projects/{id}/delete-output', [ListProjectController::class, 'deleteOutput'])->name('projects.deleteOutput');
+Route::get('/get-outputs/{id}', [ListProjectController::class, 'getOutputs'])->name('output.get');
+Route::post('/create-output-with-value/{projectId}', [ListProjectController::class, 'createOutputWithValue'])->name('output.create-with-value');
+Route::post('/create-empty-output/{id}', [ListProjectController::class, 'createEmptyOutput'])->name('output.create-empty');
+Route::post('/update-output-by-id/{id}', [ListProjectController::class, 'updateOutputById'])->name('output.update-by-id');
+Route::post('/soft-delete-output/{outputId}', [ListProjectController::class, 'softDeleteOutput'])->name('output.soft-delete');
+Route::delete('/delete-output-by-id/{id}', [ListProjectController::class, 'deleteOutputById'])->name('output.delete-by-id');
 
+Route::post('/create-empty-outcome/{projectId}', [ListProjectController::class, 'createEmptyOutcome'])->name('outcome.create-empty');
+Route::post('/create-outcome-with-value/{projectId}', [ListProjectController::class, 'createOutcomeWithValue'])->name('outcome.create-with-value');
+Route::post('/update-outcome-by-id/{id}', [ListProjectController::class, 'updateOutcomeById'])->name('outcome.update-by-id');
+Route::delete('/delete-outcome-by-id/{id}', [ListProjectController::class, 'deleteOutcomeById'])->name('outcome.delete-by-id');
+Route::get('/get-outcomes/{projectId}', [ListProjectController::class, 'getOutcomes'])->name('outcome.get');
 
-// Project inline editing Objective
-Route::post('/projects/{id}/add-objective', [ProjectController::class, 'addObjective']);
-Route::post('/projects/{id}/update-objective', [ProjectController::class, 'updateObjective']);
-Route::delete('/projects/{id}/delete-objective/{objectiveId}', [ProjectController::class, 'deleteObjective']);
+Route::post('/create-empty-expected-result/{projectId}', [ListProjectController::class, 'createEmptyExpectedResult'])->name('expected-result.create-empty');
+Route::post('/create-expected-result-with-value/{projectId}', [ListProjectController::class, 'createExpectedResultWithValue'])->name('result.create-with-value');
+Route::post('/update-expected-result-by-id/{id}', [ListProjectController::class, 'updateExpectedResultById'])->name('expected-result.update-by-id');
+Route::delete('/delete-expected-result-by-id/{id}', [ListProjectController::class, 'deleteExpectedResultById'])->name('expected-result.delete-by-id');
+Route::get('/get-expected-results/{projectId}', [ListProjectController::class, 'getExpectedResults'])->name('expected-result.get');
+
+Route::post('/update-target-details/{projectId}', [ListProjectController::class, 'updateTargetDetails'])->name('target.update-details');
+Route::get('/get-target-details/{projectId}', [ListProjectController::class, 'getTargetDetails'])->name('target.get-details');
+
+// Routes for Indicators
+Route::get('/get-indicators/{projectId}', [ListProjectController::class, 'getIndicators'])->name('indicators.get');
+Route::post('/create-indicator-with-value/{projectId}/{type}', [ListProjectController::class, 'createIndicatorWithValue'])->name('indicators.createWithValue');
+Route::post('/create-empty-indicator/{projectId}/{type}', [ListProjectController::class, 'createEmptyIndicator'])->name('indicators.create.empty');
+Route::post('/update-indicator/{indicatorId}', [ListProjectController::class, 'updateIndicator'])->name('indicators.update');
+Route::delete('/delete-indicator/{indicatorId}', [ListProjectController::class, 'deleteIndicator'])->name('indicators.delete');
+Route::delete('/delete-indicators-by-type/{projectId}/{type}', [ListProjectController::class, 'deleteIndicatorsByType'])->name('indicators.deleteByType');
+
+// Routes สำหรับจัดการวัตถุประสงค์โครงการ
+Route::post('/projects/objectives/add', [ListProjectController::class, 'addObjective'])->name('objectives.add');
+Route::post('/projects/objectives/update/{id}', [ListProjectController::class, 'updateObjective'])->name('objectives.update');
+Route::delete('/projects/objectives/delete/{id}', [ListProjectController::class, 'deleteObjective'])->name('objectives.delete');
+
+Route::put('/api/projects/{id}/speaker', [ListProjectController::class, 'updateSpeaker'])->name('api.projects.updateSpeaker');
+
+// Routes for Platform, Program, and KPI inline editing
+Route::post('/api/projects/{projectId}/save-platforms', [ListProjectController::class, 'savePlatforms'])->name('api.projects.savePlatforms');

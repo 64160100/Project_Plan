@@ -8,7 +8,7 @@ class ProjectHasIndicatorsModel extends Model
 {
     protected $connection = 'mydb';
     protected $table = 'Project_has_Indicators';
-    protected $primaryKey = 'Project_Id';
+    protected $primaryKey = 'Id_Project_has_Indicators';
     protected $keyType = 'int';
     public $timestamps = false;
 
